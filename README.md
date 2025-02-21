@@ -10,3 +10,10 @@ Things to add:
     - Change the input files (save single file and just have commented code on how to load the codes when they are in different files)
 - simulation codes (change name of files to something easier to understand)
 
+-Environment:
+    -Networkx
+    -pyviz
+    -pandas
+    -parallel
+    -Python 3.10.12
+    
