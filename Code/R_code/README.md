@@ -35,6 +35,6 @@ set_sim_test_carr_cap_15apr2024.R:
 equal_growth_rates_29june2024.R:  
 -Supplementary Figure 7
 
-syn_first_div_frag_26Aug2024.R:
+syn_first_div_frag_26Aug2024.R:  
 -Figure 8
 
