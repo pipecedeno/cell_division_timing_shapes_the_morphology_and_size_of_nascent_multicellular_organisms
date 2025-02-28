@@ -88,12 +88,48 @@ sim_frag_clust_diff_mean_dists_24apr2024.py -n 100 -o slow_first_div -g 100 -e 1
 Note: this is the same code used for figure 5, just with different parameters.
 
 
-### Supplementary figure 5: Validation of the network model with biophysical simulations
+### Table 1
 
-First some networks need to be created for the matlab code to be  
+1.- Find the threshold that will obtain the desired volume for the grande strain
+The matlab simulations were done using the scripts:
+```
+snowflake_asp_ratio_volume_aprox.m
+snowflake_cell_diam_volume_aprox.m
+snowflake_synchrony_volume_aprox.m
+```
+With the data created from this scripts, the results were loaded to an R script (volume_predictions_8jan2023.R, all the analysis are in this script), and a linear regression was fitted to the data to obtain what threshold value would be the best for the following step.
+
+Commands used to create the network files for the synchrony predictions
+```
+sim_edges_network_null_1nov2023.py -d grande_doubling_time_dist_2024dec2.csv -m 3000 -n 50 -o grande_3000m_50n
+
+sim_edges_network_null_1nov2023.py -d petite_doubling_time_dist_2023may30.csv -m 3000 -n 50 -o petite_3000m_50n
 ```
 
+2.- Do simulation with constant threshold and vary the desired variable
+This matlab simulations were done using the following scripts:
 ```
+snowflake_different_aspect_ratios.m
+snowflake_different_cell_diameters.m
+snowflake_synchrony_volume_prediction.m
+```
+With this data a linear regression was fitted to the data, and a the difference from the predictions was obtained by using the actual parameter for each of the strains.
+
+### Supplementary figure 3: Validation of the network model with biophysical simulations
+
+First some networks need to be created for the matlab code to be executed:
+```
+sim_edges_network_null_1nov2023.py -d grande_doubling_time_dist_2024dec2.csv -m 1000 -n 500 -o test_grande_1000m_500n
+
+sim_edges_network_null_1nov2023.py -d petite_doubling_time_dist_2023may30.csv -m 1000 -n 500 -o test_petite_1000m_500n
+```
+
+Then the matlab code ``` size_diff_sync_vs_async_2024sep26_v3.m ``` is executed to calculate the size at fragmentation and also the overlaps between the cells.
+
+Finally, the code matlab code ``` size_diff_overlap_acumulation_2024dec2.m ``` is executed to calculate how the overlap changes as a cell gets added.
+
+Notes: both matlab codes need have their input parameters in the first lines of the code. For the overlap acumulation code only 100 networks were created instead of 500.
+
 
 ### Supplementary figure 4: Network growth with fragmentation tracking only one cluster after fragmentation
 
@@ -111,6 +147,14 @@ sim_frag_clust_edge_degree_after_all_cells_22feb2024.py -d grande_doubling_time_
 ```
 par_set_sim_v0_17feb2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_plus_15min_28june2024.csv -n petite:second-15min -o petite_second-15min_1mill_50sim -e 14 -c 5000:5000 -r 20 -t 10 -m 50 -g 0.1 -p 0.1 -k 1000000 -h 12 -i 50 -y random
 ```
+
+
+### Codes to create visualizations
+
+- cell_overlap_viz_26sep2024.m: was used to create the 3D visualizations shown in supplementary figure 3.
+- network_plot_no_fragmentation.ipynb: code used to create the networks in figure 3.
+- syn_first_div_filaments_3oct2024.ipynb: code used to create the networks in figure 8.
+
 
 
 
