@@ -298,13 +298,13 @@ common_legend <- cowplot::get_legend(
 
 
 figure_supp_v2=plot_grid(supp_p1_dist,supp_p1_gen, supp_p2_dist,supp_p2_gen, supp_p3_dist,supp_p3_gen, 
-                         labels=c('A)', 'B)', 'C)', 'D)', 'E)', 'F)'), ncol=2, align='hv', label_size=16)
+                         labels=c('A', 'B', 'C', 'D', 'E', 'F'), ncol=2, align='hv', label_size=16)
 figure_supp_v2
 
 figure_supp_v2_with_legend <- plot_grid(figure_supp_v2, common_legend, ncol = 1, rel_heights = c(1, 0.05), label_size=11)
 figure_supp_v2_with_legend
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_network_trajectories_random_3dec2024.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_network_trajectories_random_23apr2025.png',
        plot=figure_supp_v2_with_legend, dpi='retina', width=10, height=11, bg = 'white')
 
 

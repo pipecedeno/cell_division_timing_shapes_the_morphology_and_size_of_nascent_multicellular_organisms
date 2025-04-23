@@ -110,10 +110,10 @@ ggplot(normal_frames[normal_frames$id_file=='2022sep30_gob21_6',],
 # Figure 1 ####
 
 
-img_petite_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_2hr_5f_scale_masks.png")
+img_petite_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_2hr_5f_scale_masks_v2.png")
 img_plot_petite_v2 <- rasterGrob(img_petite_v2, interpolate = TRUE)
 
-img_grande_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_1hr_5f_scale_0.5x_masks.png")
+img_grande_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_1hr_5f_scale_0.5x_masks_v2.png")
 img_plot_grande_v2 <- rasterGrob(img_grande_v2, interpolate = TRUE)
 
 
@@ -129,13 +129,13 @@ p2_ancestors_v2=ggplot(ancestor_tl_dt,
   # scale_y_continuous(breaks = c(0, 3, 6, 9), limits=c(0,11))+
   geom_histogram(binwidth = 10, position = 'identity')+
   facet_wrap(~strain, ncol=1, scales='free')+
-  xlab('Minutes')+
+  xlab('Time from First Division (min)')+
   ylab('Number of Divisions')+
   theme(legend.position = c(1, 1),
         legend.justification = c(1, 1))+
   labs(fill = "Strain")+
   scale_fill_manual(labels = c("Petite", "Grande"),
-                    values = c("#add8e6", "#ff767e"))+
+                    values = c("#F0D77BFF", "#AE93BEFF"))+
   theme(strip.background = element_blank(), strip.text.x = element_blank())+
   NULL
 p2_ancestors_v2
@@ -146,14 +146,14 @@ cell_sync_ancestors$strain=ifelse(cell_sync_ancestors$strain=='petite', 'Petite'
 
 p3_ancestors=ggplot(cell_sync_ancestors, 
                     aes(x=mother_minutes, y=daughter_minutes, col=strain))+
-  geom_point(alpha=0.5)+
+  geom_point(alpha=0.75)+
   geom_abline(linetype='dashed')+
   facet_wrap(~strain, ncol=5)+
   guides(col='none')+
-  xlab('Mother Doubling Time (minutes)')+
-  ylab('Daughter Doubling\nTime (minutes)')+
+  xlab('Mother Doubling Time (min)')+
+  ylab('Daughter Doubling\nTime (min)')+
   scale_x_continuous(breaks = seq(100, 300, by = 100))+
-  # scale_color_manual(values=c("#ff767e","#add8e6","#00BF7D","#00B0F6","#E76BF3"))+
+  scale_color_manual(values=c("#AE93BEFF", "#F0D77BFF"))+
   # theme_classic(base_size = 11)+
   theme(
     panel.grid.major = element_blank(),
@@ -178,15 +178,14 @@ p4_doubling_times_violin_ancestors=ggplot(p4_ancestors_dt,
                                           aes(x=division_number, y=hours, fill=timepoint, col=name))+
   facet_wrap(~name, ncol=5)+
   # geom_boxplot()+
-  geom_jitter(alpha=0.5)+
+  geom_jitter(alpha=0.75)+
   # geom_violin(adjust=2, color='black')+
   stat_summary(fun='mean', geom='crossbar', col='black')+
   xlab('Division Number')+
-  ylab('\nHours')+
+  ylab('Cell Doubling Time\n(hours)')+
   guides(fill='none', col='none')+
   petite_t200_colors+
-  scale_fill_manual(values=c("#ff767e","#add8e6","#00BF7D","#00B0F6","#E76BF3"))+
-  scale_color_manual(values=c("#ff767e","#add8e6","#00BF7D","#00B0F6","#E76BF3"))+
+  scale_color_manual(values=c("#AE93BEFF", "#F0D77BFF"))+
   # theme_classic(base_size = 11)+
   theme(
     panel.grid.major = element_blank(),
@@ -199,20 +198,20 @@ p4_doubling_times_violin_ancestors
 
 # Create the first column with two plots
 column1 <- plot_grid(img_plot_petite_v2, img_plot_grande_v2, 
-                     labels = c('A)', 'B)'), 
+                     labels = c('A', 'B'), 
                      ncol = 1, 
                      label_size = 16, 
-                     rel_heights = c(0.8, 1))
+                     rel_heights = c(0.9, 1))
 
 column2=plot_grid(p3_ancestors, p4_doubling_times_violin_ancestors, 
-                  labels=c('D)', 'E)'),
+                  labels=c('D', 'E'),
                   ncol=1,
                   label_size = 16,
                   rel_heights = c(1,1))
 
 
 row_v2=plot_grid(p2_ancestors_v2, column2,
-                 labels = c('C)', ''),
+                 labels = c('C', ''),
                  ncol = 2,
                  label_size = 16,
                  rel_widths = c(1.4, 1.4))
@@ -223,9 +222,9 @@ figure_1_paper_ancestors_dt_v2 <- plot_grid(column1, row_v2,
 figure_1_paper_ancestors_dt_v2
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_synchronization_ancestors_dt_4nov2024.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_synchronization_ancestors_dt_23apr2025.svg',
        plot=figure_1_paper_ancestors_dt_v2, dpi='retina', width=10, height=12, bg='white')
-
+# Note: plot is saved as svg to fix the labels of the strain in the microscopy images
 
 # Figure 7 ####
 
@@ -256,7 +255,7 @@ p4_doubling_times_violin=ggplot(doubled[as.numeric(doubled$division_number)<=2 &
   # geom_violin(adjust=2, color='black')+
   stat_summary(fun='mean', geom='crossbar', col='black')+
   xlab('Division Number')+
-  ylab('\nHours')+
+  ylab('Cell Doubling Time\n(hours)')+
   guides(fill='none', col='none')+
   petite_t200_colors+
   scale_fill_manual(values=c("#ff767e","#add8e6","#00BF7D","#00B0F6","#E76BF3"))+
@@ -271,9 +270,9 @@ p4_doubling_times_violin=ggplot(doubled[as.numeric(doubled$division_number)<=2 &
 p4_doubling_times_violin
 
 figure_evol_sync=plot_grid(p3_paper, p4_doubling_times_violin, 
-                           labels=c('A)', 'B)'), ncol=1, label_size=16)
+                           labels=c('A', 'B'), ncol=1, label_size=16)
 figure_evol_sync
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_evolution_synchrony_PA_line_16oct2024.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_evolution_synchrony_PA_line_23apr2025.png',
        plot=figure_evol_sync, dpi='retina', width=10, height=6, bg='white')
 

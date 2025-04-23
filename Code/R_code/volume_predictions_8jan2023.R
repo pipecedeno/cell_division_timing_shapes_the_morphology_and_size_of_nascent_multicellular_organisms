@@ -53,7 +53,7 @@ load_one_csv <- function(file) {
 }
 
 
-in_dir="~/Dropbox (GaTech)/BioSci-Ratcliff/Luis_Felipe/work_directory/observed_synchrony/data/Microscopy/media_concentration_27-28jun2023"
+in_dir="~/work_dir/observed_synchrony/data/Microscopy/media_concentration_27-28jun2023"
 
 data_clust <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
                     .fun = load_one_csv)

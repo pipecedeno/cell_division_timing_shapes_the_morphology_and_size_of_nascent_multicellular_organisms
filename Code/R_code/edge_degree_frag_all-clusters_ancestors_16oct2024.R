@@ -302,7 +302,7 @@ pairwise.t.test(mean_frag_sim$mean_propagule_prop, mean_frag_sim$strain, p.adjus
 p1_temp=ggplot(mean_frag_sim, aes(x=strain, y=mean_clust_size, fill=strain))+
   geom_violin()+
   stat_summary(fun='mean', geom='crossbar')+
-  xlab('Strain')+ylab('Mean Fracture\nSize')+
+  xlab('')+ylab('Mean Size\n at Fracture')+
   petite_t200_colors+
   theme_classic(base_size = 10)+
   guides(fill='none')+
@@ -313,7 +313,7 @@ p1_temp
 
 p2_temp=ggplot(mean_frag_sim, aes(x=strain, y=mean_propagule_prop, fill=strain))+
   geom_violin()+
-  xlab('Generation')+
+  xlab('')+
   ylab('Proportion\nPropagule Size')+
   stat_summary(fun='mean', geom='crossbar')+
   petite_t200_colors+
@@ -360,7 +360,7 @@ pairwise.t.test(mean_diam_sim$mean_norm_diam, mean_diam_sim$strain, p.adjust.met
 
 p3_temp=ggplot(mean_diam_sim, aes(x=strain, y=mean_norm_diam, fill=strain))+
   geom_violin()+
-  xlab('Strain')+ylab('Normalized\nDiameter')+
+  xlab('')+ylab('Normalized\nDiameter')+
   stat_summary(fun='mean', geom='crossbar')+
   petite_t200_colors+
   theme_classic(base_size = 10)+
@@ -375,8 +375,8 @@ p3_temp
 
 
 fig_restructured_updated=plot_grid(p1_temp, p2_temp, p3_temp,
-                               labels=c('A)', 'B)', 'C)'), ncol=1, label_size=11)
+                               labels=c('A', 'B', 'C'), ncol=1, label_size=11)
 fig_restructured_updated
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_4_network_properties_all-clusters_18nov2024_ancestors.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_4_network_properties_all-clusters_23apr2025_ancestors.png',
        plot=fig_restructured_updated, dpi='retina', width=3.5, height=6.3, bg='white')

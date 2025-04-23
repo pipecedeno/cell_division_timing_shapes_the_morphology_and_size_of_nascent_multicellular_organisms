@@ -1082,11 +1082,11 @@ supp_mean_settling_top
 
 
 supp_carr_cap=plot_grid(supp_mean_growth, supp_mean_growth_top, supp_mean_settling, supp_mean_settling_top, 
-                        labels=c('A)', 'B)', 'C)', 'D)'), ncol=2, align='hv')
+                        labels=c('A', 'B', 'C', 'D'), ncol=2, align='hv')
 supp_carr_cap
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_carrying_capacity_test_17oct2024.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_carrying_capacity_test_23apr2025.png',
        plot=supp_carr_cap, dpi='retina', width=9, height=7)
 
 
@@ -1141,10 +1141,10 @@ p_num_gen
 
 
 supp_s_rate=plot_grid(growth_s_rate,settling_s_rate, p_num_gen,
-                      labels=c('A)', 'B)', 'C)'), ncol=1)
+                      labels=c('A', 'B', 'C'), ncol=1)
 supp_s_rate
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_selection_rate_per_transfer_14feb2025_v1.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_selection_rate_per_transfer_23apr2025.png',
        plot=supp_s_rate, dpi='retina', width=6, height=8)
 
 
@@ -1188,10 +1188,10 @@ fig6b_v2=ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$carr_cap=='10mill',],
 fig6b_v2
 
 
-figure_6_v3=plot_grid(fig6a_v2, fig6b_v2, labels=c('A)', 'B)'), ncol=1, align='hv')
+figure_6_v3=plot_grid(fig6a_v2, fig6b_v2, labels=c('A', 'B'), ncol=1, align='hv')
 figure_6_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_selection_rates_2Oct2024.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_selection_rates_23apr2025.png',
        plot=figure_6_v3, dpi='retina', width=4, height=6)
 
 

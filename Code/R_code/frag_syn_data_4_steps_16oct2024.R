@@ -310,11 +310,11 @@ diam_var
 
 supp_net_prop_v3=plot_grid(clust_delay,clust_var, prop_delay,prop_var, 
                            diam_delay,diam_var,
-                           labels=c('A)', 'B)', 'C)', 'D)', 'E)', 'F)'), ncol=2, 
+                           labels=c('A', 'B', 'C', 'D', 'E', 'F'), ncol=2, 
                            align='hv', label_size=12)
 supp_net_prop_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig5_frag_syn_network_prop_17oct2024.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig5_frag_syn_network_prop_23apr2025.png',
        plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
 
 
@@ -470,16 +470,14 @@ legend <- get_legend(
 
 plot_summary_effects_temp <- plot_grid(clust_p1, clust_p2, diameter_p1, diameter_p2,
                                        propagule_p1, propagule_p2,
-                                  labels = c("A)", "B)", "C)", "D)", "E)", "F)"), 
+                                  labels = c("A", "B", "C", "D", "E", "F"), 
                                   ncol = 2, align = 'v', axis = 'l',
                                   rel_heights = c(1, 1, 1),
                                   rel_widths = c(1, 1),label_size=12)
 
-plot_summary_effects_v2=plot_grid(plot_summary_effects_temp, legend, ncol=1, rel_heights = c(1, 0.08))
-plot_summary_effects_v2
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_5_syn_summ_doub_t_effects_8nov2024.png',
-       plot=plot_summary_effects_v2, dpi='retina', width=6, height=6, bg='white')
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_5_syn_summ_doub_t_effects_23apr2025.png',
+       plot=plot_summary_effects_temp, dpi='retina', width=6, height=6, bg='white')
 
 
 

@@ -318,11 +318,11 @@ p_fast_first
 
 
 figure_first_div_net=plot_grid(fig_a, fig_b, fig_c, fig_e, p_fast_first, p_sync_net,
-                                 labels=c('A)', 'B)', 'C)', 'D)', 'E)', 'F)'), ncol=2, 
+                                 labels=c('A', 'B', 'C', 'D', 'E', 'F'), ncol=2, 
                                  align='hv', label_size=12)
 figure_first_div_net
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_8_first_div_2oct2024_networks.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_8_first_div_23apr2025_networks.png',
        plot=figure_first_div_net, dpi='retina', height=10, width=8, bg='white')
 
 

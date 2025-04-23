@@ -232,7 +232,7 @@ p_grande
 p_frac_size=ggplot(summ_clust_size, aes(x=strain, y=mean_size, fill=strain))+
   geom_violin()+
   stat_summary(fun='mean', geom='crossbar')+
-  petite_t200_colors+
+  scale_fill_manual(values=c("#F0D77BFF", "#AE93BEFF"))+
   guides(fill='none')+
   labs(x='Strain', y='Mean Fracture Size\n(Number of Cells)')+
   NULL
@@ -243,7 +243,8 @@ p_overlap=ggplot(mean_summ_overlap_size,
   geom_line()+
   geom_ribbon(aes(x=cluster_size, y=mean_overlap, ymin=ci_lower,
                   ymax=ci_upper, fill=strain), alpha=0.5, linetype='blank')+
-  petite_t200_colors+
+  scale_fill_manual(values=c("#F0D77BFF", "#AE93BEFF"))+
+  scale_color_manual(values=c("#F0D77BFF", "#AE93BEFF"))+
   xlab('Cluster size (number of cells)')+
   ylab('Mean Overlap')+
   guides(col='none', fill='none')+
@@ -255,7 +256,7 @@ p_overlap
 p_mean_dist_overlaps=ggplot(summ_overlap_pos, aes(x=strain, y=mean_dist, fill=strain))+
   geom_violin()+
   stat_summary(fun='mean', geom='crossbar')+
-  petite_t200_colors+
+  scale_fill_manual(values=c("#F0D77BFF", "#AE93BEFF"))+
   labs(x='Strain', y='Mean Distance\nBetween Overlaps')+
   guides(fill='none')+
   NULL
@@ -265,11 +266,11 @@ p_mean_dist_overlaps
 
 
 fig_physics_sim_mean_dist=plot_grid(p_petite, p_grande, p_overlap, p_frac_size, p_mean_dist_overlaps,
-                          labels=c('A)', 'B)', 'C)', 'D)', 'E)'), ncol=2, label_size=16, rel_heights=c(1.2,1,1))
+                          labels=c('A', 'B', 'C', 'D', 'E'), ncol=2, label_size=16, rel_heights=c(1.2,1,1))
 fig_physics_sim_mean_dist
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig3_physics_sims_13nov2024_ancestors.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig3_physics_sims_23apr2025_ancestors.png',
        plot=fig_physics_sim_mean_dist, dpi='retina', width=10, height=12, bg='white')
 
 

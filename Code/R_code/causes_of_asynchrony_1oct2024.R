@@ -104,6 +104,7 @@ for (std_i in std_devs){
 
 summary(table_parameters)
 
+# This files are used for simulations using this synthetic data distributions
 # write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/5_diffs_5_stds_16oct2024/params_5diffs_5stds_16oct2024.csv", row.names=FALSE)
 # write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/4_diffs_4_stds_17oct2024/params_4diffs_4stds_17oct2024.csv", row.names=FALSE)
 # write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/15_diffs_15_stds_17oct2024_every_5_minutes/params_15diffs_15stds_17oct2024.csv", row.names=FALSE)
@@ -114,7 +115,7 @@ summary(table_parameters)
 
 default_mean=60
 means <- c(60, 80, 100, 120)
-delay_names=c("0 min", "20 min", "40 min", "60 min")
+delay_names=c("0", "20", "40", "60")
 std_devs <- c(0, 5, 10, 15)
 std_names=c("0", "5", "10", "15")
 
@@ -178,14 +179,14 @@ g <- ggplotGrob(p)
 top_margin <- unit(0.5, "cm")  # Adjust this value to change the top gap
 g <- gtable_add_rows(g, heights = top_margin, pos = 0)
 g <- gtable_add_grob(g, 
-                     grob = textGrob("Delay", gp = gpar(fontsize = 12, fontface = "bold")), 
+                     grob = textGrob("Delay (min)", gp = gpar(fontsize = 11)), 
                      t = 1, l = 3, r = ncol(g) - 1)
 
 # Add right label (reduced width)
 right_margin <- unit(0.5, "cm")  # Adjust this value to change the right gap
 g <- gtable_add_cols(g, widths = right_margin, pos = -1)
 g <- gtable_add_grob(g, 
-                     grob = textGrob("Standard Deviation", rot = -90, gp = gpar(fontsize = 12, fontface = "bold")), 
+                     grob = textGrob("Standard Deviation", rot = -90, gp = gpar(fontsize = 11)), 
                      t = 3, b = nrow(g) - 1, l = ncol(g))
 
 # Draw the plot
@@ -289,7 +290,7 @@ divisions_diff_delay=df_divisions_diff[df_divisions_diff$std==0 |
                                          df_divisions_diff$std==unique(df_divisions_diff$std)[34] |
                                          df_divisions_diff$std==unique(df_divisions_diff$std)[50],]
 
-p_test_delay=ggplot(divisions_diff_delay, aes(x=delay, y=ld50, col=as.factor(round(std,2)), group=as.factor(round(std,2))))+
+p_test_delay=ggplot(divisions_diff_delay, aes(x=delay, y=ld50, col=as.factor(round(std,0)), group=as.factor(round(std,0))))+
   geom_line()+
   theme_classic()+
   labs(color="Std", x="Delay", y="Median Doubling\nTime Difference")+
@@ -311,9 +312,10 @@ plot_grid(p_test_delay, p_test_var)
 
 
 figure_2_v3=plot_grid(g, p_test_delay, p_test_var,
-                      labels=c('A)', 'B)', 'C)'), ncol=1, label_size=12, rel_heights=c(2.5,2,2))
+                      labels=c('A', 'B', 'C'), ncol=1, label_size=12, rel_heights=c(2.5,2,2))
+figure_2_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_causes_asynchrony_median_diff_20feb2025.svg',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_causes_asynchrony_median_diff_23apr2025.svg',
        plot=figure_2_v3, dpi='retina', width=4.2, height=7, bg='white')
 # Note: this image is saved as an svg to later modify the label of Delay to center align it correctly in the plot
 

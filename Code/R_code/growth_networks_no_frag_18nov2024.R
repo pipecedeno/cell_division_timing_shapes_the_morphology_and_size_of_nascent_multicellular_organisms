@@ -75,10 +75,10 @@ tapply(diameter_df$cases_mother_with_undivided_cells, diameter_df$strain, summar
 # Paper Figure ####
 
 
-img_petite <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_diameter_undivided_18nov2024.png")
+img_petite <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_diameter_undivided_23apr2025.png")
 img_plot_petite_net <- rasterGrob(img_petite, interpolate = TRUE)
 
-img_grande <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_diameter_undivided_3dec2024.png")
+img_grande <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_diameter_undivided_23apr2025.png")
 img_plot_grande_net <- rasterGrob(img_grande, interpolate = TRUE)
 
 # Create text annotations
@@ -151,7 +151,7 @@ p_diam_v2=ggplot(diameter_df, aes(x=strain, y=diameter, fill=strain))+
   # stat_summary(fun='mean', geom='crossbar')+
   petite_t200_colors+
   guides(fill='none')+
-  labs(x='Strain', y='Network Diameter')+
+  labs(x='Strain', y='Network Diameter (# edges)')+
   NULL
 p_diam_v2
 
@@ -165,8 +165,8 @@ p_undivided_v2=ggplot(diameter_df, aes(x=strain, y=cases_mother_with_undivided_c
 p_undivided_v2
 
 fig_restructured_alt_v2=plot_grid(dt_distributions_v2, p_petite, p_grande, p_undivided_v2, p_diam_v2,
-                               labels=c('A)', 'B)', 'C)', 'D)', 'E)'), ncol=3, label_size=16)
+                               labels=c('A', 'B', 'C', 'D', 'E'), ncol=3, label_size=16)
 fig_restructured_alt_v2
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_3_growth_no_frag_20feb2025_ancestors.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_3_growth_no_frag_23apr2025_ancestors.png',
        plot=fig_restructured_alt_v2, dpi='retina', width=15, height=8, bg='white')

@@ -11,9 +11,12 @@ Things to add:
 - simulation codes (change name of files to something easier to understand)
 
 -Environment:
-    -Networkx
-    -pyviz
-    -pandas
-    -parallel
     -Python 3.10.12
-    
+    -matplotlib=3.8.2
+    -Networkx=3.2.1
+    -pyviz=0.3.2
+    -pandas=2.2.0
+    -parallel=20240122
+
+
+
