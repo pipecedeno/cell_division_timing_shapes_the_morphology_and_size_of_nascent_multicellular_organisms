@@ -20,20 +20,23 @@ edge_degree_frag_all-clusters_ancestors_16oct2024.R:
 physics_sync_async_diff_size_16oct2024_ancestors.R:  
 -Supplementary Figure 3
 
-edge_degree_frag_random_16oct2024_ancestors.R:  
+normalized_net_diam_method_29apr2025.R:
 -Supplementary Figure 4
+
+edge_degree_frag_random_16oct2024_ancestors.R:  
+-Supplementary Figure 5
 
 frag_syn_data_4_steps_16oct2024.R:  
 -Figure 5  
--Supplementary Figure 5
+-Supplementary Figure 6
 
 set_sim_test_carr_cap_15apr2024.R:  
 -Figure 6  
--Supplementary Figure 6  
--Supplementary Figure 8
+-Supplementary Figure 7  
+-Supplementary Figure 9
 
 equal_growth_rates_29june2024.R:  
--Supplementary Figure 7
+-Supplementary Figure 8
 
 syn_first_div_frag_26Aug2024.R:  
 -Figure 8

@@ -433,7 +433,7 @@ fig5d_v2
 supp_fig=plot_grid(fig5c_v2, fig5d_v2, labels=c('A', 'B'), ncol=1, align='hv')
 supp_fig
 
-ggsave(filename="~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig7_selection_rates_equal_growth_23apr2025.png",
+ggsave(filename="~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_selection_rates_equal_growth_23apr2025.png",
        plot=supp_fig, dpi='retina', width=4, height=6)
 
 

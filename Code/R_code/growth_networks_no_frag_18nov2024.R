@@ -40,6 +40,11 @@ ggplot(diameter_df, aes(x=strain, y=diameter, fill=strain))+
   petite_t200_colors+
   NULL
 
+pairwise.t.test(diameter_df$diameter, diameter_df$strain, p.adjust.method = "bonferroni")
+#                  Petite Petite w/o delay
+# Petite w/o delay <2e-16 -               
+# Grande           <2e-16 0.059           
+# P value adjustment method: bonferroni 
 
 tapply(diameter_df$diameter, diameter_df$strain, summary)
 # $Petite
@@ -70,7 +75,11 @@ tapply(diameter_df$cases_mother_with_undivided_cells, diameter_df$strain, summar
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 # 0.00    4.00    5.00    5.32    7.00   13.00
 
-
+pairwise.t.test(diameter_df$cases_mother_with_undivided_cells, diameter_df$strain, p.adjust.method="bonferroni")
+#                  Petite Petite w/o delay
+# Petite w/o delay <2e-16 -               
+# Grande           <2e-16 <2e-16          
+# P value adjustment method: bonferroni 
 
 # Paper Figure ####
 

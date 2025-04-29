@@ -314,7 +314,7 @@ supp_net_prop_v3=plot_grid(clust_delay,clust_var, prop_delay,prop_var,
                            align='hv', label_size=12)
 supp_net_prop_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig5_frag_syn_network_prop_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_frag_syn_network_prop_23apr2025.png',
        plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
 
 

@@ -1030,12 +1030,12 @@ supp_mean_settling=ggplot(mean_comp_sett_carr_cap[mean_comp_sett_carr_cap$carr_c
   coord_cartesian(ylim = c(-0.5, 6))+
   theme_classic(base_size = 11)+
   # theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  scale_x_discrete(labels=c("100k" = "1e5",
-                            "1mill" = "1e6",
-                            "10mill" = "1e7",
-                            "10mill-boot" = "1e7-boot",
-                            "100mill-boot" = "1e8-boot",
-                            "1bill-boot" = "1e9-boot"))+
+  scale_x_discrete(labels=c("100k" = expression(10^5),
+                            "1mill" = expression(10^6),
+                            "10mill" = expression(10^7),
+                            "10mill-boot" = expression(paste(10^7, " boot")),
+                            "100mill-boot" = expression(paste(10^8, " boot")),
+                            "1bill-boot" = expression(paste(10^9, " boot"))))+
   NULL
 supp_mean_settling
 
@@ -1060,34 +1060,38 @@ supp_mean_growth_top
 
 
 supp_mean_settling_top=ggplot(mean_comp_sett_carr_cap_top, 
-       aes(x=carr_cap, y=mean_sel_r, col=carr_cap))+
+                              aes(x=carr_cap, y=mean_sel_r, col=carr_cap))+
   stat_summary(fun='mean', geom='crossbar', col='black', linetype='dashed', linewidth=0.3)+
   geom_jitter(alpha=0.5)+
-  # ylab('Settling Selection Rate \n(Ancestor w/o delay - Ancestor)\nper selection phase')+
   ylab('')+
   xlab('Carrying Capacity')+
   guides(col='none')+
   scale_y_continuous(breaks = seq(-0, 6, by = 1))+
   coord_cartesian(ylim = c(-0.5, 6))+
   theme_classic(base_size = 11)+
-  # theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
-  scale_x_discrete(labels=c("100k" = "1e5",
-                            "1mill" = "1e6",
-                            "10mill" = "1e7",
-                            "10mill-boot" = "1e7-boot",
-                            "100mill-boot" = "1e8-boot",
-                            "1bill-boot" = "1e9-boot"))+
+  scale_x_discrete(labels=c("100k" = expression(10^5),
+                            "1mill" = expression(10^6),
+                            "10mill" = expression(10^7),
+                            "10mill-boot" = expression(paste(10^7, " boot")),
+                            "100mill-boot" = expression(paste(10^8, " boot")),
+                            "1bill-boot" = expression(paste(10^9, " boot"))))+
   NULL
 supp_mean_settling_top
 
 
-supp_carr_cap=plot_grid(supp_mean_growth, supp_mean_growth_top, supp_mean_settling, supp_mean_settling_top, 
-                        labels=c('A', 'B', 'C', 'D'), ncol=2, align='hv')
+# supp_carr_cap=plot_grid(supp_mean_growth, supp_mean_growth_top, supp_mean_settling, supp_mean_settling_top, 
+#                         labels=c('A', 'B', 'C', 'D'), ncol=2, align='hv')
+# supp_carr_cap
+# 
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_carrying_capacity_test_23apr2025.png',
+#        plot=supp_carr_cap, dpi='retina', width=9, height=7)
+
+supp_carr_cap=plot_grid(supp_mean_settling, supp_mean_settling_top, 
+                        labels=c('A', 'B'), ncol=2, align='hv')
 supp_carr_cap
 
-
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_carrying_capacity_test_23apr2025.png',
-       plot=supp_carr_cap, dpi='retina', width=9, height=7)
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig9_carrying_capacity_test_25apr2025.png',
+       plot=supp_carr_cap, dpi='retina', width=9, height=3.5)
 
 
 # Supplementary Figure 6 ####
@@ -1144,7 +1148,7 @@ supp_s_rate=plot_grid(growth_s_rate,settling_s_rate, p_num_gen,
                       labels=c('A', 'B', 'C'), ncol=1)
 supp_s_rate
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_selection_rate_per_transfer_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig7_selection_rate_per_transfer_23apr2025.png',
        plot=supp_s_rate, dpi='retina', width=6, height=8)
 
 

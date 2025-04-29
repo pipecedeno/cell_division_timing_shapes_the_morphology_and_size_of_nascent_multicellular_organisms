@@ -39,19 +39,6 @@ ggplot(cell_sync, aes(x=mother_minutes, y=daughter_minutes, col=timepoint))+
   ylab('Daughter doubling time (min)')+
   NULL
 
-cor_res=cell_sync %>%
-  group_by(ordered_timepoint) %>%
-  summarise(correlation=cor(mother_minutes, daughter_minutes))
-cor_res
-# ordered_timepoint correlation
-# 1 grande                  0.914
-# 2 petite                  0.508
-# 3 t200                    0.844
-# 4 t400                    0.789
-# 5 t600                    0.891
-# 6 t1000                   0.749
-
-table(cell_sync$ordered_timepoint)
 
 # Branch synchrony ####
 
@@ -144,6 +131,10 @@ p2_ancestors_v2
 cell_sync_ancestors=cell_sync[cell_sync$strain=='grande' | cell_sync$strain=='petite',]
 cell_sync_ancestors$strain=ifelse(cell_sync_ancestors$strain=='petite', 'Petite', 'Grande')
 
+table(cell_sync_ancestors$strain)
+# Grande Petite 
+# 90     46
+
 p3_ancestors=ggplot(cell_sync_ancestors, 
                     aes(x=mother_minutes, y=daughter_minutes, col=strain))+
   geom_point(alpha=0.75)+
@@ -194,7 +185,6 @@ p4_doubling_times_violin_ancestors=ggplot(p4_ancestors_dt,
   )+
   NULL
 p4_doubling_times_violin_ancestors
-
 
 # Create the first column with two plots
 column1 <- plot_grid(img_plot_petite_v2, img_plot_grande_v2, 

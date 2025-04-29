@@ -304,7 +304,7 @@ figure_supp_v2
 figure_supp_v2_with_legend <- plot_grid(figure_supp_v2, common_legend, ncol = 1, rel_heights = c(1, 0.05), label_size=11)
 figure_supp_v2_with_legend
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_network_trajectories_random_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig5_network_trajectories_random_23apr2025.png',
        plot=figure_supp_v2_with_legend, dpi='retina', width=10, height=11, bg = 'white')
 
 

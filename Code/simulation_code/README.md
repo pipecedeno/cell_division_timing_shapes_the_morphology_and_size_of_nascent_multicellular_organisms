@@ -32,14 +32,14 @@ To execute this code the file params_4diffs_4stds_17oct2024.csv is needed from c
 exec_sim_frag_clust_from_file_params.sh
 ```
 
-Note: this same data is used for Supplementary Figure 5
+Note: this same data is used for Supplementary Figure 6
 
 # Note: update this code so that it can be executed with flags for the other parameters and for the input file
 
 
 ### Figure 6: Settling selection simulations
 
-All the following codes are needed for figure 6, and supplementary figures 6 and 8.  
+All the following codes are needed for figure 6, and supplementary figures 7 and 9.  
 
 ```
 # Testing different carrying capacities
@@ -130,8 +130,9 @@ Finally, the code matlab code ``` size_diff_overlap_acumulation_2024dec2.m ``` i
 
 Notes: both matlab codes need have their input parameters in the first lines of the code. For the overlap acumulation code only 100 networks were created instead of 500.
 
+### Supplementary Figure 4:
 
-### Supplementary figure 4: Network growth with fragmentation tracking only one cluster after fragmentation
+### Supplementary figure 5: Network growth with fragmentation tracking only one cluster after fragmentation
 
 ```
 sim_frag_clust_edge_degree_after_all_cells_22feb2024.py -d petite_doubling_time_dist_2023may30.csv -n 500 -g 100 -e 14 -o petite_14e_100g_random -c random
@@ -142,7 +143,7 @@ sim_frag_clust_edge_degree_after_all_cells_22feb2024.py -d grande_doubling_time_
 ```
 
 
-### Supplementary figure 7: Settling selection simulations with same growth rates
+### Supplementary figure 8: Settling selection simulations with same growth rates
 
 ```
 par_set_sim_v0_17feb2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_plus_15min_28june2024.csv -n petite:second-15min -o petite_second-15min_1mill_50sim -e 14 -c 5000:5000 -r 20 -t 10 -m 50 -g 0.1 -p 0.1 -k 1000000 -h 12 -i 50 -y random
