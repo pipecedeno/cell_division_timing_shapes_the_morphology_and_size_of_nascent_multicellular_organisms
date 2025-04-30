@@ -293,7 +293,7 @@ divisions_diff_delay=df_divisions_diff[df_divisions_diff$std==0 |
 p_test_delay=ggplot(divisions_diff_delay, aes(x=delay, y=ld50, col=as.factor(round(std,0)), group=as.factor(round(std,0))))+
   geom_line()+
   theme_classic()+
-  labs(color="Std", x="Delay", y="Median Doubling\nTime Difference")+
+  labs(color="Std", x="Delay (min)", y="Median Doubling\nTime Difference")+
   NULL
 p_test_delay
 
