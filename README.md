@@ -14,9 +14,31 @@ Things to add:
     -Python 3.10.12
     -matplotlib=3.8.2
     -Networkx=3.2.1
-    -pyviz=0.3.2
+    -pyvis=0.3.2
     -pandas=2.2.0
+    -numpy=1.26.4
     -parallel=20240122
 
+Commands to create the conda environment: 
+```
+# Create a new conda environment with Python 3.10.12
+conda create -n network_sim python=3.10.12
 
+# Activate the new environment
+conda activate network_sim
+
+# Install the required packages 
+conda install matplotlib=3.8.2 networkx=3.2.1 pandas=2.2.0 numpy=1.26.4 pyvis=0.3.2
+conda install -c conda-forge parallel=20240122
+```
+
+Alternatively, the conda environment can be crated by executing ```conda env create -f environment.yml``` with the environment.yml file being either ```network_sim_macos.yml``` or ```network_sim_ubuntu.yml```.
+
+Matlab version used: R2023b
+
+## How to execute the code?
+
+All the code was executed in macOS Sequoia 15.4.1 and Linux (Ubuntu 22.04.2).
+
+In order to execute the code used 
 

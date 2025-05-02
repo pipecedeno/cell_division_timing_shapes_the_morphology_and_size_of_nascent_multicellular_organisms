@@ -27,13 +27,9 @@ import os
 import pandas as pd
 import argparse
 import networkx as nx
-# import matplotlib.pyplot as plt
-# from random import choice
 import random
 import numpy as np
 
-# import netlsd
-# from scipy.stats import skew, kurtosis
 import time
 
 #only used for testing purposes
