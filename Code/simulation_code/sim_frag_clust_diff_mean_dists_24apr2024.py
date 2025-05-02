@@ -86,7 +86,6 @@ import time
 from itertools import permutations
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('-d','--doubling_t',dest="doubling_t",required=True) #csv file of the doubling time distributions
 parser.add_argument('-i','--first_dist_params',dest="first_dist_params",required=True) #mean and variance of lognormal distribution for first division
 parser.add_argument('-j','--second_dist_params',dest="second_dist_params",required=True) #mean and variance of lognormal distribution for second or more divisions
 parser.add_argument('-n','--number_sims',dest="number_sims",required=True) #number of simulations it is going to run

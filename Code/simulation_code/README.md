@@ -29,12 +29,11 @@ Note: this bash script calls the following scripts:
 To execute this code the file params_4diffs_4stds_17oct2024.csv is needed from causes_of_asynchrony_1oct2024.R, as this file contains the parameters of the log-normal distributions that are going to be used for the simulations.
 
 ```
-exec_sim_frag_clust_from_file_params.sh
+exec_sim_frag_clust_from_file_params.sh -n 30 -g 50 -e 14 -c random -i ~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_5_delay_variation_in_cluster_properties/params_4diffs_4stds_17oct2024.csv
 ```
 
 Note: this same data is used for Supplementary Figure 6
 
-# Note: update this code so that it can be executed with flags for the other parameters and for the input file
 
 
 ### Figure 6: Settling selection simulations
