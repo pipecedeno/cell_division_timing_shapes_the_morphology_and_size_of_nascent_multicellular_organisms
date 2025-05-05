@@ -1,14 +1,7 @@
 # Emergence of coordinated cell division during the evolution of multicellularity
 
-Things to add:
-- Conda environment and versions (also upload environment yml file, and add command to create environment with the file)
-- Explanation of how to run the codes (adding them to path) (explanation on how to run the matlab simulations)
-- document with which simulations code were used for which figures
-- List of commands used to run each of the simulation results
-- R codes:
-    - Clean the codes to only have important parts
-    - Change the input files (save single file and just have commented code on how to load the codes when they are in different files)
-- simulation codes (change name of files to something easier to understand)
+
+## Conda environment creation:
 
 -Environment:
     -Python 3.10.12
@@ -40,5 +33,50 @@ Matlab version used: R2023b
 
 All the code was executed in macOS Sequoia 15.4.1 and Linux (Ubuntu 22.04.2).
 
-In order to execute the code used 
+In order to use the code from this repository you need to give execution permission to all the python and bash scripts, this can be done with the following two commands:
+
+```
+chmod +x *.py
+chomd +x *.sh
+```
+
+Next, the folder Code/simulation_code needs to be added to the PATH variable of the terminal, that can be done by adding the complete path of the folder into the .zshrc or .bashrc depending if you are in macOS or Linux, respectively. In the file the line needs to be added if not already there: ```export PATH="$PATH:<whole path>/Code/simulation_code/```
+
+### Simulations with matlab
+
+For the settling selection simulations, given that this ones use matlab executed from the terminal, the path also needs to be added within the matlab app so that the code can be executed from anywhere in the terminal. First, make sure that matlab can be opened in the terminal, this can be done by typing ```matlab``` in the terminal, if this command doesn't work then the executable file needs to be added to the PATH variable. Then, within matlab the following commands need to be executed to add the folder Code/simulation_code in the matlab path:
+
+```
+addpath('/path/to/Code/simulation_code');
+savepath;
+```
+
+Now the bash scripts should be capable of executing the matlab commands.
+
+## Github Structure
+
+The github has the following structure:
+
+```
+emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/
+├── Code
+│   ├── R_code
+│   └── simulation_code
+│       ├── table_1
+│       └── visualization_codes
+├── Data
+│   ├── fig_3_network_growth_no_fragmentation
+│   ├── fig_4_network_growth_with_fragmentation
+│   ├── fig_5_delay_variation_in_cluster_properties
+│   ├── fig_8_fast_first_division
+│   ├── Images
+│   ├── network_files
+│   ├── settling_simulation_data
+│   ├── supp_fig_3_size_difference_physics_sim
+│   └── supp_fig_4_growth_with_fragmentation_all
+├── Paper_figures
+└── Supplementary_videos
+```
+
+In the Code folder the simulation_code includes all the python, bash, and matlab scripts required to generate all the data of the results. And the folder R_code includes all the R scripts that were used to analyze the data from the simulations and generate  all the plots of the article. Each of these folders has their own README.md file with instructions of which codes were used for each figure and the commands used in the simulations.  
 
