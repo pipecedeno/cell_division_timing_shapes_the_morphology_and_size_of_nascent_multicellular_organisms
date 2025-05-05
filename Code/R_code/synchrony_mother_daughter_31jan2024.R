@@ -19,7 +19,7 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
-cell_sync=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/cell_sync_mother_daughter_2024dec2.csv", header=TRUE)
+cell_sync=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/cell_sync_mother_daughter_2025may5.csv", header=TRUE)
 
 cell_sync$ordered_timepoint=cell_sync$timepoint
 cell_sync$ordered_timepoint=ifelse(cell_sync$strain=='petite', 'petite',
@@ -42,7 +42,7 @@ ggplot(cell_sync, aes(x=mother_minutes, y=daughter_minutes, col=timepoint))+
 
 # Branch synchrony ####
 
-df_all=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/timelapse_doubling_time_inf_2024dec2_clean.csv", header = TRUE)
+df_all=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/timelapse_doubling_time_inf_2025may5.csv", header = TRUE)
 df_all$division_number=as.factor(df_all$division_number)
 df_all$timepoint=factor(df_all$timepoint, levels=c('t0','t200','t400','t600','t800','t1000'))
 
@@ -263,6 +263,6 @@ figure_evol_sync=plot_grid(p3_paper, p4_doubling_times_violin,
                            labels=c('A', 'B'), ncol=1, label_size=16)
 figure_evol_sync
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_evolution_synchrony_PA_line_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_evolution_synchrony_PA_line_5may2025.png',
        plot=figure_evol_sync, dpi='retina', width=10, height=6, bg='white')
 

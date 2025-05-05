@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
 '''
-Date:19jan2023
-This is an updated version of the script merge_time_lapse_tables.py so that in the strain variable it now saves PA1 to 5, instead of the gob
-isolate, so the information of the column name is going to be moved to the column strain.
-(This changed was made because for the t400 strains I don't know which are the gob name of the strains)
+Date: 5 May 2025
+This is an updated version of the script merge_time_lapse_tables_v2.py where the cell_death and big_clust
+columns have been removed as they are no longer necessary in the final version.
 
 Expected file naming format:
 (date)_(strain)_(replicate)_(sufix).csv
@@ -25,7 +24,7 @@ for them to be identified:
 output:
 -o: csv file merging all of the important information.
 
-The columns that the final csv file will have, as of the version of the 26oct2022, are the following:
+The columns that the final csv file will have, as of the current version, are the following:
 	-From column A to I it has the information of the branch table that is obtained of the branch hierarchy analysis.
 	-best_ellipse_angle: it has the angle of the last cell of the branch which needs to have a solidity bigger than 0.95, and it being
 	different from 1, so it's not a circle of the spot I manually added. The angle is already in a range from 0 to 90.
@@ -36,9 +35,7 @@ The columns that the final csv file will have, as of the version of the 26oct202
 	-strain
 	-strain_date
 	-complete_id: id of each timelapse the branch is from, format: (strain)_(timepoint)_(replicate)_(date)
-	-cell_death: flag to know if the cluster of the time lapse had visible cell death, True, False, and NA for gob21
 	-strain_timepoint: (strain)_(timepoint). The strain can be PA1 to 5, or gob8 and gob21, for gob8 and gob21 the time point is ancestor
-	-big_clust: flag to know if the clusters grew macroscopic or not, True, False and NA for gob21
 	-cell_id: id to track specific cell, so when a branch divides, the mother cell will have the same cell_id and the new bud will get a new cell_id
 	-division_number: number starting from 0 that means how many times a cell has divided, 0 if it hasn't divided yet. [Note: need to consider if this
 	number should start from 1, as for the analysis it's more intuitive if it starts from 1]
@@ -49,7 +46,6 @@ The columns that the final csv file will have, as of the version of the 26oct202
 	-mother_delta_t: if a cell divided it will have a mother_delta_t in seconds, which is the amount of time the mother cell took to divide.
 	-max_num_div: maximum amount of times that the cell divided, this number is repeated, as the rows of the same cell will have the same value, so if you want unique 
 	values should get only one of this values per cell_id.
-
 
 Modifications history:
 Date: 26jan2023
@@ -70,9 +66,12 @@ Date: 10apr2023
 Changed gob21 and gob8 timepoint to be called 't0' instead of being called ancestor
 small_id variable was deleted, as 2 time lapses had the same small_id because in the 22nov2022 t200 and t1000 were imaged together.
 
+Date: 5 May 2025
+Removed the dict_cell_death and list_clust_big variables and associated columns as they are no longer needed.
+
 #just the command that I use to run this script, and in which directory, can be used as an example of how to run this code
 cd work_dir/timelapses/
-merge_time_lapse_tables_v2.py -d timelapses_csv_files/ -o tl_merged_csv_doubling.csv
+merge_time_lapse_tables_v3.py -d timelapses_csv_files/ -o tl_merged_csv_doubling.csv
 '''
 
 import pandas as pd
@@ -283,23 +282,7 @@ print('Amount of groups found: ',len(list_files))
 # print(list_files)
 
 
-#dictionary of the ids to later assigned if they had cell death or not. True if they had cell death, False if they didn't have, and
-#NA for gob21
-#Note: this could be later passed as a list and only have a list of the ids that had cell death.
-dict_cell_death={'2022sep30_gob2149_1':False, '2022sep30_gob2149_4':True, '2022sep30_gob2152_4':True, '2022sep30_gob2149_2':True, 
-'2022sep27_gob2149_5':False,'2022sep27_gob2152_2':True, '2022sep27_gob2151_3':True, '2022sep27_gob2149_3':False, '2022sep27_gob2149_1':False, 
-'2022sep30_gob2149_3':False, '2022sep27_gob2150_1':False,'2022sep30_gob2151_1':True,
-'2022dec1_gob2151_4':True, '2022dec1_gob2151_7':True, '2022dec1_gob2152_3':True, '2022dec1_gob2152_8':False,
-'2022nov22_gob2150_2':True, '2022nov22_gob2150_5':True, '2022nov22_gob2150_6':True, '2022nov22_gob2153_1':True, '2022nov22_gob383_6':False, 
-'2022nov22_gob385_1':False, '2022nov22_gob385_4':False, '2022nov22_gob386_1':True, '2022nov22_gob386_2':False, '2022nov22_gob386_4':False, 
-'2022nov22_gob386_7':False, '2022nov22_gob440_1':False, '2022nov22_gob440_2':False, '2022nov22_gob463_4':True, '2022nov22_gob463_7':True, 
-'2022nov23_gob2151_1':True, '2022nov23_gob383_4':False, '2022nov23_gob383_5':True, '2022nov23_gob385_2':True, '2022nov23_gob440_4':True}
 
-
-#list of ids of the clusters that grew to be macroscopic.
-list_clust_big=['2022sep30_gob2149_1', '2022sep30_gob2149_2', '2022sep30_gob2149_3', '2022sep30_gob2149_4', '2022sep30_gob2151_1', 
-'2022sep30_gob2152_4', '2022sep27_gob2150_1', '2022sep27_gob2151_3', '2022dec1_gob2151_4', '2022dec1_gob2151_7', '2022nov22_gob2150_2', 
-'2022nov22_gob2150_5', '2022nov22_gob2150_6', '2022nov22_gob2153_1', '2022nov23_gob2151_1']
 
 
 #dictionary to change the names from gob2149-53 to PA1-5
@@ -339,10 +322,6 @@ for id_file in list_files:
 		temp_time_point=time_point_dict[id_file.split("_")[1]]
 		temp_replicate=id_file.split("_")[2]
 
-	if(id_file in dict_cell_death):
-		temp_cell_death=dict_cell_death[id_file]
-	else:
-		temp_cell_death='NA'
 
 	#loading tables that were the output of the time lapse analysis
 	temp_df_branches=pd.read_csv(directory+id_file+"_branch_table.csv", header=0, skiprows=[1,2,3])
@@ -364,7 +343,6 @@ for id_file in list_files:
 	#now is (strain)_(timepoint)_(replicate)_(date)
 	temp_date=id_file.split('_')[0]
 	#temp_merged['small_id']=temp_strain+'_'+temp_time_point+'_'+temp_replicate #small id format: (strain)_(timepoint)_(replicate) #modified for v2
-	temp_merged['cell_death']=temp_cell_death
 
 	temp_merged['timepoint']=temp_time_point
 
@@ -376,17 +354,6 @@ for id_file in list_files:
 	#Deleted columns for v2
 	# temp_merged['name']=strain_convertion_dict[temp_strain]
 	# temp_merged['name_timepoint']=strain_convertion_dict[temp_strain]+'_'+temp_time_point
-
-	#if the cluster id is in the list then it was a macroscopic cluster, if gob21_ or gob8_is in the name of the file
-	#it gets assigned a NA, and if non of does conditions got satisfied, then it is a cluster that wasn't macroscopic  
-	if(id_file in list_clust_big):
-		temp_big_clust=True
-	elif(("gob21_" in id_file) or ("gob8_" in id_file)):
-		temp_big_clust='NA'
-	else:
-		temp_big_clust=False
-
-	temp_merged['big_clust']=temp_big_clust
 
 	#getting cell ids
 	temp_merged=get_mother_daughter_relationship(temp_merged, temp_df_edges, temp_df_spots)
