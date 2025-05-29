@@ -11,6 +11,15 @@ sim_clust_no_fragmentation_15nov2024.py -d petite_only_second_doubling_8feb2024.
 sim_clust_no_fragmentation_15nov2024.py -d grande_doubling_time_dist_2024dec2.csv -n 300 -o grande_300n_200m -m 200
 ```
 
+### updated code for figure 3:
+```
+sim_clust_no_fragmentation_27may2025.py -d petite_doubling_time_dist_2023may30.csv -n 300 -o petite_300n_1200m -m 1200
+
+sim_clust_no_fragmentation_27may2025.py -d grande_doubling_time_dist_2024dec2.csv -n 300 -o grande_300n_1200m -m 1200
+
+sim_clust_no_fragmentation_27may2025.py -d petite_only_second_doubling_8feb2024.csv -n 300 -o petite-second-only_300n_1200m -m 1200 
+```
+
 ### Code for figure 4: Network growth with fragmentation keeping track of all cluster fractures
 
 ```
@@ -130,6 +139,12 @@ Finally, the code matlab code ``` size_diff_overlap_acumulation_2024dec2.m ``` i
 Notes: both matlab codes need have their input parameters in the first lines of the code. For the overlap acumulation code only 100 networks were created instead of 500.
 
 ### Supplementary Figure 4:
+
+The code used to generate the results is the following:
+
+test_network_diam_normalization.ipynb
+
+The value of the linear regression obtained here is what was used in the for the normalization, even though an R code was used to generate the plots.
 
 ### Supplementary figure 5: Network growth with fragmentation tracking only one cluster after fragmentation
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
 '''
-Date: 15nov2024
+Date: 27may2025
 
 This code simulates snowflake yeast growth without fragmentation, growing clusters until they 
 reach a maximum size. For each simulation, it records:
 - Network diameter
-- Degree distribution
 - Number of mother cells with 2+ undivided daughter cells
+- Max edge degree
 
-The first 5 networks are saved as graphml files.
+The first simulation saves all networks after each division event.
 
 Inputs:
 	-doubling_t: file of empirical data from where the cell doubling times are going to be extracted from
@@ -18,10 +18,9 @@ Inputs:
 	-max_clust_size: maximum number of cells the clusters are allowed to have
 
 Outputs:
-	-degree_dist file: columns "Degree,Frequency,Probability,sim_number"
-	-diameter: columns "sim_number,diameter,cases_mother_with_undivided_cells"
+	-diameter: columns "sim_number,diameter,cases_mother_with_undivided_cells,max_edge_degree,num_nodes"
 	-diff_d_t: columns "sim_number,diff_minutes"
-	-graphml files for first 5 networks
+	-graphml files for all networks in first simulation
 
 '''
 
@@ -40,9 +39,6 @@ parser.add_argument('-n','--number_sims',dest="number_sims",required=True)
 parser.add_argument('-o','--output_dir',dest="output_dir",required=True)
 parser.add_argument('-m','--max_clust_size',dest="max_clust_size",required=True)
 args = parser.parse_args()
-
-# Number of networks to save (hardcoded)
-NETWORKS_TO_SAVE = 5
 
 def load_doubling_time(path_to_file, column):
 	temp_file = pd.read_csv(path_to_file, header=0)
@@ -125,25 +121,6 @@ def divide_cells(cluster_population, cells_to_divide, dict_doub_t_dist, cont_ids
 		
 	return [cont_ids, cells_to_divide]
 
-def save_degree_distribution_to_csv(network):
-	# Get the degree of all nodes
-	degrees = dict(network.degree())
-	df_degrees = pd.DataFrame(degrees.items(), columns=['Node', 'Degree'])
-	
-	# Create degree distribution
-	degree_counts = df_degrees['Degree'].value_counts().reset_index()
-	degree_counts.columns = ['Degree', 'Frequency']
-	
-	# Calculate probability distribution
-	total_nodes = len(df_degrees)
-	degree_counts['Probability'] = degree_counts['Frequency'] / total_nodes
-	
-	# Add simulation number
-	degree_counts['sim_number'] = input_variables['sim_number']
-
-	for i in range(len(degree_counts)):
-		dict_files['degree_dist'].write(",".join([str(j) for j in degree_counts.iloc[i]]) + "\n")
-
 def count_mothers_with_multiple_undivided(network):
 	mothers_with_multiple_undivided = 0
 	for node in network.nodes():
@@ -153,10 +130,49 @@ def count_mothers_with_multiple_undivided(network):
 			mothers_with_multiple_undivided += 1
 	return mothers_with_multiple_undivided
 
-def save_network_if_needed(network, sim_number):
-	"""Save network as graphml if it's one of the first NETWORKS_TO_SAVE simulations"""
-	if int(sim_number) <= NETWORKS_TO_SAVE:
-		network_path = os.path.join(input_variables['network_dir'], f'network_{sim_number}.graphml')
+# Function to calculate and return the edge with the highest edge degree
+def calculate_max_edge_degree(network):
+	# Initialize result variables
+	max_edge_degree = -1
+	max_edge = None
+	for edge in network.edges():
+		node1, node2 = edge
+		degree_node1 = network.degree(node1)
+		degree_node2 = network.degree(node2)
+		edge_degree = degree_node1 + degree_node2 - 2
+		if (edge_degree > max_edge_degree):
+			max_edge_degree = edge_degree
+			max_edge = edge
+	return([max_edge, max_edge_degree])
+
+def save_network_parameters(network, sim_number, division_step=None):
+	"""Save network diameter, mothers with undivided cells, number of nodes, and max edge degree"""
+	if network.number_of_nodes() > 1:  # Need at least 2 nodes for diameter
+		network_diameter = nx.diameter(network)
+	else:
+		network_diameter = 0
+	
+	mothers_with_undivided = count_mothers_with_multiple_undivided(network)
+	num_nodes = network.number_of_nodes()
+	
+	# Calculate max edge degree
+	if network.number_of_edges() > 0:  # Need at least 1 edge for max edge degree
+		max_edge, max_edge_degree = calculate_max_edge_degree(network)
+	else:
+		max_edge_degree = -1
+	
+	# Save parameters
+	dict_files['diameter'].write(f"{sim_number},{network_diameter},{mothers_with_undivided},{num_nodes},{max_edge_degree}\n")
+
+# function to save the graphml files of the network for each step only for the first simulation
+def save_network_if_needed(network, sim_number, division_step=None):
+	"""Save network as graphml if it's the first simulation"""
+	if int(sim_number) == 1:
+		if division_step is not None:
+			num_nodes = network.number_of_nodes()
+			network_path = os.path.join(input_variables['network_dir'], f'network_sim1_step{division_step}_n{num_nodes}.graphml')
+		else:
+			network_path = os.path.join(input_variables['network_dir'], f'network_sim1_final.graphml')
 		nx.write_graphml(network, network_path)
 
 def simulate_one_cluster_growth(input_variables, dict_doub_t_dist):
@@ -168,6 +184,10 @@ def simulate_one_cluster_growth(input_variables, dict_doub_t_dist):
 	snowflake = nx.Graph()
 	snowflake.add_node(cont_ids, number_divisions=0)
 	
+	# Save initial network parameters (1 node)
+	save_network_parameters(snowflake, sim_number)
+	save_network_if_needed(snowflake, sim_number, 0)
+	
 	# Sample first doubling time
 	temp_next_doub = sample_doub_t(dict_doub_t_dist, 0, 0)
 	cells_to_divide = []
@@ -175,6 +195,7 @@ def simulate_one_cluster_growth(input_variables, dict_doub_t_dist):
 	cont_ids += 1
 
 	curr_time = cells_to_divide[0][0]
+	division_step = 1
 	
 	# Grow cluster until max size
 	while len(cells_to_divide) > 0 and snowflake.number_of_nodes() < max_clust_size:
@@ -184,40 +205,29 @@ def simulate_one_cluster_growth(input_variables, dict_doub_t_dist):
 		# Divide cells at current time
 		cont_ids, cells_to_divide = divide_cells(snowflake, cells_to_divide, dict_doub_t_dist, cont_ids)
 		
+		# Save network parameters after each division event
+		save_network_parameters(snowflake, sim_number)
+		
+		# Save network if it's the first simulation
+		save_network_if_needed(snowflake, sim_number, division_step)
+		
+		division_step += 1
+		
+		# Check if we've reached max size
 		if snowflake.number_of_nodes() >= max_clust_size:
-			# Save final network properties
-			network_diameter = nx.diameter(snowflake)
-			mothers_with_undivided = count_mothers_with_multiple_undivided(snowflake)
-			
-			# Save diameter and mothers with undivided cells
-			dict_files['diameter'].write(f"{sim_number},{network_diameter},{mothers_with_undivided}\n")
-			
-			# Save degree distribution
-			# save_degree_distribution_to_csv(snowflake)
-			
-			# Save network if it's one of the first 5
-			save_network_if_needed(snowflake, sim_number)
 			break
 
 def initialize_files(input_variables):
 	output_dir = input_variables['output_dir']
 	dict_files = {}
 	
-	# Initialize degree distribution file
-	# degree_dist_file = os.path.join(output_dir, "degree_distribution.csv")
-	# if os.path.exists(degree_dist_file):
-	# 	dict_files['degree_dist'] = open(degree_dist_file, "a")
-	# else:
-	# 	dict_files['degree_dist'] = open(degree_dist_file, "w")
-	# 	dict_files['degree_dist'].write("Degree,Frequency,Probability,sim_number\n")
-	
 	# Initialize diameter file
-	diam_file = os.path.join(output_dir, "networks_diameter.csv")
+	diam_file = os.path.join(output_dir, "network_information.csv")
 	if os.path.exists(diam_file):
 		dict_files['diameter'] = open(diam_file, "a")
 	else:
 		dict_files['diameter'] = open(diam_file, "w")
-		dict_files['diameter'].write("sim_number,diameter,cases_mother_with_undivided_cells\n")
+		dict_files['diameter'].write("sim_number,diameter,cases_mother_with_undivided_cells,num_nodes,max_edge_degree\n")
 	
 	# Initialize doubling time difference file
 	diff_d_t_file = os.path.join(output_dir, "diff_doub_t.csv")
@@ -266,7 +276,7 @@ dict_files = initialize_files(input_variables)
 
 # Create and write to log file
 log_file = open(os.path.join(output_dir, "log.txt"), "a")
-log_file.write("sim_clust_no_fragmentation_15nov2024.py\nInputs received:\n")
+log_file.write("sim_clust_no_fragmentation_27may2024.py\nInputs received:\n")
 log_file.write("-d: " + args.doubling_t + "\n")
 log_file.write("-n: " + args.number_sims + "\n")
 log_file.write("-o: " + args.output_dir + "\n")
@@ -290,6 +300,3 @@ log_file.close()
 
 # Close all output files
 close_all_files(dict_files)
-
-
-

@@ -56,12 +56,14 @@ load_one_csv_cluster_size <- function(file) {
 # Loading cluster size data ####
 #Directory where the images are located
 
-in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cluster_measurements"
+# in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cluster_measurements"
+
+in_dir="~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cluster_measurements"
 
 data_clust <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
                     .fun = load_one_csv_cluster_size)
 data_clust$volume=(4/3)*pi*((data_clust$Major/2)^3)
-data_clust$strain=factor(data_clust$strain, levels=c('petite', 'grande'))
+data_clust$strain=factor(data_clust$strain, levels=c('grande', 'petite'))
 summary(data_clust)
 
 
@@ -82,16 +84,30 @@ median_volume=data_clust %>%
 # Cluster Volume
 grande_mean_volume=mean(data_clust[data_clust$strain=='grande',]$volume)
 grande_mean_volume
+# New measurements May 19: 
 # 106836.2 um^3
+# all data combined:
+# 105010.9 um^3
+
 petite_mean_volume=mean(data_clust[data_clust$strain=='petite',]$volume)
 petite_mean_volume
+# New measurements May 19: 
 # 54170.07 um^3
+# all data combined:
+# 58179.76 um^3
 
 # Cluster Radius
 mean(data_clust[data_clust$strain=='grande',]$Major)/2
+# New measurements May 19:
 # 27.59116
+# all data combined:
+# 27.4061
 mean(data_clust[data_clust$strain=='petite',]$Major)/2
+# New measurements May 19:
 # 21.89868
+# all data combined:
+# 22.61826
+
 
 
 ggplot(data_clust, aes(x=volume))+
@@ -117,7 +133,7 @@ ggplot(data_clust, aes(x=as.factor(replicate), y=volume, fill=strain))+
   NULL
 
 
-ggplot(data_clust, aes(x=volume, group=interaction(strain, replicate)))+
+ggplot(data_clust, aes(x=volume, group=interaction(strain, replicate, date)))+
   geom_density(aes(fill=strain, alpha=0.5))+
   theme_classic()+
   guides(alpha = "none")+
@@ -164,22 +180,25 @@ load_one_csv_cell_measurements <- function(file) {
 }
 
 #Directory where the images are located
-in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cell_properties"
+# in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cell_properties"
+in_dir="~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cell_properties"
+
 
 cell_data <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
                    .fun = load_one_csv_cell_measurements)
 
-cell_data$strain=factor(cell_data$strain, levels=c('petite', 'grande'))
+cell_data$strain=factor(cell_data$strain, levels=c('grande', 'petite'))
 summary(cell_data)
 
 # Number of cells characterized in the second day
 table(cell_data$replicate, cell_data$strain)
+# Combined all data:
 #   petite grande
-# 1   1043   1285
-# 2   1540   1462
-# 3    892   1533
-# 4   1058   1517
-# 5   1334   1770
+# 1   2095   4398
+# 2   2640   3871
+# 3   2320   3999
+# 4   2450   4416
+# 5   3441   4438
 
 #### Aspect Ratio ####
 
@@ -194,13 +213,20 @@ median_ar=cell_data %>%
 
 grande_mean_ar=mean(cell_data[cell_data$strain=='grande',]$AR)
 grande_mean_ar
+# New data May 19:
 # mean: 1.19564
 # median: 1.18784
+# all data:
+# mean: 1.197828
+# median: 1.18955
 petite_mean_ar=mean(cell_data[cell_data$strain=='petite',]$AR)
 petite_mean_ar
+# New data May 19:
 # mean: 1.222915
 # median: 1.21388
-
+# all data:
+# mean: 1.221764
+# median: 1.21154
 
 ggplot(cell_data, aes(x=as.factor(replicate), y=AR, fill=strain))+
   geom_violin()+
@@ -212,7 +238,7 @@ ggplot(cell_data, aes(x=as.factor(replicate), y=AR, fill=strain))+
   NULL
 
 ggplot(cell_data, 
-       aes(x=AR, group=interaction(strain, replicate)))+
+       aes(x=AR, group=interaction(strain, replicate, date)))+
   geom_density(aes(fill=strain, alpha=0.5))+
   theme_classic()+
   guides(alpha = "none")+
@@ -235,12 +261,20 @@ summ_diam=cell_data %>%
 
 grande_mean_diam=mean(cell_data[cell_data$strain=='grande',]$Major)
 grande_mean_diam
+# New data may 19:
 # mean: 5.170423 um
 # median: 5.14785 um
+# all data:
+# mean: 5.085207
+# median: 5.067465
 petite_mean_diam=mean(cell_data[cell_data$strain=='petite',]$Major)
 petite_mean_diam
+# New data may 19:
 # mean: 4.844126 um
 # median: 4.82025 um
+# all data:
+# mean: 4.844297
+# median: 4.81492
 
 
 ggplot(cell_data, aes(x=as.factor(replicate), y=Major, fill=strain))+
@@ -253,7 +287,7 @@ ggplot(cell_data, aes(x=as.factor(replicate), y=Major, fill=strain))+
   NULL
 
 ggplot(cell_data, 
-       aes(x=Major, group=interaction(strain, replicate)))+
+       aes(x=Major, group=interaction(strain, replicate, date)))+
   geom_density(aes(fill=strain, alpha=0.5))+
   theme_classic()+
   guides(alpha = "none")+
@@ -328,7 +362,7 @@ in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measur
 cell_dist <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
                    .fun = load_one_csv_cell_distribution)
 
-cell_dist$strain=factor(cell_dist$strain, levels=c('petite', 'grande'))
+cell_dist$strain=factor(cell_dist$strain, levels=c('grande', 'petite'))
 summary(cell_dist)
 
 
@@ -376,6 +410,8 @@ mean(cell_dist[cell_dist$num_cells>25,]$num_cells)
 median(cell_dist[cell_dist$num_cells>25,]$num_cells)
 # 236.5
 
+quantile(cell_dist$num_cells, c(0.75, 0.9, 0.95, 0.97))
+
 # Number of clusters imaged in total
 table(cell_dist$replicate)
 # 1   2   3   4   5 
@@ -397,6 +433,8 @@ ggplot(cell_dist[cell_dist$num_cells>25,], aes(x=as.factor(replicate), y=num_cel
   NULL
 
 
+
+
 # Is there a correlation between cluster area an number of cells in cluster?
 ggplot(cell_dist, aes(x=Area, y=num_cells, col=replicate))+
   geom_point(alpha=0.5)+
@@ -406,43 +444,76 @@ ggplot(cell_dist, aes(x=Area, y=num_cells, col=replicate))+
   NULL
 
 
+ggplot(cell_dist, 
+       aes(x=num_cells, group=interaction(replicate)))+
+  geom_histogram(aes(fill=strain, alpha=0.5))+
+  theme_classic()+
+  guides(alpha = "none")+
+  xlab("# of cells per cluster")+
+  ylim(c(0,50))+
+  #scale_x_continuous(trans='log10')+
+  facet_wrap(~replicate, ncol=1)+
+  # geom_vline(xintercept = 25)+
+  # geom_vline(xintercept = 2.739821, linetype='dashed')+
+  # geom_vline(xintercept = 274.3413, linetype='dashed')+
+  NULL
+
+ggplot(data_clust, 
+       aes(x=(Major+Minor)/4, group=interaction(replicate)))+
+  geom_histogram(aes(fill=strain, alpha=0.5))+
+  theme_classic()+
+  guides(alpha = "none")+
+  # xlab("# of cells per cluster")+
+  # ylim(c(0,25))+
+  #scale_x_continuous(trans='log10')+
+  facet_wrap(~replicate, ncol=1)+
+  NULL
+
+quantile((data_clust$Major+data_clust$Minor)/4, c(0.97))
+
+
+ggplot(data_clust, 
+       aes(x=(sqrt(Area/pi)), group=interaction(replicate)))+
+  geom_histogram(aes(fill=strain, alpha=0.5))+
+  theme_classic()+
+  guides(alpha = "none")+
+  # xlab("# of cells per cluster")+
+  # ylim(c(0,25))+
+  #scale_x_continuous(trans='log10')+
+  facet_wrap(~replicate, ncol=1)+
+  NULL
+
+
+# Number of cells:
+quantile(cell_dist$num_cells, c(0.75, 0.90, 0.95, 0.97))
+
+# Cluster radius:
+quantile(sqrt(data_clust$Area/pi), c(0.75, 0.9, 0.95, 0.97))
+
+
 # Paper Figure ####
 
 
 #### version 2 ####
 
-p_cluster_vol_log=ggplot(data_clust, aes(x=volume))+
-  geom_density(aes(fill=strain, alpha=0.75))+
-  theme_classic(base_size = 14)+
-  guides(alpha = "none")+
-  ylab("Density")+
-  xlab(expression(log[10]~"Cluster Volume"~(mu*m^3)))+
-  scale_fill_manual(labels = c("Petite", "Grande"),
-                    values = c("#F0D77BFF", "#AE93BEFF"))+
-  geom_vline(xintercept=grande_mean_volume, col="#F0D77BFF", linetype='dashed')+
-  geom_vline(xintercept=petite_mean_volume, col="#AE93BEFF", linetype='dashed')+
-  scale_x_continuous(trans='log10')+
-  theme(legend.position = c(1, 1),
-        legend.justification = c(1, 1),
-        axis.text.y = element_blank(),  # Remove y-axis text
-        axis.ticks.y = element_blank(),  # Remove y-axis ticks
-        axis.line.y = element_blank()) +  # Remove y-axis line
-  labs(fill = "Strain")+
-  NULL
-p_cluster_vol_log
 
 p_cluster_vol=ggplot(data_clust, aes(x=volume, fill=strain))+
   # geom_density(aes(fill=strain, alpha=0.5))+
   geom_histogram(position="identity", alpha=0.75, bins=30) +
   theme_classic(base_size = 14)+
   guides(alpha = "none")+
-  ylab("# of clusters")+
+  ylab("# of Clusters")+
   xlab(expression("Cluster Volume"~(µ*m^3)))+
-  scale_fill_manual(labels = c("Petite", "Grande"),
-                    values = c("#F0D77BFF", "#AE93BEFF")) +
+  scale_fill_manual(labels = c("Grande", "Petite"),
+                    values = c("#AE93BEFF", "#F0D77BFF")) +
   geom_vline(xintercept=grande_mean_volume, col="#AE93BEFF", linetype='dashed') +
   geom_vline(xintercept=petite_mean_volume, col="#F0D77BFF", linetype='dashed') +
+  geom_point(aes(x=grande_mean_volume, y=Inf), 
+             color="#AE93BEFF", fill="#AE93BEFF", shape=25, size=3, inherit.aes=FALSE) +
+  geom_point(aes(x=petite_mean_volume, y=Inf), 
+             color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   xlim(c(0, 250000))+
+  ylim(c(0, 880))+
   theme(legend.position = c(1, 1),
         legend.justification = c(1, 1))+
   labs(fill = "Strain")+
@@ -454,12 +525,17 @@ p_ar=ggplot(cell_data,
   geom_histogram(alpha=0.75, position="identity", bins=30) +
   theme_classic(base_size = 14)+
   guides(alpha = "none", fill="none")+
-  ylab("# of cells")+
+  ylab("# of Cells")+
   xlab("Aspect Ratio")+
-  scale_fill_manual(labels = c("Petite", "Grande"),
-                    values = c("#F0D77BFF", "#AE93BEFF")) +
+  ylim(c(0, 2600))+
+  scale_fill_manual(labels = c("Grande", "Petite"),
+                    values = c("#AE93BEFF", "#F0D77BFF")) +
   geom_vline(xintercept=grande_mean_ar, col="#AE93BEFF", linetype='dashed')+
   geom_vline(xintercept=petite_mean_ar, col="#F0D77BFF", linetype='dashed')+
+  geom_point(aes(x=grande_mean_ar, y=Inf), 
+             color="#AE93BEFF", fill="#AE93BEFF", shape=25, size=3, inherit.aes=FALSE) +
+  geom_point(aes(x=petite_mean_ar, y=Inf), 
+             color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   NULL
 p_ar
 
@@ -469,13 +545,17 @@ p_diam=ggplot(cell_data,
   geom_histogram(alpha=0.75, position="identity", bins=30) +
   theme_classic(base_size = 14)+
   guides(alpha = "none", fill="none")+
-  ylab("# of cells")+
-  # xlab(expression("Cell Diameter"~(mu*m)))+
+  ylab("# of Cells")+
   xlab("Cell Diameter (µm)")+
-  scale_fill_manual(labels = c("Petite", "Grande"),
-                    values = c("#F0D77BFF", "#AE93BEFF"))+
+  ylim(c(0, 3600))+
+  scale_fill_manual(labels = c("Grande", "Petite"),
+                    values = c("#AE93BEFF", "#F0D77BFF")) +
   geom_vline(xintercept=grande_mean_diam, col="#AE93BEFF", linetype='dashed')+
   geom_vline(xintercept=petite_mean_diam, col="#F0D77BFF", linetype='dashed')+
+  geom_point(aes(x=grande_mean_diam, y=Inf), 
+             color="#AE93BEFF", fill="#AE93BEFF", shape=25, size=3, inherit.aes=FALSE) +
+  geom_point(aes(x=petite_mean_diam, y=Inf), 
+             color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   NULL
 p_diam
 
@@ -510,6 +590,6 @@ fig_1_v2=plot_grid(p_cluster_vol, col_clust_vol, plot_c_ar_diam, col_ar,
                    labels=c('A', 'B','','E'), nrow=2, label_size=16, rel_widths=c(1, 0.35), rel_heights=c(1,1))
 fig_1_v2
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_clust_size_ancestors_22may2025_v2.svg',
-       plot=fig_1_v2, dpi='retina', width=8, height=6, bg='white')
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_clust_size_ancestors_27may2025_v2.svg',
+#        plot=fig_1_v2, dpi='retina', width=8, height=6, bg='white')
 # note: image is saved as an svg to later add the strain labels for the images
