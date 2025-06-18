@@ -33,6 +33,8 @@ library(cowplot)
 
 theme_set(theme_classic(base_size = 16))
 
+setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/settling_selection_simulations/')
+
 
 get_confidence_interval <- function(data) {
   n <- length(data)
@@ -47,10 +49,21 @@ get_confidence_interval <- function(data) {
 
 # Different carrying capacities ####
 
+
 #### Growth phase ####
 
-growth_prop=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_growth_registry_15apr2024.csv", header=TRUE)
+# growth_prop=read.csv("proportions_growth_registry_all_sim.csv", header=TRUE)
 
+# growth_prop=data.frame()
+# 
+# for(j in c("10k", "100k", "1mill", "10mill")){
+#   temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_growth_registry_all_sim.csv", sep=""), header=TRUE)
+#   temp_df$carr_cap=j
+#   growth_prop=rbind(growth_prop, temp_df)
+# }
+# write.csv(growth_prop, file="set_sim_growth_registry_6june2025.csv", row.names=FALSE)
+
+growth_prop=read.csv("set_sim_growth_registry_6june2025.csv", header = TRUE)
 growth_prop$carr_cap=factor(growth_prop$carr_cap, levels=c("10k", "100k", "1mill", "10mill"))
 summary(growth_prop)
 
@@ -71,8 +84,18 @@ ggplot(growth_prop,
 
 #### Settling fitness ####
 
-settling_prop=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_settling_registry_15apr2024.csv", header=TRUE)
+# settling_prop=data.frame()
+# 
+# for(j in c("10k", "100k", "1mill", "10mill")){
+#   temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+#   temp_df$carr_cap=j
+#   #filtering out the row if any population went extinct
+#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+#   settling_prop=rbind(settling_prop, temp_df)
+# }
+# write.csv(settling_prop, file="set_sim_settling_registry_6june2025.csv", row.names = FALSE)
 
+settling_prop=read.csv("set_sim_settling_registry_6june2025.csv", header=TRUE)
 settling_prop$carr_cap=factor(settling_prop$carr_cap, levels=c("10k", "100k", "1mill", "10mill"))
 summary(settling_prop)
 
@@ -95,6 +118,7 @@ ggplot(settling_prop,
 ggplot(growth_prop,
        aes(x=transfer, y=cell_sel_r_norm, col=as.factor(sim_number)))+
   geom_line()+
+  geom_point()+
   guides(col='none')+
   ylab("Growth Selection Rate \n(Ancestor w/o delay / Ancestor)")+
   xlab('Transfer')+
@@ -105,17 +129,20 @@ ggplot(growth_prop,
 ggplot(growth_prop[growth_prop$transfer>1,],
        aes(x=transfer, y=cell_sel_r, col=as.factor(sim_number)))+
   geom_line()+
+  geom_point()+
   guides(col='none')+
   ylab("Growth Selection Rate \n(Ancestor w/o delay / Ancestor)")+
   xlab('Transfer')+
   scale_x_continuous(breaks = seq(1, 20, by = 1))+
   facet_wrap(~carr_cap, ncol=1)+
   NULL
+
 #Getting rid of the first selection rate
 
 ggplot(settling_prop,
        aes(x=transfer, y=cell_sel_r, col=as.factor(sim_number)))+
   geom_line()+
+  geom_point()+
   guides(col='none')+
   ylab("Settling Selection Rate \n(Ancestor w/o delay / Ancestor)")+
   xlab('Transfer')+
@@ -160,7 +187,7 @@ ggplot()+
   NULL
 
 
-mean_sel_r_test=data.frame(transfer=seq(1,15),
+mean_sel_r_test=data.frame(transfer=seq(1,max(mean_num_gen$transfer)),
                            gen_petite=mean_num_gen[mean_num_gen$carr_cap=="10mill",]$mean_gen_pop_1,
                            gen_second=mean_num_gen[mean_num_gen$carr_cap=="10mill",]$mean_gen_pop_2,
                            gen_population=mean_num_gen[mean_num_gen$carr_cap=="10mill",]$mean_gen_all_pop)
@@ -273,27 +300,13 @@ filt_combined_sel_r[filt_combined_sel_r$phase=='Settling',] %>%
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
 #   carr_cap    mean   var    sd     CV
-# 1 10k      0.00568 1.50  1.23  216.  
-# 2 100k     0.186   1.43  1.19    6.42
-# 3 1mill    0.382   0.594 0.771   2.02
-# 4 10mill   0.401   0.410 0.640   1.59
+# 1 10k      -0.633 2.94  1.72  -2.71
+# 2 100k      0.264 1.87  1.37   5.18
+# 3 1mill     0.384 0.743 0.862  2.24
+# 4 10mill    0.434 0.367 0.605  1.40
 # The variation and standard deviation clearly get reduced, but also the mean
 #continues increasing as the carrying capacity increases
 
-get_confidence_interval(filt_combined_sel_r[filt_combined_sel_r$phase=='Settling' & filt_combined_sel_r$carr_cap=='1mill',]$sel_r)
-# 0.2915819 0.4717670
-# The confidence interval of the 1 million carrying capacity contains the mean of the 10 million
-
-mean_sel_r_1mill=filt_combined_sel_r[filt_combined_sel_r$phase=='Settling' & filt_combined_sel_r$carr_cap=='1mill',] %>%
-  group_by(sim_number) %>%
-  summarize(mean=mean(sel_r))
-
-mean(mean_sel_r_1mill$mean)
-# 0.449589
-# The mean of the means (population mean) approximates the mean of the 10 million carrying capacity
-
-get_confidence_interval(mean_sel_r_1mill$mean)
-# 0.3722742 0.5269039
 
 
 # Plot of growth rates
@@ -321,10 +334,10 @@ filt_combined_sel_r[filt_combined_sel_r$phase=='Growth',] %>%
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
 #   carr_cap  mean      var     sd     CV
-# 1 10k      0.511 0.00313  0.0560 0.109 
-# 2 100k     0.643 0.00110  0.0332 0.0517
-# 3 1mill    0.644 0.000389 0.0197 0.0306
-# 4 10mill   0.642 0.000259 0.0161 0.0251
+# 1 10k      0.544 0.00483  0.0695 0.128 
+# 2 100k     0.639 0.00104  0.0322 0.0504
+# 3 1mill    0.641 0.000285 0.0169 0.0263
+# 4 10mill   0.643 0.000177 0.0133 0.0207
 
 
 # Using mean of the simulations
@@ -354,10 +367,10 @@ mean_filt_sel_r[mean_filt_sel_r$phase=='Growth',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap  mean
-# 1 10k      0.508
-# 2 100k     0.641
-# 3 1mill    0.644
-# 4 10mill   0.642
+# 1 10k      0.544
+# 2 100k     0.638
+# 3 1mill    0.642
+# 4 10mill   0.643
 
 ggplot(mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',], 
        aes(x=carr_cap, y=mean_sel_r, col=carr_cap))+
@@ -379,10 +392,10 @@ mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap   mean
-# 1 10k      0.0554
-# 2 100k     0.592 
-# 3 1mill    0.450 
-# 4 10mill   0.438 
+# 1 10k      -0.633
+# 2 100k      0.537
+# 3 1mill     0.480
+# 4 10mill    0.466
 
 # Paper plot using mean of the simulations
 
@@ -412,15 +425,53 @@ ggplot(mean_sim_sel_r, aes(x=phase, y=mean_sel_r, col=phase))+
   NULL
 
 
+# Clusters per time ####
 
+time_top=read.csv('petite_second_10mill_50sim/time_registry_all_sim.csv', header=TRUE)
+time_top$total_time=time_top$time+((time_top$transfer-1)*24*60)
+time_top$total_hours=time_top$total_time/60
+summary(time_top)
+
+table(time_top$sim_number)
+
+ggplot(time_top[time_top$sim_number<=5,], 
+       aes(x=total_hours, y=num_clusters, col=strain))+
+  geom_line()+
+  facet_wrap(~sim_number, ncol=1)+
+  ylab('Number of Clusters')+
+  xlab('Hours')+
+  scale_color_discrete(name = "Strain", labels = c("Ancestor", "Ancestor w/o Delay"))+
+  theme(legend.position = "bottom", legend.box = "vertical")+
+  NULL
+
+
+ggplot(time_top[time_top$sim_number<=1,], 
+       aes(x=total_hours, y=num_clusters, col=strain))+
+  geom_line()+
+  # facet_wrap(~sim_number, ncol=1)+
+  ylab('Number of Clusters')+
+  xlab('Hours')+
+  scale_color_discrete(name = "Strain", labels = c("Ancestor", "Ancestor w/o Delay"))+
+  theme(legend.position = "bottom", legend.box = "vertical")+
+  NULL
 
 # Bootstrap settling phase ####
 
 
 #### Settling fitness ####
 
-settling_prop_boot=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_bootstrap_settling_registry_15apr2024.csv", header=TRUE)
+# settling_prop_boot=data.frame()
+# 
+# for(j in c("10mill-boot", "100mill-boot", "1bill-boot")){
+#   temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+#   temp_df$carr_cap=j
+#   #filtering out the row if any population went extinct
+#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+#   settling_prop_boot=rbind(settling_prop_boot, temp_df)
+# }
+# write.csv(settling_prop_boot, file='set_sim_bootstrap_settling_registry_6june2025.csv', row.names = FALSE)
 
+settling_prop_boot=read.csv('set_sim_bootstrap_settling_registry_6june2025.csv', header=TRUE)
 settling_prop_boot$carr_cap=factor(settling_prop_boot$carr_cap, levels=c("10mill-boot", "100mill-boot", "1bill-boot"))
 summary(settling_prop_boot)
 
@@ -441,9 +492,9 @@ settling_prop_boot %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
 # carr_cap      mean
-# 1 10mill-boot  0.438
-# 2 100mill-boot 0.438
-# 3 1bill-boot   0.438
+# 1 10mill-boot  0.450
+# 2 100mill-boot 0.447
+# 3 1bill-boot   0.446
 
 mean_settling_prop_boot=settling_prop_boot %>%
   group_by(sim_number, carr_cap) %>%
@@ -461,9 +512,9 @@ mean_settling_prop_boot %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel))
 # carr_cap      mean
-# 1 10mill-boot  0.438
-# 2 100mill-boot 0.438
-# 3 1bill-boot   0.438
+# 1 10mill-boot  0.450
+# 2 100mill-boot 0.447
+# 3 1bill-boot   0.446
 
 
 #### Comparison to normal simulations ####
@@ -501,15 +552,14 @@ comp_sett_carr_cap %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
 # carr_cap        mean
-# 1 10k          0.00568
-# 2 100k         0.186  
-# 3 1mill        0.382  
-# 4 10mill       0.401  
-# 5 10mill-boot  0.438  
-# 6 100mill-boot 0.438  
-# 7 1bill-boot   0.438 
-#Maybe here it would be worth getting the confidence intervals of each carrying capacity, specially for the
-#ones of the normal simulations (without bootstrap)
+# 1 10k          -0.633
+# 2 100k          0.264
+# 3 1mill         0.384
+# 4 10mill        0.434
+# 5 10mill-boot   0.450
+# 6 100mill-boot  0.447
+# 7 1bill-boot    0.446 
+
 
 mean_comp_sett_carr_cap=comp_sett_carr_cap %>%
   group_by(carr_cap, sim_number) %>%
@@ -546,36 +596,42 @@ mean_comp_sett_carr_cap %>%
             lower_ci = mean - qt(0.975, df = n - 1) * se,
             upper_ci = mean + qt(0.975, df = n - 1) * se)
 # carr_cap       mean
-# 1 10k          0.0554
-# 2 100k         0.592 
-# 3 1mill        0.450 
-# 4 10mill       0.438 
-# 5 10mill-boot  0.438 
-# 6 100mill-boot 0.438 
-# 7 1bill-boot   0.438 
+# 1 10k          -0.633
+# 2 100k          0.537
+# 3 1mill         0.480
+# 4 10mill        0.466
+# 5 10mill-boot   0.450
+# 6 100mill-boot  0.447
+# 7 1bill-boot    0.446 
 
-
-t.test(mean_comp_sett_carr_cap[mean_comp_sett_carr_cap$carr_cap=='1mill',]$mean_sel_r, mean_comp_sett_carr_cap[mean_comp_sett_carr_cap$carr_cap=='10mill-boot',]$mean_sel_r)
 
 anova_random=aov(mean_sel_r~carr_cap, data=mean_comp_sett_carr_cap)
 summary(anova_random)
-#              Df Sum Sq Mean Sq F value Pr(>F)  
-# carr_cap      6   2.36  0.3941   1.892 0.0514 .
-# Residuals   259  53.95  0.2083
-# non of the differences are significant
-# F(6, 259)=1.892, p=0.0514
+#              Df Sum Sq Mean Sq F value   Pr(>F)    
+# carr_cap      6   6.27  1.0445   4.197 0.000456 ***
+# Residuals   294  73.17  0.2489
+# the differences are significant
+# F(6, 294)=4.197, p=0.000456
 
 pairwise.t.test(mean_comp_sett_carr_cap$mean_sel_r, mean_comp_sett_carr_cap$carr_cap, p.adjust.method='bonferroni')
-
+#              10k     100k    1mill   10mill  10mill-boot 100mill-boot
+# 100k         2.3e-05 -       -       -       -           -           
+# 1mill        6.5e-05 1.00000 -       -       -           -           
+# 10mill       8.6e-05 1.00000 1.00000 -       -           -           
+# 10mill-boot  0.00012 1.00000 1.00000 1.00000 -           -           
+# 100mill-boot 0.00012 1.00000 1.00000 1.00000 1.00000     -           
+# 1bill-boot   0.00013 1.00000 1.00000 1.00000 1.00000     1.00000
+# 10k is different from all of the others, and there is no difference between all
+# the other concentrations
 
 
 anova_growth_random=aov(mean_sel_r~carr_cap, data=mean_filt_sel_r[mean_filt_sel_r$phase=='Growth' & mean_filt_sel_r$carr_cap!='10k',])
 summary(anova_growth_random)
 #              Df   Sum Sq   Mean Sq F value Pr(>F)
-# carr_cap      2 0.000362 0.0001811   0.932  0.288
-# Residuals   104 0.020193 0.0001942 
+# carr_cap      2 0.000493 0.0002464   1.496  0.227
+# Residuals   143 0.023548 0.0001647 
 # non of the means are different from each other
-# F(2, 104)=0.932, p=0.288
+# F(2, 143)=1.496, p=0.227
 
 
 
@@ -587,8 +643,16 @@ summary(anova_growth_random)
 
 #### Growth phase ####
 
-growth_prop_top=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_top_growth_registry_15apr2024.csv", header=TRUE)
+# growth_prop_top=data.frame()
+# 
+# for(j in c("100k", "10mill", "1mill")){
+#   temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_growth_registry_all_sim.csv", sep=""), header=TRUE)
+#   temp_df$carr_cap=j
+#   growth_prop_top=rbind(growth_prop_top, temp_df)
+# }
+# write.csv(growth_prop_top, file='set_sim_top_growth_registry_6june2025.csv', row.names = FALSE)
 
+growth_prop_top=read.csv('set_sim_top_growth_registry_6june2025.csv', header=TRUE)
 growth_prop_top$carr_cap=factor(growth_prop_top$carr_cap, levels=c("100k", "1mill", "10mill"))
 summary(growth_prop_top)
 
@@ -608,8 +672,18 @@ ggplot(growth_prop_top,
 
 #### Settling fitness ####
 
-settling_prop_top=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_top_settling_registry_15apr2024.csv", header=TRUE)
+# settling_prop_top=data.frame()
+# 
+# for(j in c("100k", "1mill", "10mill")){
+#   temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+#   temp_df$carr_cap=j
+#   #filtering out the row if any population went extinct
+#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+#   settling_prop_top=rbind(settling_prop_top, temp_df)
+# }
+# write.csv(settling_prop_top, file='set_sim_top_settling_registry_6june2025.csv', row.names = FALSE)
 
+settling_prop_top=read.csv("set_sim_top_settling_registry_6june2025.csv", header=TRUE)
 settling_prop_top$carr_cap=factor(settling_prop_top$carr_cap, levels=c("100k", "1mill", "10mill"))
 summary(settling_prop_top)
 
@@ -632,6 +706,7 @@ ggplot(settling_prop_top,
 ggplot(growth_prop_top,
        aes(x=transfer, y=cell_sel_r, col=as.factor(sim_number)))+
   geom_line()+
+  geom_point()+
   guides(col='none')+
   ylab("Growth Selection Rate \n(Ancestor w/o delay / Ancestor)")+
   xlab('Transfer')+
@@ -723,26 +798,10 @@ filt_combined_sel_r_top[filt_combined_sel_r_top$phase=='Settling',] %>%
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
 #   carr_cap  mean   var    sd    CV
-# 1 100k      1.28 0.552 0.743 0.583
-# 2 1mill     4.16 1.18  1.09  0.261
-# 3 10mill    4.16 0.560 0.748 0.180
-# The variation and standard deviation actually go up from 100k to 1mill, but the coefficient
-# of variation is the only value that gets reduced
-
-get_confidence_interval(filt_combined_sel_r_top[filt_combined_sel_r_top$phase=='Settling' & filt_combined_sel_r_top$carr_cap=='1mill',]$sel_r)
-# 3.813055 4.503970
-# The confidence interval of the 1 million carrying capacity contains the mean of the 10 million
-
-mean_sel_r_1mill_top=filt_combined_sel_r_top[filt_combined_sel_r_top$phase=='Settling' & filt_combined_sel_r_top$carr_cap=='1mill',] %>%
-  group_by(sim_number) %>%
-  summarize(mean=mean(sel_r))
-
-mean(mean_sel_r_1mill_top$mean)
-# 4.275213
-# The mean of the means (population mean) approximates the mean of the 10 million carrying capacity
-
-get_confidence_interval(mean_sel_r_1mill_top$mean)
-# 0.3722742 0.5269039
+# 1 100k      1.11 0.427 0.654 0.591
+# 2 1mill     3.66 1.25  1.12  0.306
+# 3 10mill    4.76 1.39  1.18  0.248
+# The mean keeps going up so 1 million and 10 million are different values
 
 
 # Plot of growth rates
@@ -769,9 +828,9 @@ filt_combined_sel_r_top[filt_combined_sel_r_top$phase=='Growth',] %>%
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
 #   carr_cap  mean      var     sd     CV
-# 1 100k     0.634 0.00100  0.0317 0.0500
-# 2 1mill    0.640 0.000494 0.0222 0.0347
-# 3 10mill   0.640 0.000243 0.0156 0.0244
+# 1 100k     0.632 0.000973 0.0312 0.0493
+# 2 1mill    0.637 0.000357 0.0189 0.0297
+# 3 10mill   0.639 0.000141 0.0119 0.0186
 
 
 # Using mean of the simulations
@@ -800,9 +859,9 @@ mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Growth',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap  mean
-# 1 100k     0.637
-# 2 1mill    0.639
-# 3 10mill   0.640
+# 1 100k     0.632
+# 2 1mill    0.637
+# 3 10mill   0.639
 
 ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',], 
        aes(x=carr_cap, y=mean_sel_r, col=carr_cap))+
@@ -822,9 +881,9 @@ mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap  mean
-# 1 100k      1.36
-# 2 1mill     4.28
-# 3 10mill    4.28
+# 1 100k      1.11
+# 2 1mill     3.80
+# 3 10mill    4.95
 
 
 
@@ -833,8 +892,18 @@ mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',] %>%
 
 #### Settling fitness
 
-settling_prop_boot_top=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_bootstrap_top_settling_registry_15apr2024.csv", header=TRUE)
+# settling_prop_boot_top=data.frame()
+# 
+# for(j in c("10mill-boot", "100mill-boot", "1bill-boot")){
+#   temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+#   temp_df$carr_cap=j
+#   #filtering out the row if any population went extinct
+#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+#   settling_prop_boot_top=rbind(settling_prop_boot_top, temp_df)
+# }
+# write.csv(settling_prop_boot_top,file="set_sim_bootstrap_top_settling_registry_6june2025.csv", row.names = FALSE)
 
+settling_prop_boot_top=read.csv("set_sim_bootstrap_top_settling_registry_6june2025.csv", header=TRUE)
 settling_prop_boot_top$carr_cap=factor(settling_prop_boot_top$carr_cap, levels=c("10mill-boot", "100mill-boot", "1bill-boot"))
 summary(settling_prop_boot_top)
 
@@ -855,9 +924,9 @@ settling_prop_boot_top %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
 # carr_cap      mean
-# 1 10mill-boot   4.54
-# 2 100mill-boot  4.54
-# 3 1bill-boot    4.58
+# 1 10mill-boot   4.95
+# 2 100mill-boot  5.00
+# 3 1bill-boot    5.00
 
 mean_settling_prop_boot_top=settling_prop_boot_top %>%
   group_by(sim_number, carr_cap) %>%
@@ -875,9 +944,9 @@ mean_settling_prop_boot_top %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel))
 # carr_cap      mean
-# 1 10mill-boot   4.54
-# 2 100mill-boot  4.54
-# 3 1bill-boot    4.58
+# 1 10mill-boot   4.96
+# 2 100mill-boot  5.00
+# 3 1bill-boot    5.00
 
 
 #### Comparison to normal simulations ####
@@ -914,13 +983,12 @@ ggplot(comp_sett_carr_cap_top[comp_sett_carr_cap_top$carr_cap!='10k',],
 comp_sett_carr_cap_top %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
-# carr_cap      mean
-# 1 100k          1.28
-# 2 1mill         4.16
-# 3 10mill        4.16
-# 4 10mill-boot   4.54
-# 5 100mill-boot  4.54
-# 6 1bill-boot    4.58
+# 1 100k          1.11
+# 2 1mill         3.66
+# 3 10mill        4.76
+# 4 10mill-boot   4.95
+# 5 100mill-boot  5.00
+# 6 1bill-boot    5.00
 
 mean_comp_sett_carr_cap_top=comp_sett_carr_cap_top %>%
   group_by(carr_cap, sim_number) %>%
@@ -956,40 +1024,37 @@ mean_comp_sett_carr_cap_top %>%
             lower_ci = mean - qt(0.975, df = n - 1) * se,
             upper_ci = mean + qt(0.975, df = n - 1) * se)
 # carr_cap      mean
-# 1 100k          1.36
-# 2 1mill         4.28
-# 3 10mill        4.28
-# 4 10mill-boot   4.54
-# 5 100mill-boot  4.54
-# 6 1bill-boot    4.58 
-
-t.test(mean_comp_sett_carr_cap_top[mean_comp_sett_carr_cap_top$carr_cap=='1mill',]$mean_sel_r, mean_comp_sett_carr_cap_top[mean_comp_sett_carr_cap_top$carr_cap=='10mill-boot',]$mean_sel_r)
+# 1 100k          1.11
+# 2 1mill         3.80
+# 3 10mill        4.95
+# 4 10mill-boot   4.96
+# 5 100mill-boot  5.00
+# 6 1bill-boot    5.00 
 
 anova_growth_top=aov(mean_sel_r~carr_cap, data=mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Growth',])
 summary(anova_growth_top)
-#              Df   Sum Sq   Mean Sq F value Pr(>F)
-# carr_cap     2 0.000096 0.0000481   0.143  0.867
-# Residuals   94 0.031563 0.0003358 
+#             Df   Sum Sq   Mean Sq F value Pr(>F)
+# carr_cap     2 0.000185 9.265e-05   0.392  0.677
+# Residuals   77 0.018182 2.361e-04 
 # no difference is significant
-# F(2, 54)=0.141, p=0.867
+# F(2, 77)=0.392, p=0.677
 
 anova_top=aov(mean_sel_r~carr_cap, data=mean_comp_sett_carr_cap_top)
 summary(anova_top)
 #              Df Sum Sq Mean Sq F value Pr(>F)    
-# carr_cap      5  104.7   20.93   63.47 <2e-16 ***
-# Residuals   241   79.5    0.33   
+# carr_cap      5   99.1  19.821   37.34 <2e-16 ***
+# Residuals   224  118.9   0.531   
 # There is a group that is different from the others
-# F(5, 201)=62.62, p<2e-16
+# F(5, 224)=37.34, p<2e-16
 
 pairwise.t.test(mean_comp_sett_carr_cap_top$mean_sel_r, mean_comp_sett_carr_cap_top$carr_cap, p.adjust.method='bonferroni')
-#                100k   1mill 10mill 10mill-boot 100mill-boot
-# 1mill        <2e-16 -     -      -           -
-# 10mill       <2e-16 1.00  -      -           -
-# 10mill-boot  <2e-16 0.54  0.36   -           -
-# 100mill-boot <2e-16 0.56  0.38   1.00        -
-# 1bill-boot   <2e-16 0.25  0.15   1.00        1.00
-# Only 100k has a mean different from the others, so at least simulations with 1 million cells are necessary
-# to predict the correct mean. alpha=0.05/15
+#              100k    1mill   10mill 10mill-boot 100mill-boot
+# 1mill        1.5e-11 -       -      -           -           
+# 10mill       < 2e-16 1.4e-08 -      -           -           
+# 10mill-boot  < 2e-16 8.7e-09 1      -           -           
+# 100mill-boot < 2e-16 2.4e-09 1      1           -           
+# 1bill-boot   < 2e-16 2.6e-09 1      1           1
+# 100k and 1mill has a different mean that the others, so at least 10 millions is needed to estimate the mean
 
 
 
@@ -1090,7 +1155,7 @@ supp_carr_cap=plot_grid(supp_mean_settling, supp_mean_settling_top,
                         labels=c('A', 'B'), ncol=2, align='hv')
 supp_carr_cap
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig9_carrying_capacity_test_25apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig9_carrying_capacity_test_6june2025.png',
        plot=supp_carr_cap, dpi='retina', width=9, height=3.5)
 
 
@@ -1195,7 +1260,7 @@ fig6b_v2
 figure_6_v3=plot_grid(fig6a_v2, fig6b_v2, labels=c('A', 'B'), ncol=1, align='hv')
 figure_6_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_selection_rates_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_selection_rates_23apr2025.png',
        plot=figure_6_v3, dpi='retina', width=4, height=6)
 
 

@@ -28,17 +28,17 @@ cd(folder);
 
 
 % Open output file
-output_folder='/Users/pipe/work_dir/observed_synchrony/evolution_results/size_difference_prediction_10june2024';
+output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/';
 
-output_filename = fullfile(output_folder, 'exponential_clust_volume_5.0376cell_diam_v2.csv');
+output_filename = fullfile(output_folder, 'exponential_clust_volume_5.085cell_diam.csv');
 write_to_output_file=1; % 1=YES, 0=NO # For size at fracture calculations
 
 
 N               = 500; % number of clusters to generate
 numGens         = 100; % number of generations of cell division in a group %# setting this value to be really high to that it won't be a limit
-diam            = 5.0376; % smallest diameter of the cell
+diam            = 5.085; % smallest diameter of the cell
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
-AR              = 1.199;%:.1:2.8; % aspect ratio value
+AR              = 1.197;%:.1:2.8; % aspect ratio value
 err_AR          = 0; % standard deviation in aspect ratio from Shane's measurements
 pole_theta      = deg2rad(10); % buds nearest the pole will be chosen from between 0 and 10 degrees in polar angle
 THETA           = deg2rad(45); % polar angle average from SEM data
@@ -46,11 +46,7 @@ thetaVariance   = deg2rad(0); % variation in polar angle from SEM data
 distance_thresh = 1.1672; % minimum distance (um) separating bud scars
 new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
-% overlap_vec  = 1.0e2; % threshold of total overlaps
-% overlap_vec = 1.0*10.^(-1.0:0.05:1);
-% overlap_vec = 1.0*10.^(-1.0:0.05:2);
-% overlap_vec = 1.0:1.0:100;
-overlap_vec = 0.1:0.1:10;
+overlap_vec = 25:1:100;
 
 % Force input parameters:
 include_forces  = 0; % do we include forces for rearrangements? 1 = Y, 0 = N

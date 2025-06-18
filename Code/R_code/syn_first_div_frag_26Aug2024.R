@@ -24,11 +24,30 @@ mycolors <- rev(ghibli_palettes$YesterdayMedium)
 syn_data_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("YesterdayMedium", direction = -1))
 
 
-setwd("~/work_dir/observed_synchrony/evolution_results/fast_first_division_26aug2024/")
+setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig9_fast_first_division/")
 
 # Doubling time distributions ####
 
-doub_t_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_8_fast_first_division/fast_first_div_doub_times_26aug2024.csv", header=TRUE)
+# doub_t_df=data.frame()
+# 
+# for (temp_data in c("slow_first_div","fast_first_div","synchronized_strain")){
+#   temp_df=read.csv(paste(temp_data, "/sampled_times.csv", sep=""), header=TRUE)
+#   temp_df$experiment=temp_data
+#   temp_df=temp_df[1:10000,]
+#   doub_t_df=rbind(doub_t_df, temp_df)
+# }
+# 
+# doub_t_df$number_divisions=doub_t_df$number_divisions+1
+# doub_t_df$number_divisions=as.numeric(doub_t_df$number_divisions)
+# doub_t_df$experiment_name=ifelse(doub_t_df$experiment=='slow_first_div', 'Slow First Division',
+#                                  ifelse(doub_t_df$experiment=='fast_first_div', 'Fast First Division', 'Synchronous'))
+# doub_t_df$experiment_name=factor(doub_t_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
+#                                                                      'Fast First Division'))
+# summary(doub_t_df)
+# 
+# write.csv(doub_t_df, file='fast_first_div_doub_times_16june2025.csv', row.names=FALSE)
+
+doub_t_df=read.csv("fast_first_div_doub_times_16june2025.csv", header=TRUE)
 
 doub_t_df$experiment_name=factor(doub_t_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
                                                                      'Fast First Division'))
@@ -47,7 +66,29 @@ ggplot(doub_t_df[doub_t_df$number_divisions<=2,],
 
 # Difference in doubling time ####
 
-diff_dt_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_8_fast_first_division/fast_first_div_difference_doub_times_26aug2024.csv", header=TRUE)
+# diff_dt_df=data.frame()
+# 
+# for (temp_data in c("slow_first_div","fast_first_div","synchronized_strain")){
+#   temp_df=read.csv(paste(temp_data, "/diff_doub_t.csv", sep=""), header=TRUE)
+#   temp_df$experiment=temp_data
+#   
+#   temp_mean_dt=mean(doub_t_df[doub_t_df$experiment==temp_data,]$minutes)
+#   temp_df$percent_cell_cycle=temp_df$diff_minutes/temp_mean_dt
+#   
+#   temp_df=temp_df[1:20000,]
+#   
+#   diff_dt_df=rbind(diff_dt_df, temp_df)
+# }
+# 
+# diff_dt_df$experiment_name=ifelse(diff_dt_df$experiment=='slow_first_div', 'Slow First Division',
+#                                   ifelse(diff_dt_df$experiment=='fast_first_div', 'Fast First Division', 'Synchronous'))
+# diff_dt_df$experiment_name=factor(diff_dt_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
+#                                                                        'Fast First Division'))
+# summary(diff_dt_df)
+# 
+# write.csv(diff_dt_df, file='fast_first_div_difference_doub_times_16june2025.csv', row.names=FALSE)
+
+diff_dt_df=read.csv("fast_first_div_difference_doub_times_16june2025.csv", header=TRUE)
 
 diff_dt_df$experiment_name=factor(diff_dt_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
                                                                      'Fast First Division'))
@@ -67,7 +108,24 @@ ggplot(data=diff_dt_df,
 
 # Fragmentation summary ####
 
-frag_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_8_fast_first_division/fast_first_div_frag_df_26aug2024.csv", header=TRUE)
+# frag_df=data.frame()
+# 
+# for (temp_data in c("slow_first_div","fast_first_div","synchronized_strain")){
+#   temp_df=read.csv(paste(temp_data, "/fragmentation_inf.csv", sep=""), header=TRUE)
+#   temp_df$experiment=temp_data
+#   frag_df=rbind(frag_df, temp_df)
+# }
+# 
+# frag_df$experiment_name=ifelse(frag_df$experiment=='slow_first_div', 'Slow First Division',
+#                                ifelse(frag_df$experiment=='fast_first_div', 'Fast First Division', 'Synchronous'))
+# frag_df$experiment_name=factor(frag_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
+#                                                                  'Fast First Division'))
+# summary(frag_df)
+# 
+# write.csv(frag_df, file='fast_first_div_frag_df_16june2025.csv', row.names=FALSE)
+
+
+frag_df=read.csv("fast_first_div_frag_df_16june2025.csv", header=TRUE)
 
 frag_df$experiment_name=factor(frag_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
                                                                  'Fast First Division'))
@@ -157,7 +215,24 @@ ggplot(mean_frag_prop, aes(x=experiment_name, y=mean_propagule, fill=experiment_
 
 # Network Diameter ####
 
-diameter_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_8_fast_first_division/fast_first_div_diameter_df_26aug2024.csv", header=TRUE)
+# diameter_df=data.frame()
+# 
+# for (temp_data in c("slow_first_div","fast_first_div","synchronized_strain")){
+#   temp_df=read.csv(paste(temp_data, "/networks_diameter.csv", sep=""), header=TRUE)
+#   temp_df$experiment=temp_data
+#   diameter_df=rbind(diameter_df, temp_df)
+# }
+# 
+# diameter_df$experiment_name=ifelse(diameter_df$experiment=='slow_first_div', 'Slow First Division',
+#                                    ifelse(diameter_df$experiment=='fast_first_div', 'Fast First Division', 'Synchronous'))
+# diameter_df$experiment_name=factor(diameter_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
+#                                                                          'Fast First Division'))
+# summary(diameter_df)
+# 
+# write.csv(diameter_df, file='fast_first_div_diameter_df_16june2025.csv', row.names=FALSE)
+
+
+diameter_df=read.csv("fast_first_div_diameter_df_16june2025.csv", header=TRUE)
 
 diameter_df$experiment_name=factor(diameter_df$experiment_name, levels=c('Slow First Division', 'Synchronous',
                                                                  'Fast First Division'))
@@ -249,10 +324,10 @@ fig_c
 mean_clust_size %>%
   group_by(experiment_name) %>%
   summarise(mean_frac_size=mean(mean_size))
-#   experiment_name         mean_frac_size
-# 1 Slow First Division           120.8874
-# 2 Synchronous                   216.1338
-# 3 Fast First Division           542.2014
+#   experiment_name     mean_frac_size
+# 1 Slow First Division           174.6287
+# 2 Synchronous                   339.0940
+# 3 Fast First Division           951.8482
 
 
 fig_d=ggplot(mean_frag_prop, aes(x=experiment_name, y=mean_propagule, fill=experiment_name))+
@@ -283,17 +358,17 @@ summ_diam %>%
   summarise(mean_norm_diam=mean(mean_diam))
 #   experiment_name     mean_norm_diam
 # 1 Slow First Division          0.872
-# 2 Synchronous                  0.990
-# 3 Fast First Division          1.19 
+# 2 Synchronous                  0.992
+# 3 Fast First Division          1.20
 
 
 
 
 
-img_sync <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/synchronous_div_filament_size_3_3oct2024.png")
+img_sync <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/synchronous_div_filament_size_3_16june2025.png")
 img_plot_sync_net <- rasterGrob(img_sync, interpolate = TRUE)
 
-img_fast_first <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/fast_first_div_filament_size_3_3oct2024.png")
+img_fast_first <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/fast_first_div_filament_size_3_16june2025.png")
 img_plot_fast_first_net <- rasterGrob(img_fast_first, interpolate = TRUE)
 
 # Create text annotations

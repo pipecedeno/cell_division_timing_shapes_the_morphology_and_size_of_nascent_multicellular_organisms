@@ -61,11 +61,11 @@ par_set_sim_v0_17feb2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite
 #Note: this code consume up to 20GB per thread, so adjust -t accordingly to the amount of RAM in your systems
 
 #Different carrying capacities using bootstrap to increase population size
-par_boot_set_sim_v0_16may2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_8feb2024.csv -n petite:second -o petite_second_10mill-boot_50sim -e 14 -c 5000:5000 -m 50 -t 10 -g 0.1 -p 0.1 -k 1000000 -b 10000000 -h 12 -i 50 -u 30
+par_boot_set_sim_v0_16may2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_8feb2024.csv -n petite:second -o petite_second_10mill-boot_50sim -e 14 -c 5000:5000 -m 50 -t 10 -g 0.1 -p 0.1 -k 1000000 -b 10000000 -h 12 -i 50 -u 30 -y random
 
-par_boot_set_sim_v0_16may2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_8feb2024.csv -n petite:second -o petite_second_100mill-boot_50sim -e 14 -c 5000:5000 -m 50 -t 10 -g 0.1 -p 0.1 -k 1000000 -b 100000000 -h 12 -i 50 -u 30
+par_boot_set_sim_v0_16may2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_8feb2024.csv -n petite:second -o petite_second_100mill-boot_50sim -e 14 -c 5000:5000 -m 50 -t 10 -g 0.1 -p 0.1 -k 1000000 -b 100000000 -h 12 -i 50 -u 30 -y random
 
-par_boot_set_sim_v0_16may2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_8feb2024.csv -n petite:second -o petite_second_1bill-boot_50sim -e 14 -c 5000:5000 -m 50 -t 10 -g 0.1 -p 0.1 -k 1000000 -b 1000000000 -h 12 -i 50 -u 30
+par_boot_set_sim_v0_16may2024.sh -f petite_doubling_time_dist_2023may30.csv -s petite_only_second_doubling_8feb2024.csv -n petite:second -o petite_second_1bill-boot_50sim -e 14 -c 5000:5000 -m 50 -t 10 -g 0.1 -p 0.1 -k 1000000 -b 1000000000 -h 12 -i 50 -u 30 -y random
 ```
 
 Notes: 
@@ -133,6 +133,11 @@ sim_edges_network_null_1nov2023.py -d petite_doubling_time_dist_2023may30.csv -m
 ```
 
 Then the matlab code ``` size_diff_sync_vs_async_2024sep26_v3.m ``` is executed to calculate the size at fragmentation and also the overlaps between the cells.
+
+To generate the statistics of the overlap data the following python code was used:
+```
+process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap.csv -o stats_overlap_pos_10jun2025.csv
+```
 
 Finally, the code matlab code ``` size_diff_overlap_acumulation_2024dec2.m ``` is executed to calculate how the overlap changes as a cell gets added.
 

@@ -18,7 +18,6 @@ mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
 
-
 #### Growth phase ####
 
 growth_prop=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_growth_registry_equal_growth_rate_15apr2024.csv", header=TRUE)
@@ -39,6 +38,23 @@ ggplot(growth_prop,
   stat_summary(fun='mean', geom='crossbar')+
   NULL
 
+extinction_inf=growth_prop %>%
+  group_by(sim_number, experiment) %>%
+  summarize(total_transfers=max(transfer))
+
+extinction_inf %>%
+  group_by(experiment) %>%
+  summarize(mean_transfers=mean(total_transfers))
+
+ggplot(extinction_inf[extinction_inf$experiment=="Normal",], 
+       aes(x=total_transfers, col=experiment, fill=experiment))+
+  geom_histogram(position="identity", alpha=0.5, bins=10)+
+  theme_classic(base_size=16)+
+  guides(fill='none', col='none')+
+  labs(x="Transfers until Fixation", y="Count")+
+  # facet_wrap(~experiment)+
+  geom_vline(xintercept=6.62, linetype='dashed', size=1.2)+
+  NULL
 
 #### Settling fitness ####
 settling_prop=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_settling_registry_equal_growth_rate_15apr2024.csv", header=TRUE)

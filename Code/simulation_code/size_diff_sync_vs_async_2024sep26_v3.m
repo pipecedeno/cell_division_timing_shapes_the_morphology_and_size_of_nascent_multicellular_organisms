@@ -39,10 +39,10 @@ strain="grande";
 % strain="petite";
 
 %directory paths
-directory_path="~/work_dir/observed_synchrony/paper_results_2dec2024/physics_sim/fragmentation_difference_2024dec3/test_"+strain+"_1000m_500n/edges_sim_files/";
+directory_path="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/test_"+strain+"_1000m_500n/edges_sim_files/";
 
 % Open output file
-output_filename="~/work_dir/observed_synchrony/paper_results_2dec2024/physics_sim/fragmentation_difference_2024dec3/"+strain+"_frac_size_30sim_500n_1.2aspr_10attempts_25overlap_v2.csv";
+output_filename="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/"+strain+"_frac_size_30sim_500n_1.2aspr_10attempts_70overlap_v2.csv";
 
 
 write_to_output_file=1; % 1=YES, 0=NO # For size at fracture calculations
@@ -52,7 +52,7 @@ calculate_overlap_position_end=1;
 
 
 % Overlap file name
-overlap_position_name="~/work_dir/observed_synchrony/paper_results_2dec2024/physics_sim/fragmentation_difference_2024dec3/"+strain+"_overlap_pos_30sim_500n_1.2aspr_10attempts_25overlap.csv";
+overlap_position_name="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/"+strain+"_overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap.csv";
 
 %# Calculate individual cells overlap? This is for the main loop
 calc_ind_overlap=0; % 1 = Y, 0 = N
@@ -78,7 +78,7 @@ thetaVariance   = deg2rad(0); % variation in polar angle from SEM data
 distance_thresh = 1.1672; % minimum distance (um) separating bud scars
 new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
-overlap_thresh  = 2.5e1; % threshold of total overlaps %#2.5e2
+overlap_thresh  = 70; % threshold of total overlaps %#2.5e2
 
 % Force input parameters:
 include_forces  = 0; % do we include forces for rearrangements? 1 = Y, 0 = N

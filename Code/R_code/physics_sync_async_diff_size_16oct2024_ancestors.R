@@ -27,10 +27,30 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
+setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/supp_fig3_physics_sim')
+
 
 # Cluster size difference ####
 
-clust_size=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/supp_fig_3_size_difference_physics_sim/physics_sim_frag_size_sync_vs_async_2024dec3.csv", header = TRUE)
+# clust_size=data.frame()
+# 
+# for(j in c("petite", "grande")){
+#   temp_df=read.csv(paste(j, "_frac_size_30sim_500n_1.2aspr_10attempts_70overlap_v2.csv", sep=""), header=TRUE)
+#   
+#   if(j=='petite'){
+#     temp_df$strain='Petite'
+#   } else {
+#     temp_df$strain='Grande'
+#   }
+#   clust_size=rbind(clust_size, temp_df)
+# }
+# 
+# clust_size$strain=factor(clust_size$strain, levels=c('Petite', 'Grande'))
+# clust_size$gyration_diam=clust_size$gyration_diam*10**6
+# 
+# write.csv(clust_size, file="physics_sim_frag_size_sync_vs_async_10june2025.csv", row.names=FALSE)
+
+clust_size=read.csv("physics_sim_frag_size_sync_vs_async_10june2025.csv", header = TRUE)
 clust_size$strain=factor(clust_size$strain, levels=c('Petite', 'Grande'))
 
 
@@ -75,16 +95,30 @@ summ_clust_size %>%
             mean_gyration=mean(mean_diam))
 #overlap threshold 30
 #   strain     mean_fracture_size   mean_cluster_volume     mean_gyration
-# 1 Petite               189.1327              25072.59          27.99673
-# 2 Grande               207.3925              32022.67          29.86071
-# 11 cell difference between grande and petite
+# 1 Petite               312.              39294.          30.7
+# 2 Grande               335.              46741.          32.0
+# 23 cell difference between grande and petite
 
 # Strain accumulation ####
 
+# overlap_size_df=data.frame()
+# 
+# for(j in c("petite", "grande")){
+#   for(i in seq(1,5)){
+#     temp_df=read.csv(paste("24oct2024_overlap_acum_100net_20n/", j, "_overlap_clust_size_1.2ar_10attempts_", i, ".csv", sep=""), header=TRUE)
+#     if(j=='petite'){
+#       temp_df$strain='Petite'
+#     } else {
+#       temp_df$strain='Grande'
+#     }
+#     overlap_size_df=rbind(overlap_size_df, temp_df)
+#   }
+# }
 
-petite_overlap=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/supp_fig_3_size_difference_physics_sim/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+
+petite_overlap=read.csv("overlap_accumulation_2dec2024/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 petite_overlap$strain="Petite"
-grande_overlap=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/supp_fig_3_size_difference_physics_sim/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+grande_overlap=read.csv("overlap_accumulation_2dec2024/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 grande_overlap$strain="Grande"
 overlap_size_df=rbind(grande_overlap, petite_overlap)
 
@@ -132,8 +166,9 @@ mean_summ_overlap_size[mean_summ_overlap_size$cluster_size==200,]
 
 # Overlap Positions ####
 
-overlap_pos_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/supp_fig_3_size_difference_physics_sim/stats_overlap_pos_9dec2024.csv", header=TRUE)
+# process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap.csv -o stats_overlap_pos_10jun2025.csv
 
+overlap_pos_df=read.csv("stats_overlap_pos_10jun2025.csv", header=TRUE)
 
 overlap_pos_df$strain=factor(overlap_pos_df$strain, levels=c("Petite", "Grande"))
 summary(overlap_pos_df)
@@ -155,58 +190,38 @@ ggplot(summ_overlap_pos, aes(x=strain, y=mean_dist, fill=strain))+
 tapply(summ_overlap_pos$mean_dist, summ_overlap_pos$strain, summary)
 # $Petite
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 12.51   13.38   13.62   13.65   13.92   15.22 
+# 13.92   14.84   15.12   15.13   15.42   16.85 
 # $Grande
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 12.98   13.83   14.08   14.10   14.33   15.60
+# 14.56   15.38   15.62   15.62   15.88   16.71
 
 t.test(summ_overlap_pos$mean_dist~summ_overlap_pos$strain)
-# t = -18.222, df = 970.44, p-value < 2.2e-16
+# t = -20.178, df = 971.8, p-value < 2.2e-16
 # 95 percent confidence interval:
-#   -0.5008196 -0.4034362
-# sample estimates:
-# mean in group Petite mean in group Grande 
-# 13.64515             14.09728 
+#   -0.5417887 -0.4457469
+
 
 anova_mean_dist=aov(summ_overlap_pos$mean_dist~summ_overlap_pos$strain)
 summary(anova_mean_dist)
 #                          Df Sum Sq Mean Sq F value Pr(>F)    
-# summ_overlap_pos$strain   1   51.1   51.10     332 <2e-16 ***
-# Residuals               998  153.6    0.15     
-51.1/(51.1+153.6) #0.2496336
-#25% of the variance is explained by the strain variable
+# summ_overlap_pos$strain   1  60.95   60.95   407.2 <2e-16 ***
+# Residuals               998 149.40    0.15 
+60.95/(60.95+149.40) #0.2897552
+#28% of the variance is explained by the strain variable
 
-ggplot(summ_overlap_pos, aes(x=strain, y=mean_hopkins, fill=strain))+
-  geom_violin()+
-  petite_t200_colors+
-  NULL
 
-tapply(summ_overlap_pos$mean_hopkins, summ_overlap_pos$strain, summary)
-# $Petite
-# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 0.9745  0.9809  0.9822  0.9822  0.9836  0.9889 
-# $Grande
-# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 0.9767  0.9816  0.9829  0.9828  0.9843  0.9879
-
-t.test(summ_overlap_pos$mean_hopkins~summ_overlap_pos$strain)
-# t = -4.5006, df = 996.43, p-value = 7.574e-06
-# 95 percent confidence interval:
-#   -0.0008408220 -0.0003302254
-# sample estimates:
-# mean in group Petite mean in group Grande 
-# 0.9822123            0.9827978
 
 
 
 #### Paper Figure ####
 
 
-img_petite <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_overlap_189cells_3overlap_cropped.png")
+img_petite <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/matlab_plots/petite_overlap_302cells_cropped.png")
 img_plot_petite <- rasterGrob(img_petite, interpolate = TRUE)
 
-img_grande <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_overlap_201cells_3overlap_cropped.png")
+img_grande <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/matlab_plots/grande_overlap_329cells_cropped.png")
 img_plot_grande <- rasterGrob(img_grande, interpolate = TRUE)
+
 
 # Create text annotations
 text_petite <- textGrob("Petite", gp = gpar(fontsize = 14, fontface = "bold"))
@@ -270,7 +285,7 @@ fig_physics_sim_mean_dist=plot_grid(p_petite, p_grande, p_overlap, p_frac_size, 
 fig_physics_sim_mean_dist
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig3_physics_sims_23apr2025_ancestors.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig3_physics_sims_10juune2025_ancestors.png',
        plot=fig_physics_sim_mean_dist, dpi='retina', width=10, height=12, bg='white')
 
 

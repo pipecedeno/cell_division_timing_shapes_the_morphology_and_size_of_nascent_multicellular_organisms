@@ -30,24 +30,23 @@ cd(folder);
 %directory paths
 
 %Grande directory
-directory_path = '/Users/pipe/work_dir/observed_synchrony/evolution_results/size_difference_prediction_10june2024/grande_3000m_50n/edges_sim_files';
-% Petite directory
-% directory_path = '/Users/pipe/work_dir/observed_synchrony/evolution_results/size_difference_prediction_10june2024/petite_3000m_50n/edges_sim_files/';
+directory_path = '/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/grande_3000m_50n/edges_sim_files';
+
 
 
 
 
 % Open output file
-output_folder='/Users/pipe/work_dir/observed_synchrony/evolution_results/size_difference_prediction_10june2024';
+output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/';
 
-output_filename = fullfile(output_folder, 'grande_clust_volume_sync_aprox_2024june11.csv');
+output_filename = fullfile(output_folder, 'grande_clust_volume_sync_aprox_2025june12.csv');
 write_to_output_file=1; % 1=YES, 0=NO # For size at fracture calculations
 
-N               = 5; % number of clusters to generate
+N               = 10; % number of clusters to generate
 numGens         = 5; % number of generations of cell division in a group
-diam            = 5.037; % smallest diameter of the cell
+diam            = 5.085; % smallest diameter of the cell
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
-AR              = 1.199;%:.1:2.8; % aspect ratio value %# DEFAULT was 1.2
+AR              = 1.197;%:.1:2.8; % aspect ratio value %# DEFAULT was 1.2
 err_AR          = 0; % standard deviation in aspect ratio from Shane's measurements
 pole_theta      = deg2rad(10); % buds nearest the pole will be chosen from between 0 and 10 degrees in polar angle
 THETA           = deg2rad(45); % polar angle average from SEM data

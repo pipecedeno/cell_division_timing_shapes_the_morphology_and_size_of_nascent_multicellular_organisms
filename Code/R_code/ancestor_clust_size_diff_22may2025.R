@@ -583,13 +583,13 @@ col_ar=plot_grid(img_plot_petite_ar, img_plot_grande_ar,
                  ncol = 1, 
                  rel_heights = c(1, 1))
 
-plot_c_ar_diam=plot_grid(p_ar, p_diam, nrow=1, labels=c('C', 'D'), label_size = 16)
+plot_c_ar_diam=plot_grid(p_ar, p_diam, nrow=1, labels=c('D', 'E'), label_size = 16)
 plot_c_ar_diam
 
-fig_1_v2=plot_grid(p_cluster_vol, col_clust_vol, plot_c_ar_diam, col_ar, 
-                   labels=c('A', 'B','','E'), nrow=2, label_size=16, rel_widths=c(1, 0.35), rel_heights=c(1,1))
+fig_1_v2=plot_grid(col_clust_vol, p_cluster_vol, col_ar, plot_c_ar_diam, 
+                   labels=c('A', 'C','B',''), nrow=2, label_size=16, rel_widths=c(0.35, 1), rel_heights=c(1,1))
 fig_1_v2
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_clust_size_ancestors_27may2025_v2.svg',
-#        plot=fig_1_v2, dpi='retina', width=8, height=6, bg='white')
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_clust_size_ancestors_27may2025_v3.svg',
+       plot=fig_1_v2, dpi='retina', width=8, height=6, bg='white')
 # note: image is saved as an svg to later add the strain labels for the images

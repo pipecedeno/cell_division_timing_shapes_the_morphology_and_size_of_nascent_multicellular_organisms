@@ -319,26 +319,26 @@ def write_nodes_information(clusters):
 
 	# Iterate through each node in the network
 	for node_id in clusters.nodes():
-	    node_info = clusters.nodes[node_id]
-	    
-	    # Extract node information
-	    strain = node_info.get('strain', None)
-	    number_divisions = node_info.get('number_divisions', None)
-	    cluster_generation = node_info.get('cluster_generation', None)
-	    time_added = node_info.get('time_added', None)
-	    cluster_id = node_info.get('cluster_id', None)
-	    temp_transfer_added=node_info.get('transfer_added', None)
-	    
-	    # Append the node information as a dictionary to the list
-	    node_data.append({
-	        'node_id': node_id,
-	        'strain': strain,
-	        'number_divisions': number_divisions,
-	        'cluster_generation': cluster_generation,
-	        'time_added': time_added,
-	        'cluster_id': cluster_id,
-	        'transfer_added': temp_transfer_added 
-	    })
+		node_info = clusters.nodes[node_id]
+		
+		# Extract node information
+		strain = node_info.get('strain', None)
+		number_divisions = node_info.get('number_divisions', None)
+		cluster_generation = node_info.get('cluster_generation', None)
+		time_added = node_info.get('time_added', None)
+		cluster_id = node_info.get('cluster_id', None)
+		temp_transfer_added=node_info.get('transfer_added', None)
+
+		# Append the node information as a dictionary to the list
+		node_data.append({
+			'node_id': node_id,
+			'strain': strain,
+			'number_divisions': number_divisions,
+			'cluster_generation': cluster_generation,
+			'time_added': time_added,
+			'cluster_id': cluster_id,
+			'transfer_added': temp_transfer_added 
+		})
 
 	# Convert the list of dictionaries to a pandas DataFrame
 	df = pd.DataFrame(node_data)

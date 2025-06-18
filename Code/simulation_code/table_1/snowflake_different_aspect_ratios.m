@@ -29,18 +29,15 @@ cd(folder);
 
 
 % Open output file
-output_folder='~/work_dir/observed_synchrony/evolution_results/size_difference_prediction_10june2024';
+output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/';
 
-output_filename = fullfile(output_folder, 'constant_threshold_changing_aspr_2024june11.csv');
-% output_filename = fullfile(output_folder, 'grande_strain_changing_aspr_2024june10.csv'); % test for tom
-% output_filename = fullfile(output_folder, 'grande_volume_prediction_1.199ar.csv');
-% output_filename = fullfile(output_folder, 'petite_volume_prediction_1.22ar.csv');
+output_filename = fullfile(output_folder, 'constant_threshold_changing_aspr_2025june12.csv');
 write_to_output_file=1; % 1=YES, 0=NO # For size at fracture calculations
 
 
 N               = 300; % number of clusters to generate % 1000 for grande and petite
 numGens         = 100; % number of generations of cell division in a group %# setting this value to be really high to that it won't be a limit
-diam            = 5.037; % smallest diameter of the cell
+diam            = 5.085; % smallest diameter of the cell
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
 % AR              = 1.199;%:.1:2.8; % aspect ratio value % For grande
 % AR              = 1.22;%:.1:2.8; % aspect ratio value % For petite
@@ -52,7 +49,7 @@ thetaVariance   = deg2rad(0); % variation in polar angle from SEM data
 distance_thresh = 1.1672; % minimum distance (um) separating bud scars
 new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
-overlap_thresh  = 65.08341; % threshold of total overlaps
+overlap_thresh  = 63.45398; % threshold of total overlaps
 % overlap_vec = 1.0*10.^(1:0.05:2);
 
 % Force input parameters:

@@ -23,8 +23,6 @@ mycolors <- rev(ghibli_palettes$YesterdayMedium)
 syn_data_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("YesterdayMedium", direction = -1))
 
 
-# Fragmentation summary ####
-
 std_vector=seq(0, 15, 5)
 delay_vector=seq(0, 60, 20)
 
@@ -34,8 +32,27 @@ color_diff_mean=list(scale_color_gradient(name = "Delay", low = "lightblue", hig
 color_variation=list(scale_color_gradient( name = "Variation", low = "pink", high = "darkred", 
                                            breaks = std_vector, limits = c(min(std_vector), max(std_vector))))
 
+setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig6_effects_delay_and_variation")
 
-frag_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_5_delay_variation_in_cluster_properties/frag_syn_frag_df_17oct2024.csv", header=TRUE)
+# Fragmentation summary ####
+
+# frag_df=data.frame()
+# 
+# for (temp_var in std_vector){
+#   for (temp_diff in delay_vector){
+#     temp_df=read.csv(paste("test_", temp_var,"_var_", temp_diff,"_diff/fragmentation_inf.csv", sep=""), header=TRUE)
+#     temp_df$variation=temp_var
+#     temp_df$diff_mean=temp_diff
+#     frag_df=rbind(frag_df, temp_df)
+#   }
+# }
+# 
+# summary(frag_df)
+# 
+# write.csv(frag_df, "frag_syn_frag_df_29may2025.csv", row.names = FALSE)
+
+# frag_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_5_delay_variation_in_cluster_properties/frag_syn_frag_df_17oct2024.csv", header=TRUE)
+frag_df=read.csv("frag_syn_frag_df_29may2025.csv", header=TRUE)
 summary(frag_df)
 
 
@@ -154,7 +171,23 @@ ggplot(mean_mean_frag_prop, aes(x=variation, y=mean_prop, col=diff_mean, group=d
 
 # Network Diameter ####
 
-diameter_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_5_delay_variation_in_cluster_properties/frag_syn_diameter_df_17oct2024.csv", header=TRUE)
+# diameter_df=data.frame()
+# 
+# for (temp_var in std_vector){
+#   for (temp_diff in delay_vector){
+#     temp_df=read.csv(paste("test_", temp_var,"_var_", temp_diff,"_diff/networks_diameter.csv", sep=""), header=TRUE)
+#     temp_df$variation=temp_var
+#     temp_df$diff_mean=temp_diff
+#     diameter_df=rbind(diameter_df, temp_df)
+#   }
+# }
+# 
+# summary(diameter_df)
+# 
+# write.csv(diameter_df, "frag_syn_diameter_df_2june2025.csv", row.names = FALSE)
+
+
+diameter_df=read.csv("frag_syn_diameter_df_2june2025.csv", header=TRUE)
 
 summary(diameter_df)
 
@@ -314,7 +347,7 @@ supp_net_prop_v3=plot_grid(clust_delay,clust_var, prop_delay,prop_var,
                            align='hv', label_size=12)
 supp_net_prop_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_frag_syn_network_prop_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_frag_syn_network_prop_2june2025.png',
        plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
 
 
@@ -322,13 +355,13 @@ ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_o
 # Figure 5 ####
 
 mean_mean_clust_size$var_cat=NA
-mean_mean_clust_size$var_cat=ifelse(mean_mean_clust_size$variation==0, '0', 
+mean_mean_clust_size$var_cat=ifelse(mean_mean_clust_size$variation==0, '0',
                                     ifelse(mean_mean_clust_size$variation==5, 'l',
                                            ifelse(mean_mean_clust_size$variation==10, 'm', 'h')))
 mean_mean_clust_size$var_cat=factor(mean_mean_clust_size$var_cat, levels=c('0', 'l', 'm', 'h'))
 
 mean_mean_clust_size$diff_cat=NA
-mean_mean_clust_size$diff_cat=ifelse(mean_mean_clust_size$diff_mean==0, '0', 
+mean_mean_clust_size$diff_cat=ifelse(mean_mean_clust_size$diff_mean==0, '0',
                                      ifelse(mean_mean_clust_size$diff_mean==20, 'l',
                                             ifelse(mean_mean_clust_size$diff_mean==40, 'm', 'h')))
 mean_mean_clust_size$diff_cat=factor(mean_mean_clust_size$diff_cat, levels=c('0', 'l', 'm', 'h'))
@@ -367,13 +400,13 @@ clust_p1
 
 
 mean_mean_frag_prop$var_cat=NA
-mean_mean_frag_prop$var_cat=ifelse(mean_mean_frag_prop$variation==0, '0', 
+mean_mean_frag_prop$var_cat=ifelse(mean_mean_frag_prop$variation==0, '0',
                                    ifelse(mean_mean_frag_prop$variation==5, 'l',
                                           ifelse(mean_mean_frag_prop$variation==10, 'm', 'h')))
 mean_mean_frag_prop$var_cat=factor(mean_mean_frag_prop$var_cat, levels=c('0', 'l', 'm', 'h'))
 
 mean_mean_frag_prop$diff_cat=NA
-mean_mean_frag_prop$diff_cat=ifelse(mean_mean_frag_prop$diff_mean==0, '0', 
+mean_mean_frag_prop$diff_cat=ifelse(mean_mean_frag_prop$diff_mean==0, '0',
                                     ifelse(mean_mean_frag_prop$diff_mean==20, 'l',
                                            ifelse(mean_mean_frag_prop$diff_mean==40, 'm', 'h')))
 mean_mean_frag_prop$diff_cat=factor(mean_mean_frag_prop$diff_cat, levels=c('0', 'l', 'm', 'h'))
@@ -474,9 +507,10 @@ plot_summary_effects_temp <- plot_grid(clust_p1, clust_p2, diameter_p1, diameter
                                   ncol = 2, align = 'v', axis = 'l',
                                   rel_heights = c(1, 1, 1),
                                   rel_widths = c(1, 1),label_size=12)
+plot_summary_effects_temp
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_5_syn_summ_doub_t_effects_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_syn_summ_doub_t_effects_2june2025.png',
        plot=plot_summary_effects_temp, dpi='retina', width=6, height=6, bg='white')
 
 

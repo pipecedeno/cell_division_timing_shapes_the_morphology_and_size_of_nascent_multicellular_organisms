@@ -24,7 +24,6 @@ to run the results of overlaps_force_each_step_28nov2023 you need to make includ
 % September 26 2024
 If after 10 attempts it hasn't found how a place to position the new bud then it will just add it in a random position
 Added to also calculate the volume of the cluster, and diameter of gyration
-Added option so that the cells are added after the 10 attempts or not
 
 
 % 4nov2024

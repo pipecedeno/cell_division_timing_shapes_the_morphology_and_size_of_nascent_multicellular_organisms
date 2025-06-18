@@ -45,7 +45,7 @@ Nov 18
 Now include forces works
 I had to fix some parameters that I moved from ELYES_SIM when creating the daughters and how some
 variables were initialized. And the I just modified get_forces_torques to its original state as
-before I made some modifications on it whe trying to fix the code
+before I made some modifications on it when trying to fix the code
 
 Nov 30 
 Adding option to save edges that where not added
@@ -57,8 +57,6 @@ folder = pwd;
 cd(folder);
 
 
-% Evolved test file
-% file_path = '/Users/pipe/work_dir/observed_synchrony/evolution_results/physics_sim_26sep2024/clust_size_sync_vs_async_26sep2024/test_pa2-t200_1000m_50n/edges_sim_files/edges_network_sim_2.csv';
 % Petite test file
 file_path = '/Users/pipe/work_dir/observed_synchrony/evolution_results/physics_sim_26sep2024/clust_size_sync_vs_async_26sep2024/test_petite_1000m_50n/edges_sim_files/edges_network_sim_3.csv';
 % Grande test file
@@ -127,7 +125,7 @@ thetaVariance   = deg2rad(0); % variation in polar angle from SEM data
 distance_thresh = 1.1672; % minimum distance (um) separating bud scars
 new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
-overlap_thresh  = 3.0e1; % threshold of total overlaps %#2.5e2
+overlap_thresh  = 70; % threshold of total overlaps %#2.5e2
 
 
 % Grow the cluster to the same amount of cells

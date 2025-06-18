@@ -12,7 +12,8 @@ reach a maximum size. For each simulation, it records:
 The first simulation saves all networks after each division event.
 
 Inputs:
-	-doubling_t: file of empirical data from where the cell doubling times are going to be extracted from
+	-first_dist_params: mean and variance of lognormal distribution for first division
+	-second_dist_params: mean and variance of lognormal distribution for second or more divisions
 	-number_sims: number of simulations
 	-output_dir: output directory 
 	-max_clust_size: maximum number of cells the clusters are allowed to have
@@ -21,11 +22,14 @@ Outputs:
 	-diameter: columns "sim_number,diameter,cases_mother_with_undivided_cells,max_edge_degree,num_nodes"
 	-diff_d_t: columns "sim_number,diff_minutes"
 	-graphml files for all networks in first simulation
+	-sampled_times: columns "sim_number,number_divisions,minutes"
 
 Modifications:
 29may2025:
 Made the simulation to save the network properties every 5 cells added instead of doing it every time all the cells off a specific time
 are added.
+
+Modified to use log-normal distributions instead of empirical distributions for doubling time sampling.
 
 '''
 
@@ -39,25 +43,24 @@ import numpy as np
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-d','--doubling_t',dest="doubling_t",required=True)
+parser.add_argument('-i','--first_dist_params',dest="first_dist_params",required=True, help="mean and variance of lognormal distribution for first division (comma-separated)")
+parser.add_argument('-j','--second_dist_params',dest="second_dist_params",required=True, help="mean and variance of lognormal distribution for second or more divisions (comma-separated)")
 parser.add_argument('-n','--number_sims',dest="number_sims",required=True)
 parser.add_argument('-o','--output_dir',dest="output_dir",required=True)
 parser.add_argument('-m','--max_clust_size',dest="max_clust_size",required=True)
 args = parser.parse_args()
 
-def load_doubling_time(path_to_file, column):
-	temp_file = pd.read_csv(path_to_file, header=0)
-	grouped_data = temp_file.groupby('division_number')['minutes'].apply(list)
-	doub_t_dist = dict(zip(grouped_data.index, grouped_data.values))
-	return doub_t_dist
-
-def sample_doub_t(dict_doub_t_dist, divisions_cell, curr_time):
-	keys_num_div = dict_doub_t_dist.keys()
-	if divisions_cell in dict_doub_t_dist:
-		sampling_dist = divisions_cell
+def sample_doub_t(first_div_params, second_div_params, divisions_cell, curr_time):
+	"""Sample doubling time using log-normal distribution"""
+	if divisions_cell == 0:
+		dist_mu = first_div_params[0]
+		dist_sigma = first_div_params[1]
 	else:
-		sampling_dist = max(keys_num_div)
-	return curr_time + random.choice(dict_doub_t_dist[sampling_dist])
+		dist_mu = second_div_params[0]
+		dist_sigma = second_div_params[1]
+	
+	sampled_time = round(float(np.random.lognormal(dist_mu, dist_sigma, 1)[0]), 4)
+	return curr_time + sampled_time
 
 def add_cells_list(input_time, cell_id, ordered_list):
 	if not ordered_list:
@@ -76,7 +79,7 @@ def add_cells_list(input_time, cell_id, ordered_list):
 	return ordered_list
 
 # This function adds all the cells that are going to divide for that specific time
-def divide_cells(cluster_population, cells_to_divide, dict_doub_t_dist, cont_ids, sim_number, division_step):
+def divide_cells(cluster_population, cells_to_divide, first_div_params, second_div_params, cont_ids, sim_number, division_step):
 	curr_time = cells_to_divide[0][0]
 	list_ids = cells_to_divide[0][1].copy()  # Make a copy to avoid modifying the original list 
 	# (this is the nodes that are going to divide this time)
@@ -93,7 +96,7 @@ def divide_cells(cluster_population, cells_to_divide, dict_doub_t_dist, cont_ids
 		daughter_id = cont_ids
 		cluster_population.add_node(daughter_id, number_divisions=0)
 		cluster_population.add_edge(mother_id, daughter_id)
-		temp_daughter_time = sample_doub_t(dict_doub_t_dist, 0, curr_time)
+		temp_daughter_time = sample_doub_t(first_div_params, second_div_params, 0, curr_time)
 		
 		# Only add daughter's next division time if we haven't reached max size
 		if cluster_population.number_of_nodes() < max_size:
@@ -103,7 +106,7 @@ def divide_cells(cluster_population, cells_to_divide, dict_doub_t_dist, cont_ids
 		# Divide mother cell
 		cluster_population.nodes[mother_id]["number_divisions"] += 1
 		temp_mother_div = cluster_population.nodes[mother_id]["number_divisions"]
-		temp_mother_time = sample_doub_t(dict_doub_t_dist, temp_mother_div, curr_time)
+		temp_mother_time = sample_doub_t(first_div_params, second_div_params, temp_mother_div, curr_time)
 
 		# Saving network properties every 5 cells added
 		if(cluster_population.number_of_nodes()%5 == 0):
@@ -116,6 +119,10 @@ def divide_cells(cluster_population, cells_to_divide, dict_doub_t_dist, cont_ids
 		# Only add mother's next division time if we haven't reached max size
 		if cluster_population.number_of_nodes() < max_size:
 			cells_to_divide = add_cells_list(temp_mother_time, mother_id, cells_to_divide)
+
+		# Save sampled times
+		dict_files['sampled_times'].write(f"{sim_number},{temp_mother_div},{temp_mother_time-curr_time}\n")
+		dict_files['sampled_times'].write(f"{sim_number},0,{temp_daughter_time-curr_time}\n")
 
 		# Save doubling time difference
 		dict_files['diff_d_t'].write(input_variables["sim_number"] + "," + 
@@ -188,7 +195,7 @@ def save_network_if_needed(network, sim_number, division_step=None):
 			network_path = os.path.join(input_variables['network_dir'], f'network_sim1_final.graphml')
 		nx.write_graphml(network, network_path)
 
-def simulate_one_cluster_growth(input_variables, dict_doub_t_dist):
+def simulate_one_cluster_growth(input_variables, first_div_params, second_div_params):
 	max_clust_size = input_variables['max_clust_size']
 	sim_number = input_variables['sim_number']
 	
@@ -199,10 +206,9 @@ def simulate_one_cluster_growth(input_variables, dict_doub_t_dist):
 	
 	# Save initial network parameters (1 node)
 	save_network_parameters(snowflake, sim_number)
-	# save_network_if_needed(snowflake, sim_number, 0)
 	
 	# Sample first doubling time
-	temp_next_doub = sample_doub_t(dict_doub_t_dist, 0, 0)
+	temp_next_doub = sample_doub_t(first_div_params, second_div_params, 0, 0)
 	cells_to_divide = []
 	cells_to_divide = add_cells_list(temp_next_doub, cont_ids, cells_to_divide)
 	cont_ids += 1
@@ -216,13 +222,7 @@ def simulate_one_cluster_growth(input_variables, dict_doub_t_dist):
 		curr_time = cells_to_divide[0][0]
 		
 		# Divide cells at current time
-		cont_ids, cells_to_divide = divide_cells(snowflake, cells_to_divide, dict_doub_t_dist, cont_ids, sim_number, division_step)
-		
-		# Save network parameters after all cells dividing in this time were added
-		# save_network_parameters(snowflake, sim_number)
-		
-		# Save network if it's the first simulation
-		# save_network_if_needed(snowflake, sim_number, division_step)
+		cont_ids, cells_to_divide = divide_cells(snowflake, cells_to_divide, first_div_params, second_div_params, cont_ids, sim_number, division_step)
 		
 		division_step += 1
 		
@@ -250,6 +250,14 @@ def initialize_files(input_variables):
 		dict_files['diff_d_t'] = open(diff_d_t_file, "w")
 		dict_files['diff_d_t'].write("sim_number,diff_minutes\n")
 	
+	# Initialize sampled times file
+	sampled_times_file = os.path.join(output_dir, "sampled_times.csv")
+	if os.path.exists(sampled_times_file):
+		dict_files['sampled_times'] = open(sampled_times_file, "a")
+	else:
+		dict_files['sampled_times'] = open(sampled_times_file, "w")
+		dict_files['sampled_times'].write("sim_number,number_divisions,minutes\n")
+	
 	return dict_files
 
 def close_all_files(dict_files):
@@ -258,8 +266,10 @@ def close_all_files(dict_files):
 
 #### MAIN ####
 
-# Load doubling time distributions
-dict_doub_t_dist = load_doubling_time(args.doubling_t, "minutes")
+# Parse distribution parameters
+first_div_params = [float(elem) for elem in args.first_dist_params.split(",")]
+second_div_params = [float(elem) for elem in args.second_dist_params.split(",")]
+
 output_dir = args.output_dir
 max_clust_size = int(args.max_clust_size)
 num_iterations = int(args.number_sims)
@@ -278,7 +288,6 @@ if not os.path.exists(network_dir):
 
 # Initialize input variables dictionary
 input_variables = {
-	"dict_doub_t_dist": dict_doub_t_dist,
 	"output_dir": output_dir,
 	"network_dir": network_dir,
 	"max_clust_size": max_clust_size
@@ -289,8 +298,9 @@ dict_files = initialize_files(input_variables)
 
 # Create and write to log file
 log_file = open(os.path.join(output_dir, "log.txt"), "a")
-log_file.write("sim_clust_no_fragmentation_27may2024.py\nInputs received:\n")
-log_file.write("-d: " + args.doubling_t + "\n")
+log_file.write("sim_clust_no_fragmentation_27may2025.py (modified for log-normal distributions)\nInputs received:\n")
+log_file.write("-i: " + args.first_dist_params + "\n")
+log_file.write("-j: " + args.second_dist_params + "\n")
 log_file.write("-n: " + args.number_sims + "\n")
 log_file.write("-o: " + args.output_dir + "\n")
 log_file.write("-m: " + args.max_clust_size + "\n")
@@ -301,7 +311,7 @@ for i in range(1, num_iterations + 1):
 	input_variables["sim_number"] = str(i)
 	
 	start_time = time.time()
-	simulate_one_cluster_growth(input_variables, dict_doub_t_dist)
+	simulate_one_cluster_growth(input_variables, first_div_params, second_div_params)
 	end_time = time.time()
 	elapsed_time = end_time - start_time
 	

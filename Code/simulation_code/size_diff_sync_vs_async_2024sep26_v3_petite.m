@@ -14,11 +14,19 @@ functions are missing.
 This code was used to generate the results of size at fracture at different aspect ratios which are saved in
 /home/pipe/work_dir/observed_synchrony/physics_model/edges_sim_9nov2023
 
-Date: 9 January 2023
+% September 26 2024
+% File modified from snowflake_sim_growth_from_python_iterate_through_directory.m in the physics_simulation folder
+If after 10 attempts it hasn't found how a place to position the new bud then it will just add it in a random position
+Added to also calculate the volume of the cluster, and diameter of gyration
 
-This code is based on snowflake_sim_growth_python_iterate_through_directory.m
-Modified the code so that it allows to iterate through different overlaps to find the one that is appropiate to approximate
-a volume of 77951.81 using the synchrony data from the grande strain.
+
+% October 28 2024
+% File modified to get the center of the overlaps if calculate_overlap_position_end is equal to one.
+
+
+% November 14 2024
+% Modified the code so that it only checks the overlap after all the cells of that time are added, which is similar to the network
+simulations that the edge degree is only checked after all cells that divide in the same time are added.
 
 %}
 
@@ -27,30 +35,42 @@ folder = pwd;
 cd(folder);
 
 
+% strain="grande";
+strain="petite";
+
 %directory paths
-
-%Grande directory
-directory_path = '/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/grande_3000m_50n/edges_sim_files';
-strain='grande';
-% Petite directory
-% directory_path = '/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/petite_3000m_50n/edges_sim_files';
-% strain='petite';
-
-
+directory_path="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/test_"+strain+"_1000m_500n/edges_sim_files/";
 
 % Open output file
-output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/';
+output_filename="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/"+strain+"_frac_size_30sim_500n_1.2aspr_10attempts_70overlap_v2.csv";
 
-output_filename = fullfile(output_folder, 'grande_volume_pred_synchrony_2025june12.csv');
-% output_filename = fullfile(output_folder, 'petite_volume_pred_synchrony_2025june12.csv');
-% test all outputs combined
+
 write_to_output_file=1; % 1=YES, 0=NO # For size at fracture calculations
 
-N               = 100; % number of clusters to generate
+% Calculate position of the overlaps when the fragmentation happens
+calculate_overlap_position_end=1;
+
+
+% Overlap file name
+overlap_position_name="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/"+strain+"_overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap.csv";
+
+%# Calculate individual cells overlap? This is for the main loop
+calc_ind_overlap=0; % 1 = Y, 0 = N
+%# save individual overlaps to file?
+save_ind_overlaps=0; % 1 = Y, 0 = N
+% overlaps_filename = 'test_overlaps.csv';
+% overlaps_filename = '/home/lprez3/work_dir/observed_synchrony/physics_model/overlap_sim_18nov2023/grande_50sim_50n_1.2ar_overlaps.csv';
+% overlaps_filename = '/home/lprez3/work_dir/observed_synchrony/physics_model/overlap_sim_18nov2023/petite_50sim_50n_1.2ar_overlaps.csv';
+
+
+add_cell_after_all_attempts=0; % 1 it always add the cell, 0 only adds it if there was space in the first 10 attempts
+
+
+N               = 30; % number of clusters to generate
 numGens         = 5; % number of generations of cell division in a group
-diam            = 5.085; % smallest diameter of the cell
+diam            = 4.58; % smallest diameter of the cell
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
-AR              = 1.197;%:.1:2.8; % aspect ratio value
+AR              = 1.2;%:.1:2.8; % aspect ratio value %# DEFAULT was 1.2
 err_AR          = 0; % standard deviation in aspect ratio from Shane's measurements
 pole_theta      = deg2rad(10); % buds nearest the pole will be chosen from between 0 and 10 degrees in polar angle
 THETA           = deg2rad(45); % polar angle average from SEM data
@@ -58,11 +78,7 @@ thetaVariance   = deg2rad(0); % variation in polar angle from SEM data
 distance_thresh = 1.1672; % minimum distance (um) separating bud scars
 new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
-overlap_thresh  = 233.1009; % threshold of total overlaps %#2.5e2
-
-
-
-
+overlap_thresh  = 70; % threshold of total overlaps %#2.5e2
 
 % Force input parameters:
 include_forces  = 0; % do we include forces for rearrangements? 1 = Y, 0 = N
@@ -78,22 +94,55 @@ T               = 25; % number of timesteps to allow mechanical relaxation
 % Do we visualize figures?
 figure_viz = 0; % 1 = Y, 0 = N
 
-% Do we save to file for voro++?
-voro_save = 0;
 
 
 %# Creating file for saving size at fracture distributions
-volume_size_output=0; %#initializing variable to avoid errors even if it is not used
+clust_size_output=0; %#initializing variable to avoid errors even if it is not used
 if write_to_output_file==1
-    volume_size_output = create_file(output_filename);
+    clust_size_output = create_file(output_filename);
     % Check if the file already existed, if it already existed the program
     % execution is going to be stopped
-    if volume_size_output == -1
+    if clust_size_output == -1
         return;
     end
     % Add file header
-    fprintf(volume_size_output, 'strain,sim_number,file_number,num_cells,volume_clust\n');
+    fprintf(clust_size_output, 'file_num,sim_number,size_fracture,volume,gyration_diam\n');
 end
+
+%# Creating file for saving cell overlap information
+overlaps_output=0; %#initializing variable to avoid errors even if it is not used
+if save_ind_overlaps==1
+    overlaps_output = create_file(overlaps_filename);
+    % Check if the file already existed, if it already existed the program
+    % execution is going to be stopped
+    if overlaps_output == -1
+        return;
+    end
+    % Add file header
+    fprintf(overlaps_output, 'file_num,sim_number,node_id,degree,overlap_vol,num_small_overlaps,num_big_overlaps\n');
+end
+
+%# Creating file for saving the position of the cell overlaps
+overlap_pos_file=0; %#initializing variable to avoid errors even if it is not used
+if calculate_overlap_position_end==1
+    overlap_pos_file = create_file(overlap_position_name);
+    % Check if the file already existed, if it already existed the program
+    % execution is going to be stopped
+    if overlap_pos_file == -1
+        return;
+    end
+
+    % Add file header
+    fprintf(overlap_pos_file, 'file_num,sim_number,node_1_id,node_2_id,overlap_x,overlap_y,overlap_z\n');
+end
+
+% clust_size_output, write_to_output_file, cont_sim, file_number, add_cell_after_all_attempts
+global input_variables;
+input_variables=containers.Map();
+input_variables('clust_size_output')=clust_size_output;
+input_variables('write_to_output_file')=write_to_output_file;
+input_variables('add_cell_after_all_attempts')=add_cell_after_all_attempts;
+
 
 
 % Initialization:
@@ -103,7 +152,7 @@ fprintf('Written by Thomas C. Day, 2020\n');
 %% MAIN CODE: -------------------------------------------------------------
 % -------------------------------------------------------------------------
 % Parallel iteration over varied params:
-save('params.mat','N','numGens','diam','pole_theta','THETA','distance_thresh','new_bud_prob','overlap_thresh');
+% save('params.mat','N','numGens','diam','pole_theta','THETA','distance_thresh','new_bud_prob','overlap_thresh');
 % Ncells = zeros(length(AR),1);
 % Scells = Ncells;
 % for a = 1:length(AR)
@@ -122,8 +171,9 @@ for i = 1:length(file_list)
     full_file_path = fullfile(directory_path, file_name);
 
     edges_data = readtable(full_file_path, 'Delimiter', ',', 'ReadVariableNames', true);
-    node1_vals      = edges_data.node1;
-    node2_vals      = edges_data.node2;
+    node1_vals=edges_data.node1;
+    node2_vals=edges_data.node2;
+    node_times=edges_data.time_sim;
 
     if ~isempty(match)
         % Extracted number as a string
@@ -131,6 +181,8 @@ for i = 1:length(file_list)
         
         % Convert the number string to a numeric value
         file_number = str2double(number_str);
+
+        input_variables('file_number')=file_number;
 
         cells_sim = cell(N,1);
         % aspRat    = AR(a);
@@ -140,38 +192,49 @@ for i = 1:length(file_list)
         filename = strrep(filename, '.','-');
         COM = zeros(3,N);
         RAD = zeros(1,N);
-        ncells = zeros(1,N);
-        
+    	ncells = zeros(1,N);
+    	
         for ii = 1:N
             
+            input_variables('sim_number')=ii;
+
             % Generate one cluster:
             % fprintf(['Cluster #: ',num2str(ii), ' / ', num2str(N), '\n']);
-            [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, theta, thetaVariance, distance_thresh, new_bud_prob, numGens, NEIGHBOR_THRESH, check_overlap, overlap_thresh, node1_vals, node2_vals);
+            [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, theta, thetaVariance, distance_thresh, new_bud_prob, numGens, NEIGHBOR_THRESH, check_overlap, overlap_thresh, node1_vals, node2_vals, node_times);
             ncells(ii) = length(cell_list);
-            Centers = [cell_list.Center];
-            Centers = Centers';
-            [T,V] = convhull(Centers);
-            cluster_volumes(ii) = V;
+    		
 
-            if write_to_output_file==1
-                fprintf(volume_size_output, '%s,%d,%d,%d,%d\n', strain, ii, file_number, length(cell_list), V);
-            end
-            
+            % Calculating individual cell overlaps
+            if calc_ind_overlap == 1
+                [cell_overlaps, big_overlaps_list, small_overlaps_list] = calculate_ind_cell_overlaps(cell_list, NEIGHBOR_THRESH);
 
-            % Allow for force relaxations from steric interactions:
-            if include_forces == 1
-                warning('off');
-                [~, cell_list, overlaps] = INCLUDE_FORCES(cell_list, NEIGHBOR_THRESH, STERIC_MAG, CHITIN_MAG, BOND_TORQ_MAG, mobility_pos, mobility_rot, dt, T, figure_viz);
-                warning('on');
+                if save_ind_overlaps==1
+                    save_ind_overlaps_to_file(overlaps_output, file_number, ii, cell_list, cell_overlaps, big_overlaps_list, small_overlaps_list);
+                end
             end
 
-            
-            
+
+            if calculate_overlap_position_end==1
+                % Obtain distances between all particles:
+                [D, ~, ~, ~] = get_particle_distances(cell_list);
+                
+                % Find all pairs of cells within the neighborhood threshold:
+                Neighbor = D < NEIGHBOR_THRESH; % finds all neighbor cells
+                Neighbor = Neighbor - eye(size(Neighbor)); % we don't care about counting a cell as its own neighbor
+
+                for n = 1:length(cell_list)
+                    neighbors = find(Neighbor(:,n) == 1); % only need to check the neighboring cells for interactions
+                    
+                    get_center_overlaps(cell_list, n, neighbors, overlap_pos_file);
+                end
+            end
+
+            	
         end
-        % fprintf(['Mean number of cells per group: ',num2str(mean(ncells)),'\n']);
-        % fprintf(['Stdev number of cells per group: ',num2str(std(ncells)),'\n']);
-        % Ncells(a) = mean(ncells);
-        % Scells(a) = std(ncells);
+    	% fprintf(['Mean number of cells per group: ',num2str(mean(ncells)),'\n']);
+    	% fprintf(['Stdev number of cells per group: ',num2str(std(ncells)),'\n']);
+    	% Ncells(a) = mean(ncells);
+    	% Scells(a) = std(ncells);
     end
 
     fprintf(['File #: ',num2str(i), ' / ', num2str(tot_files), '\n']);
@@ -191,21 +254,20 @@ if figure_viz == 1
     material dull;
 end
 
-% Save voro information to file:
-if voro_save == 1
-    saveCOM  = [COM; RAD];
-    voroname = 'COM_file.txt';
-    fid = fopen(voroname, 'w');
-    fprintf(fid,'%f %f %f %f\n', saveCOM);
-    fclose(fid);
-end
-
 
 %# Close output files
 if write_to_output_file==1
-    fclose(volume_size_output);
+    fclose(clust_size_output);
 end
 
+if save_ind_overlaps==1
+    fclose(overlaps_output);
+end
+
+
+if calculate_overlap_position_end==1
+    fclose(overlap_pos_file);
+end
 
 %% Added functions by Luis
 
@@ -260,13 +322,59 @@ function [final_overlaps, big_overlaps_list, small_overlaps_list] = calculate_in
 end
 
 
-%# Function to calculate each cells total overlap volume
-% The function is modification of get_overlaps and it only returns the cumulative value
-% of that cell
-% probably some of the stuff that is no longer used could be deleted to increase performance of
-% the function
-function [sum_overlap, num_big_overlaps, num_small_overlaps] = get_cell_overlap(cell_list, ix_o_i, nbors)
+
+
+function save_ind_overlaps_to_file(overlaps_output, file_number, sim_number, cell_list, cell_overlaps, big_overlaps_list, small_overlaps_list)
+
+    for i = 1:length(cell_list)
+        %cell id (network)
+        temp_cell_id=cell_list(i).networkID;
+
+        %The plus one is to take into account their connection to their mother
+        temp_degree=length(cell_list(i).Daughters)+1;
+
+        fprintf(overlaps_output, '%d,%d,%d,%d,%d,%d,%d\n', file_number, sim_number, temp_cell_id, temp_degree, cell_overlaps(i), big_overlaps_list(i), small_overlaps_list(i));
+
+    end
+end
+
+
+% Function to obtain the gyration diameter of a cluster, it calculates the radius, converts it to meters and then
+%multiplies by two to get the diameter
+function [diameter]=gyration_diameter(cell_list)
+    % Number of points (cells)
+    num_points = length(cell_list);
     
+    % Extract the center of each cell into a Nx3 matrix
+    centers = zeros(num_points, 3);
+    for i = 1:num_points
+        centers(i, :) = cell_list(i).Center.';
+    end
+    
+    % Find cluster center
+    cluster_center = mean(centers, 1);
+    
+    % Distance from every point to the center
+    distances = sqrt(sum((centers - cluster_center).^2, 2));
+    
+    % Gyration radius
+    Rg = sqrt(sum(distances.^2) / num_points)*10^-6;
+    diameter=Rg*2;
+end
+
+
+
+%# Function to write the position of all the overlaps in the cluster after fragmentation
+% function modified from get_cell_overlap and writes to overlap_pos_file to save the coordinates of the overlap
+% center
+% Note: each overlap is processed more than once as they are processed for each cell, so there needs to be a filtering
+% step to not count the overlap more than once
+function get_center_overlaps(cell_list, ix_o_i, nbors, overlap_pos_file)
+    
+    global input_variables;
+    sim_number=input_variables('sim_number');
+    file_number=input_variables('file_number');
+
     % Obtain overlapping volume and center point of overlap:
     cell1       = cell_list(ix_o_i);
     Force_pts   = [];
@@ -275,8 +383,6 @@ function [sum_overlap, num_big_overlaps, num_small_overlaps] = get_cell_overlap(
     Directions  = [];
 
     sum_overlap=0;
-    num_small_overlaps=0;
-    num_big_overlaps=0;
 
     for j = 1:length(nbors)
         cell2 = cell_list(nbors(j));
@@ -308,13 +414,11 @@ function [sum_overlap, num_big_overlaps, num_small_overlaps] = get_cell_overlap(
             COM     = [];
             Fpt_1   = [];
             direction = [];
-
         elseif (10 <= length(ix)) && (length(ix) < 100) % they only overlap by a little bit
             r1_E2   = M2 \ r1;
             D_help  = vecnorm(r1_E2(1:3,:));
             ix_E2   = find(D_help < 1);
             inters  = [r1(1:3,ix_E2), r2(1:3,ix)]';
-
             %# Sometimes convhull gives and error saying there are not enough unique points to 
             % calculate the volume, and by testing it seems that the error is caused because the
             % inters variable repeats the same value for each of it columns, as if the intesection
@@ -340,14 +444,12 @@ function [sum_overlap, num_big_overlaps, num_small_overlaps] = get_cell_overlap(
                 direction = direction/norm(direction);
 
                 sum_overlap=sum_overlap+overlap(2);
-                num_small_overlaps=num_small_overlaps+1;
             else
                 overlap = []; % add nothing to the overlaps
                 COM     = [];
                 Fpt_1   = [];
                 direction = [];
             end
-
 
         else % they overlap by a significant amount
             v1       = [x1,y1,z1]; % vertices defining cell1
@@ -366,8 +468,7 @@ function [sum_overlap, num_big_overlaps, num_small_overlaps] = get_cell_overlap(
             direction = direc(1:3) - Fpt_1;
             direction = direction/norm(direction);
 
-            sum_overlap=sum_overlap+overlap(2);
-            num_big_overlaps=num_big_overlaps+1;
+            sum_overlap=sum_overlap+overlap;
         end
         % Store info to cell array:
         Force_pts = [Force_pts, Fpt_1];
@@ -375,30 +476,25 @@ function [sum_overlap, num_big_overlaps, num_small_overlaps] = get_cell_overlap(
         Overlaps = [Overlaps, overlap];
         Directions = [Directions, direction];
 
-    end
-
-end
-
-function save_ind_overlaps_to_file(overlaps_output, file_number, sim_number, cell_list, cell_overlaps, big_overlaps_list, small_overlaps_list)
-
-    for i = 1:length(cell_list)
-        %cell id (network)
-        temp_cell_id=cell_list(i).networkID;
-
-        %The plus one is to take into account their connection to their mother
-        temp_degree=length(cell_list(i).Daughters)+1;
-
-        fprintf(overlaps_output, '%d,%d,%d,%d,%d,%d,%d\n', file_number, sim_number, temp_cell_id, temp_degree, cell_overlaps(i), big_overlaps_list(i), small_overlaps_list(i));
+        if length(COM)>=1
+            fprintf(overlap_pos_file, "%d,%d,%d,%d,%d,%d,%d\n", file_number, sim_number, cell1.networkID, cell2.networkID, COM(1), COM(2), COM(3));
+        end
 
     end
+
 end
 
 
 %% FUNCTIONS
-function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, theta, thetaVariance, distance_thresh, new_bud_prob, numGens, neighbor_thresh, check_overlap, overlap_thresh, node1_vals, node2_vals)
+function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, theta, thetaVariance, distance_thresh, new_bud_prob, numGens, neighbor_thresh, check_overlap, overlap_thresh, node1_vals, node2_vals, node_times)
 
-    % The following parameters of the code where deleted:
-    % clust_size_output, write_to_output_file, cont_sim, file_number
+    global input_variables;
+    write_to_output_file=input_variables('write_to_output_file');
+    sim_number=input_variables('sim_number');
+    file_number=input_variables('file_number');
+    clust_size_output=input_variables('clust_size_output');
+    add_cell_after_all_attempts=input_variables('add_cell_after_all_attempts');
+
 
     cell_list       = [];  % this will eventually be the tabulated list
     
@@ -420,6 +516,9 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
     cont_failed_to_add_edge=0;
     cont_missing_mother_cell=0;
 
+    curr_time=node_times(1);
+    last_time=curr_time;
+
     % Iterate over generations:
     % for g = 1:numGens
     % Iterate over the edges of the loaded file
@@ -428,8 +527,9 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
         
         % First check the total amount of overlap in the cluster:edges_sim_files
         %fprintf(['Gen = ',num2str(g),'\n']);
-        if check_overlap == 1
+        if check_overlap == 1 & last_time<curr_time
             flag = CHECK_OVERLAPS2(cell_list, overlap_thresh);
+            last_time=curr_time;
         else
             flag = 0;
         end
@@ -438,14 +538,6 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
 
         if flag ~= 1
             
-            % If there is not too much overlap:
-            % nPossible   = length(cell_list); % number of possible new cells
-            %# What to do with this variables?
-            % variedTheta = theta + thetaVariance * randn(nPossible, 1); % list of theta values corresponding to these cells
-
-            % Assign positions for the newest cells:
-            % for n = 1:nPossible
-                % n is the mother cell
 
             %# I need to find the position of the mother cell in the list cell_list by checking if cell_list(n).IDnumber
             %# is equal to node1_vals(cont_rows), if it isn't found then we need to skip the row as that cell was not able to
@@ -453,6 +545,7 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
             %# After the for loop if the cell id of the mother was found, then n is going to be the position
             mother_cell_id=node1_vals(cont_rows);
             daughter_cell_id=node2_vals(cont_rows);
+            curr_time=node_times(cont_rows);
 
             nPossible   = length(cell_list);
             cell_id_in_list=0;
@@ -464,79 +557,70 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
                 end
             end
 
-            % fprintf(['cell_id_in_list: ', num2str(cell_id_in_list),'\n']);
+            if cell_id_in_list==1
 
-            %# If the cellid of the mother wasn't found in the list, then the code will skip to the next edge to add 
-            if cell_id_in_list==0
-                % fprintf(['cell not found in list\n'])
-                cont_missing_mother_cell=cont_missing_mother_cell+1;
-                continue;
-            end
+                %# Doing at least 10 attempts to find where the cell is going to be located
+                cont_attempts=0;
+                newBud=0; %# Default value of new bud, it is assigned here as this would be the first time it is assigned
 
-            %# Doing at least 10 attempts to find where the cell is going to be located
-            cont_attempts=0;
-            newBud=0; %# Default value of new bud, it is assigned here as this would be the first time it is assigned
+                while cont_attempts<10 & newBud == 0 %if one of this conditions is met then it needs to stop
+                    %# This may need to be outside the loop, now we are only sampling 1 value because it is processing one cell at a time
+                    variedTheta = theta + thetaVariance * randn(1); %theta value corresponding to the cell
+                    %# To test if variedtheta gets different values or not when
+                    %# thetaVariance is 0
+                    % fprintf(['variedTheta: ', num2str(variedTheta), '\n']); %# it prints always the same value
 
-            %#Think if this variable needs to be outside of the loop or
-            %inside
-            % variedTheta = theta + thetaVariance * randn(1);
+                    [newBud, newBudRel, newAxis] = getDaughterPos(cell_list(n), pole_theta, variedTheta, distance_thresh, new_bud_prob); % finds the new bud xyz position and relative position to the old cell
+                    cont_attempts=cont_attempts+1;
+                end
 
-            while cont_attempts<10 & newBud == 0 %if one of this conditions is met then it needs to stop
-                %# This may need to be outside the loop, now we are only sampling 1 value because it is processing one cell at a time
-                variedTheta = theta + thetaVariance * randn(1); %theta value corresponding to the cell
-                %# To test if variedtheta gets different values or not when
-                %# thetaVariance is 0
-                % fprintf(['variedTheta: ', num2str(variedTheta), '\n']); %# it prints always the same value
+                % If there wasn't space for the cell then it is just sampled randomly if add_cell_after_all_attempts is 1
+                if newBud==0 & add_cell_after_all_attempts==1
+                    variedTheta = theta + thetaVariance * randn(1);
+                    [newBud, newBudRel, newAxis] = getDaughterPos_always(cell_list(n), pole_theta, variedTheta, distance_thresh, new_bud_prob); % finds the new bud xyz position and relative position to the old cell
+                end
 
-                [newBud, newBudRel, newAxis] = getDaughterPos(cell_list(n), pole_theta, variedTheta, distance_thresh, new_bud_prob); % finds the new bud xyz position and relative position to the old cell
-                cont_attempts=cont_attempts+1;
-            end
 
-            if newBud==0
-                % fprintf('failed to add an edge\n')
-                cont_failed_to_add_edge=cont_failed_to_add_edge+1;
-            end
 
-            % fprintf(['cont_attempts: ',num2str(cont_attempts), '\n']);
+                if newBud ~= 0 % if the budding chance was successful
+                    counting_ix = counting_ix + 1; % the number of cells goes up by one
 
-            if newBud ~= 0 % if the budding chance was successful
-                counting_ix = counting_ix + 1; % the number of cells goes up by one
+                    % record new bud in mother cell information array:
+                    cell_list(n).BudXYZ = [cell_list(n).BudXYZ, newBudRel];
+                    cell_list(n).Daughters = [cell_list(n).Daughters, counting_ix];
 
-                % record new bud in mother cell information array:
-                cell_list(n).BudXYZ = [cell_list(n).BudXYZ, newBudRel];
-                cell_list(n).Daughters = [cell_list(n).Daughters, counting_ix];
+                    % record new cell information for the cell list:
+                    newCell.IDnumber     = counting_ix;
+                    newCell.Generation   = 0; %# how to count generations? this are cells generation it was g before but I set it as 0 for the moment
+                    newCell.Mother       = cell_list(n).IDnumber;
+                    newCell.networkID    = daughter_cell_id;
+                    newCell.Daughters    = [];
+                    newCell.BudXYZ       = [];
+                    newCell.Overlaps     = [];
+                    newCell.Neighborhood = [];
+                    newCell.Radii        = 1/2 * [aspRat * diam; diam; diam];
 
-                % record new cell information for the cell list:
-                newCell.IDnumber     = counting_ix;
-                newCell.Generation   = 0; %# how to count generations? this are cells generation it was g before but I set it as 0 for the moment
-                newCell.Mother       = cell_list(n).IDnumber;
-                newCell.networkID    = daughter_cell_id;
-                newCell.Daughters    = [];
-                newCell.BudXYZ       = [];
-                newCell.Overlaps     = [];
-                newCell.Neighborhood = [];
-                newCell.Radii        = 1/2 * [aspRat * diam; diam; diam];
+                    % Find new cell center:
+                    [Sm, Rm, Tm]   = GET_SURFACE_MATRICES(cell_list(n), .1);
+                    A              = newCell.Radii(1);
+                    p              = A * newAxis + newBudRel;
+                    q              = Tm * Rm * [p; 1];
+                    newCell.Center = q(1:3);
 
-                % Find new cell center:
-                [Sm, Rm, Tm]   = GET_SURFACE_MATRICES(cell_list(n), .1);
-                A              = newCell.Radii(1);
-                p              = A * newAxis + newBudRel;
-                q              = Tm * Rm * [p; 1];
-                newCell.Center = q(1:3);
+                    % Choose a cell orientation based upon surface normal axis:
+                    avec   = newCell.Center - newBud(1:3);
+                    avec   = avec./norm(avec);
+                    bvec_x = rand;
+                    bvec_y = rand;
+                    bvec_z = - (avec(1)*bvec_x + avec(2)*bvec_y)/avec(3);
+                    bvec   = [bvec_x; bvec_y; bvec_z];
+                    bvec   = bvec./norm(bvec);
+                    cvec   = cross(avec, bvec);
+                    newCell.Rmatrix = [avec, bvec, cvec];
 
-                % Choose a cell orientation based upon surface normal axis:
-                avec   = newCell.Center - newBud(1:3);
-                avec   = avec./norm(avec);
-                bvec_x = rand;
-                bvec_y = rand;
-                bvec_z = - (avec(1)*bvec_x + avec(2)*bvec_y)/avec(3);
-                bvec   = [bvec_x; bvec_y; bvec_z];
-                bvec   = bvec./norm(bvec);
-                cvec   = cross(avec, bvec);
-                newCell.Rmatrix = [avec, bvec, cvec];
-
-                % add new cell to cell list:
-                cell_list = [cell_list, newCell];
+                    % add new cell to cell list:
+                    cell_list = [cell_list, newCell];
+                end
             end
         else
             cell_list = cell_list;
@@ -547,10 +631,17 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
 
     end
 
-    % %# write information to output file
-    % if write_to_output_file==1
-    %     fprintf(clust_size_output, '%d,%d,%d,%d,%d\n', file_number, cont_sim, length(cell_list), cont_failed_to_add_edge, cont_missing_mother_cell);
-    % end
+    % Calculating cluster volume
+    Centers = [cell_list.Center];
+    Centers = Centers';
+    [T,V] = convhull(Centers);
+
+    temp_diameter=gyration_diameter(cell_list);
+
+    %# write information to output file
+    if write_to_output_file==1
+        fprintf(clust_size_output, '%d,%d,%d,%d,%d\n', file_number, sim_number, length(cell_list), V, temp_diameter);
+    end
     
 end
 
@@ -628,6 +719,7 @@ function [S, R, T] = GET_SURFACE_MATRICES(cell_of_interest, scaling)
 
 end
 
+
 function [newPos, relativePos, axis] = getDaughterPos(CELL, POLE_TH, TH, DISTANCE_THRESH, NEW_BUD_PROB_THRESH)
 
     % Surface definition for possible mother cell:
@@ -697,68 +789,70 @@ function [newPos, relativePos, axis] = getDaughterPos(CELL, POLE_TH, TH, DISTANC
 
 end
 
-function [cell_list_in, cell_list_out, Overlaps] = INCLUDE_FORCES(cell_list, neighbor_thresh, steric_magnitude, chitin_magnitude, bond_torque_magnitude, mobility_pos, mobility_rot, dt, T, figure_viz)
-% This function takes as input a grown snowflake and calculates the forces
-% and torques on each cell. From these forces, it the calculates any
-% rearrangements.
+% function modified to always return a budding cell position no matter of the distance to other budding cells
+function [newPos, relativePos, axis] = getDaughterPos_always(CELL, POLE_TH, TH, DISTANCE_THRESH, NEW_BUD_PROB_THRESH)
 
-cell_list_in = cell_list;
+    % Surface definition for possible mother cell:
+    [Sm, Rm, Tm] = GET_SURFACE_MATRICES(CELL, .1);
 
-for t = 1:T
-    fprintf(['Time = ',num2str(t),'\n']);
-    [Forces, Torques, flog1, flog2, Overlaps] = get_forces_torques(cell_list, neighbor_thresh, steric_magnitude, chitin_magnitude, bond_torque_magnitude);
-    [cell_list] = UPDATE_POSITIONS(cell_list, Forces, Torques, mobility_pos, mobility_rot, dt);
-    
-    if figure_viz == 1
-        if mod(t,1) == 0
-            figure(1); clf;
-            hold on; box on; set(gca,'linewidth',2);
-            for n = 1:length(cell_list)
-                c_o_i = cell_list(n);
-                [x,y,z] = VISUALIZE_ELLIPSOID(c_o_i, 30);
-                surf(x,y,z,'facealpha',1,'edgecolor','none');
-                %{
-%                 Fnet = 3*Forces(:,n) + c_o_i.Center;
-%                 Tnet = 3*Torques(:,n) + c_o_i.Center;
-%                 plot3([c_o_i.Center(1), Fnet(1)], [c_o_i.Center(2),Fnet(2)], [c_o_i.Center(3), Fnet(3)],'r-','linewidth',3);
-%                 plot3([c_o_i.Center(1), Tnet(1)], [c_o_i.Center(2),Tnet(2)], [c_o_i.Center(3), Tnet(3)],'b-','linewidth',3);
-                forces = flog1{n};
-                ix = find(vecnorm(forces) ~= 0);
-                forces(:,ix) = forces(:,ix)./vecnorm(forces(:,ix));
-                pts = flog2{n};
-                plot3(pts(1,1), pts(2,1), pts(3,1), 'rx','markersize',12,'linewidth',2); % plot birth scar location
-                plot3([pts(1,1), pts(1,1)+forces(1,1)], [pts(2,1), pts(2,1)+forces(2,1)], [pts(3,1), pts(3,1)+forces(3,1)],'r-','linewidth',2); % plot force from birth scar
-                nDaughters = length(cell_list(n).Daughters);
-                if nDaughters == 0
-                    nDaughters = 1;
-                end
-                for jj = 1:nDaughters
-                    plot3(pts(1,jj+1), pts(2,jj+1), pts(3,jj+1),'b.','markersize',10,'linewidth',2);
-                    plot3([pts(1,jj+1), pts(1,jj+1)+forces(1,jj+1)], [pts(2,jj+1), pts(2,jj+1)+forces(2,jj+1)], [pts(3,jj+1), pts(3,jj+1)+forces(3,jj+1)],'b-','linewidth',2); % plot force from daughters
-                end
-                plot3(pts(1,nDaughters+2:end), pts(2,nDaughters+2:end), pts(3,nDaughters+2:end),'go','markersize',14,'linewidth',2);
-                plot3([pts(1,nDaughters+2:end), pts(1,nDaughters+2:end) + forces(1,nDaughters+2:end)],[pts(2,nDaughters+2:end), pts(2,nDaughters+2:end) + forces(2,nDaughters+2:end)], [pts(3,nDaughters+2:end), pts(3,nDaughters+2:end) + forces(3,nDaughters+2:end)],'g-','linewidth',2);
-                %}
-            end
-            view(3); axis equal;
-            lightangle(15,15);
-            lighting gouraud;
-            material dull;
-            centers = [cell_list.Center];
-            xlim([min(centers(1,:)) - 5, max(centers(1,:)) + 5]);
-            ylim([min(centers(2,:)) - 5, max(centers(2,:)) + 5]);
-            zlim([min(centers(3,:)) - 5, max(centers(3,:)) + 5]);
-            title([num2str(t)]);
-            drawnow;
-            % print(['test_sims_t=',num2str(t,'%03.f')],'-dpng','-r500');
-            % uncomment this line to print the file
+    % Determine where on cell body to bud the next scar:
+    if isempty(CELL.Daughters) % reproduce near the pole with prob 0.7
+        frac = rand;
+        if frac < NEW_BUD_PROB_THRESH
+            % bud at pole
+            th = POLE_TH * rand;
+            ph = 2 * pi * rand;
+            ix_too_close = [];
+            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
+            x = r * cos(th);
+            y = r * sin(th) * cos(ph);
+            z = r * sin(th) * sin(ph);
+        else
+            % bud on the polar angle
+            ph = 2 * pi * rand;
+            th = TH;
+            ix_too_close = [];
+            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
+            x = r * cos(th);
+            y = r * sin(th) * cos(ph);
+            z = r * sin(th) * sin(ph);
         end
+
+    else % reproduce based upon the polar angle theta, sometimes back bud (if 3 or more bud scars)
+        
+        nDaughters = size(CELL.BudXYZ,2);
+        if nDaughters < 4
+            ph = 2 * pi * rand;
+            th = TH;
+        else
+            frac = rand;
+            if frac < 1 % bud at the distal pole
+                ph = 2 * pi * rand;
+                th = TH;
+            else % bud at proximal pole
+                ph = 2 * pi * rand;
+                th = deg2rad(180) - TH;
+            end
+        end
+
+        % Check if new location is too close to existing scars:
+        r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
+        x = r * cos(th);
+        y = r * sin(th) * cos(ph);
+        z = r * sin(th) * sin(ph);
+        t = [x; y; z];
+        s = CELL.BudXYZ - t;
+        d = sqrt(s(1,:).^2 + s(2,:).^2 + s(3,:).^2);
+        ix_too_close = find(d < DISTANCE_THRESH);
     end
-end
-    
-cell_list_out = cell_list;
+
+    relativePos = [x; y; z];
+    newPos      = Tm * Rm * [relativePos; 1];
+    normal      = 2 * [x/Sm(1,1)^2; y/Sm(2,2)^2; z/Sm(3,3)^2];
+    axis        = normal./norm(normal);
 
 end
+
 
 
 function [cell_list_out] = UPDATE_POSITIONS(cell_list, Forces, Torques, mobility_pos, mobility_rot, dt)
@@ -788,226 +882,6 @@ function [cell_list_out] = UPDATE_POSITIONS(cell_list, Forces, Torques, mobility
 end
 
 
-function [Forces, Torques, forces_log1, forces_log2, final_overlaps] = get_forces_torques(cell_list, neighbor_thresh, steric_magnitude, chitin_magnitude, bond_torque_magnitude)
-    % Calculate the forces and torques acting on all cells in the group.
-    % This function can get quite heavy.
-
-    % Obtain distances between all particles:
-    [D, ~, ~, ~] = get_particle_distances(cell_list);
-    
-    % Find all pairs of cells within the neighborhood threshold:
-    N = D < neighbor_thresh; % finds all neighbor cells
-    N = N - eye(size(N)); % we don't care about counting a cell as its own neighbor
-    
-    % Obtain forces/torques for each cell:
-    Forces = zeros(3, length(cell_list));
-    Torques = zeros(3, length(cell_list));
-    final_overlaps = [];
-    for n = 1:length(cell_list)
-        neighbors = find(N(:,n) == 1); % only need to check the neighboring cells for interactions
-        
-        % Steric interactions:
-        [F_pts, O_pts, Overlaps, Directions] = get_overlaps(cell_list, n, neighbors);
-        final_overlaps = [final_overlaps, Overlaps];
-        
-        % Chitin interactions:
-        [m_pts, d_pts] = CHITIN_INTERACTIONS(cell_list, n);
-        
-        % Calculate forces:
-        % Force from chitin bond with mother cell
-        if isempty(m_pts)
-            F_mother = [0;0;0];
-        else
-            F_mother = chitin_magnitude * m_pts;
-        end
-        % Forces from chitin bonds with daughters
-        if isempty(d_pts)
-            F_daughter = [0;0;0];
-        else
-            F_daughter = chitin_magnitude * d_pts;
-        end
-        % Forces from steric interactions
-        if ~isempty(Overlaps)
-            F_steric = steric_magnitude * Overlaps(2,:) .* Directions;
-        else
-            F_steric = [0;0;0];
-        end
-        % All forces
-        forces = [F_mother, F_daughter, F_steric];
-        Forces(:,n) = sum(forces, 2);
-        
-        % Log forces and force pts for visualization:
-        forces_log1{n} = forces;
-        [S,R,T] = GET_SURFACE_MATRICES(cell_list(n),0);
-        M = T*R*S;
-        mother_log = M*[-1;0;0;1];
-        if ~isempty(cell_list(n).Daughters)
-            daughter_log = T*R*[cell_list(n).BudXYZ; ones(1,length(cell_list(n).Daughters))];
-            if isempty(F_pts)
-                F_pts = mother_log(1:3);            
-            end
-            forces_log2{n} = [mother_log(1:3), daughter_log(1:3,:), F_pts];
-        else
-            if isempty(F_pts)
-                F_pts = mother_log(1:3);
-            end
-            forces_log2{n} = [mother_log(1:3), mother_log(1:3), F_pts];
-        end
-        
-        % Calculate torques:
-        % First calculate the r-vector:
-        [S, R, T]  = GET_SURFACE_MATRICES(cell_list(n), 0); 
-        M = T*R*S;
-        if isempty(cell_list(n).Mother)
-            r_mother = [0;0;0;1];
-        else
-            r_mother   = M * [-1; 0; 0; 1] - M * [0;0;0;1];
-        end
-        if ~isempty(cell_list(n).Daughters)
-            r_daughter = T * R * [cell_list(n).BudXYZ; ones(1,size(cell_list(n).BudXYZ,2))] - M*[0;0;0;1];
-        else
-            r_daughter = [0;0;0;1];
-        end
-        r_steric   = [F_pts; ones(1,size(F_pts,2))] - M*[0;0;0;1];
-        if isempty(r_steric)
-            r_steric = [0;0;0;1];
-        end
-        r_angle = -r_mother(1:3);
-        if ~isempty(cell_list(n).Mother)
-            % n 
-            cell_mother = cell_list(n).Mother + 1;
-            ix = find(cell_list(cell_mother).Daughters == n - 1);
-            budxyz = cell_list(cell_mother).BudXYZ(:,ix);
-            [s, r, t] = GET_SURFACE_MATRICES(cell_list(cell_mother),0);
-            surf_norm = 2 * [budxyz(1)/s(1,1)^2; budxyz(2)/s(2,2)^2; budxyz(3)/s(3,3)^2];
-            preferred_axis = r * [surf_norm; 1];
-            current_axis = R * S * [1;0;0;1];
-            preferred_axis = preferred_axis(1:3)/norm(preferred_axis(1:3));
-            current_axis = current_axis(1:3)/norm(current_axis(1:3));
-            v = bond_torque_magnitude * (preferred_axis - current_axis);
-        else
-            v = [0;0;0];
-        end
-        forces = [forces, v];
-        rdisp = [r_mother(1:3,:), r_daughter(1:3,:), r_steric(1:3,:), r_angle];
-        torques = zeros(size(forces));
-        for i = 1:size(forces,2)
-            torques(:,i) = cross(forces(:,i), rdisp(:,i));
-        end
-        Torques(:,n) = sum(torques, 2);
-    end
-
-end
-
-function [Force_pts, Overlap_pts, Overlaps, Directions] = get_overlaps(cell_list, ix_o_i, nbors)
-    
-    % Obtain overlapping volume and center point of overlap:
-    cell1       = cell_list(ix_o_i);
-    Force_pts   = [];
-    Overlap_pts = [];
-    Overlaps    = [];
-    Directions  = [];
-    for j = 1:length(nbors)
-        cell2 = cell_list(nbors(j));
-        
-        % Check if the two cells overlap at all: --------------------------  
-        % First numerically approximate the surface of each cell
-        [x1,y1,z1] = VISUALIZE_ELLIPSOID(cell1, 20); % numerical surface
-        [x2,y2,z2] = VISUALIZE_ELLIPSOID(cell2, 20);
-        x1 = x1(:); y1 = y1(:); z1 = z1(:);
-        x2 = x2(:); y2 = y2(:); z2 = z2(:);
-        r1 = [x1,y1,z1,ones(size(x1))]';
-        r2 = [x2,y2,z2,ones(size(x2))]';
-        
-        % Second find the analytic surface of each ellipsoid
-        [S1,R1,T1] = GET_SURFACE_MATRICES(cell1, 0); % find analytic surface matrix
-        [S2,R2,T2] = GET_SURFACE_MATRICES(cell2, 0);
-        M1 = T1 * R1 * S1; % surface matrices
-        M2 = T2 * R2 * S2;
-        
-        % Third transform the approximate surface of E2 into the analytic
-        % coords of E1
-        r2_E1 = M1 \ r2;        % all the points defining E2, in E1 coords
-        D = vecnorm(r2_E1(1:3,:)); % distance from origin in E1 space
-        ix = find(D < 1); % any points less than 1 are within the surface of E1
-        
-        % Main calculation:
-        if length(ix) < 10 % they do not overlap
-            overlap = []; % add nothing to the overlaps
-            COM     = [];
-            Fpt_1   = [];
-            direction = [];
-        elseif (10 <= length(ix)) && (length(ix) < 100) % they only overlap by a little bit
-            r1_E2   = M2 \ r1;
-            D_help  = vecnorm(r1_E2(1:3,:));
-            ix_E2   = find(D_help < 1);
-            inters  = [r1(1:3,ix_E2), r2(1:3,ix)]';
-            %# Sometimes convhull gives and error saying there are not enough unique points to 
-            % calculate the volume, and by testing it seems that the error is caused because the
-            % inters variable repeats the same value for each of it columns, as if the intesection
-            % of the ellipses was just a single point, this code is going to test if that is the 
-            % case, and assing the value as if there was no overlap in that case, and it they are
-            % different then it is going to do the same computation as it had in the original function
-
-            hasMultipleUniqueValues = false(1, size(inters, 2));
-
-            % Check each column for multiple unique values
-            for i = 1:size(inters, 2)
-                uniqueValues = unique(inters(:, i));
-                hasMultipleUniqueValues(i) = length(uniqueValues) > 3;
-            end
-
-            if all(hasMultipleUniqueValues)
-                [~,vol] = convhull(inters(:,1),inters(:,2),inters(:,3));
-                overlap = [nbors(j); vol];
-                COM     = mean(inters)';
-                Fpt_1   = get_force_point(COM, cell1);% Find force point on the surface of the cell of interest
-                direc   = M1 * [0;0;0;1];
-                direction = direc(1:3) - Fpt_1;
-                direction = direction/norm(direction);
-            else
-                overlap = []; % add nothing to the overlaps
-                COM     = [];
-                Fpt_1   = [];
-                direction = [];
-            end
-        else % they overlap by a significant amount
-            v1       = [x1,y1,z1]; % vertices defining cell1
-            v2       = [x2,y2,z2]; % vertices defining cell2
-            r1_E2    = M2 \ r1;
-            D_help   = vecnorm(r1_E2(1:3,:));
-            ix_E2    = find(D_help < 1);
-            inters   = [r1(1:3,ix_E2), r2(1:3,ix)]';
-            COM      = mean(inters)'; % a point common to both cells
-            [inters] = INTERSECTION(v1, v2, COM');
-            [~,vol]  = convhull(inters(:,1), inters(:,2), inters(:,3)); % returns the volume of overlap
-            overlap  = [nbors(j); vol]; % add to overlaps array
-            COM      = mean(inters)'; % center of the overlap volume
-            Fpt_1    = get_force_point(COM, cell_list(ix_o_i));
-            direc    = M1 * [0;0;0;1];
-            direction = direc(1:3) - Fpt_1;
-            direction = direction/norm(direction);
-            % Find force point on the surface of the cell of interest:
-        end
-        % Store info to cell array:
-        Force_pts = [Force_pts, Fpt_1];
-        Overlap_pts = [Overlap_pts, COM];
-        Overlaps = [Overlaps, overlap];
-        Directions = [Directions, direction];
-%         cell_list(ix_o_i).Force_pts   = [cell_list(ix_o_i).Force_pts, Fpt_1];
-%         cell_list(ix_o_i).Overlap_pts = [cell_list(ix_o_i).Overlap_pts, COM];
-%         cell_list(ix_o_i).Overlaps    = [cell_list(ix_o_i).Overlaps, overlap];
-    end
-    
-%     % Trim to unique overlap readings:
-%     if ~isempty(cell_list(ix_o_i).Overlaps)
-%         [~,ix_unique,~] = unique(cell_list(ix_o_i).Overlaps(1,:));
-%         cell_list(ix_o_i).Overlaps    = cell_list(ix_o_i).Overlaps(:,ix_unique);
-%         cell_list(ix_o_i).Overlap_pts = cell_list(ix_o_i).Overlap_pts(:,ix_unique);
-%         cell_list(ix_o_i).Force_pts   = cell_list(ix_o_i).Force_pts(:,ix_unique);
-%     end
-
-end
 
 function [m_pts, d_pts] = CHITIN_INTERACTIONS(cell_list, n)
 % Obtain all the chitin interactions acting on cell n:

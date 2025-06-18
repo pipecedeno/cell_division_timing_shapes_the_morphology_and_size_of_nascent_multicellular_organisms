@@ -8,18 +8,12 @@ of the cluster gets higher than the threshold. The code will grow only one clust
 so after fragmentation the parent cluster (the one with the highest amount of cells) is discarded
 to chech how similarity changes in the case where more differences are going to occur.
 
-Note: this code cannot be executed in parallel, because netlsd already uses all cores
+Modified: 2June2025 - Changed cell division processing to batch mode
+MODIFICATION: Changed to process all cells that divide at the same time together,
+similar to sim_clust_no_fragmentation_15nov2024.py. Fragmentation is now checked
+only after all cells at a given timepoint have divided.
 
-This code is a modification of sim_frag_pop_edge_degree_5oct2023.py.
 
-###
-Notes:
-One of the biases that this program has when there are many cells that divide at the same time,
-is that the first cell that appeared in the list with that time is the one that is going to divide
-first, and also because of how the elements are added to the list, if the mother and the daughter
-cell sample the same doubling time, the daughter is going to divide first because that is the cell
-that gets added first to the list.
-###
 
 Inputs:
 	-e: edge degree threshold of when fragmentation should happen
@@ -35,41 +29,6 @@ Outputs:
 	-networks diameter
 	-updates to fragmentation, it saves how many cells divided (updates) between fragmentations
 	-Network files are only saved for the first network to reach multiples of 10
-
-Modification history:
-Date: 16Aug2023
-The function save_degrees_to_csv was replaced by save_degree_distribution_to_csv. The idea of this
-change is to save directly the degree distribution table into the "degree_dist" csv file instead
-of the degree of each node, the idea of this change is to save storage of the information
-saved and to avoid calculating the degree distribution in R after loading all the tables for each
-simulation. This new table includes a column of frequency and another column of probability
-to be able to plot the degree distribution more easily
-
-Date: 7Sep2023
--Added the output file num_snowflakes_per_update.csv which saves how many clusters there
-are by update after each fracture, this file is to know when the population reaches 50 clusters
-and compare in which population it is being reached faster
--made the input_variabled dictionary a global variable, it is not longer being passed
-as an argument to all functions
--Now the code saves the first network that reaches each generation divisible by %10, so 0, 10, 20...
-The idea is to be able to visualize the networks after several generations
-
-Date: 18Oct2023
--Changed the code so that the output files are in a dictionary and their are kept open throughout
-the program execution
--Now the file size_at_fracture.csv won't be saved as that information is now contained in a column
-on the fragmentation_inf.csv file
-
-
-Date: 24Apr2024
--Changed the fragmentation part of the code to work similar to sim_frag_clust_edge_degree_after_all_cells_22feb2024.py
-so that the fragmentation of the cluster happens at random and it always saves the information of the propagule
--Changed the while loop in the simulate one cluster function so that the function save_final_networks function is no longer
-used and as now the while loop is going to stop by checking the size of cells to divide as in the break cluster function
-it reinitialize the list if the desired size is reached
--deleted the network similarity functions and now it is not calculated at all 
-
-
 '''
 
 import os
@@ -98,15 +57,10 @@ args = parser.parse_args()
 ### Global variables ####
 list_flags_saved_network=[]
 
-
-
-
 #### Functions for simulating networks growth ########
-
 
 #sampling the doubling time of the next division using a log normal distribution
 def sample_doub_t(first_div_params, second_div_params, division_cells):
-
 	if(division_cells==0):
 		dist_mu=first_div_params[0]
 		dist_sigma=first_div_params[1]
@@ -116,32 +70,61 @@ def sample_doub_t(first_div_params, second_div_params, division_cells):
 	
 	return(round(float(np.random.lognormal(dist_mu, dist_sigma, 1)[0]), 4))
 
-
-
-#This function adds the new doubling time to the list of doubling times, because it is expected
-#that the new doubling time is bigger than the elements of the list, it is going to iterate it
-#in reverse to make this more efficient. The element input is formed of [time until doubling, id 
-#of cell], and ordered list is the already ordered list of doublings.
-def add_to_ordered_list(element, ordered_list):
-	# Find the index to insert the element by iterating in reverse order
+# Modified function to add cells to ordered list by time (similar to no-fragmentation version)
+def add_cells_list(input_time, cell_id, ordered_list):
+	if not ordered_list:
+		ordered_list.append([input_time, [cell_id]])
+		return ordered_list
+	
 	for i, el in reversed(list(enumerate(ordered_list))):
-		if element[0] >= el[0]:
-			ordered_list.insert(i + 1, element)
-			return(ordered_list)
-	# If the element's number is smaller than all elements, insert it at the beginning
-	ordered_list.insert(0, element)
-	return(ordered_list)
+		if input_time == el[0]:
+			ordered_list[i][-1].append(cell_id)
+			return ordered_list
+		elif input_time > el[0]:
+			ordered_list.insert(i+1, [input_time, [cell_id]])
+			return ordered_list
+	
+	ordered_list.insert(0, [input_time, [cell_id]])
+	return ordered_list
 
-#This function is to substract the first value to the whole list, it will return the new updated
-#list of values
-def subtract_time(number, lst):
-	modified_lst = []
-	for element in lst:
-		time = element[0] - number
-		modified_element = [time] + element[1:]
-		modified_lst.append(modified_element)
-	return(modified_lst)
+# Modified function to divide all cells at the current timepoint
+def divide_cells(cluster_population, cells_to_divide, cont_ids, curr_time):
+	first_div_params = input_variables['first_div_params']
+	second_div_params = input_variables['second_div_params']
+	sim_number = input_variables['sim_number']
+	
+	list_ids = cells_to_divide[0][1].copy()  # Make a copy to avoid modifying the original list
+	
+	for mother_id in list_ids:
+		# Get mother cell identity before division
+		temp_mother_identity = cluster_population.nodes[mother_id]['identity']
+		
+		# Create daughter cell
+		daughter_id = cont_ids
+		cluster_population.add_node(daughter_id, number_divisions=0, identity=temp_mother_identity)
+		cluster_population.add_edge(mother_id, daughter_id)
+		temp_daughter_time = sample_doub_t(first_div_params, second_div_params, 0)
+		cells_to_divide = add_cells_list(curr_time + temp_daughter_time, daughter_id, cells_to_divide)
+		cont_ids += 1
 
+		# Update mother cell
+		cluster_population.nodes[mother_id]["number_divisions"] += 1
+		temp_mother_div = cluster_population.nodes[mother_id]["number_divisions"]
+		temp_mother_time = sample_doub_t(first_div_params, second_div_params, temp_mother_div)
+		cells_to_divide = add_cells_list(curr_time + temp_mother_time, mother_id, cells_to_divide)
+
+		# Save doubling information
+		dict_files['sampled_times'].write(sim_number+','+str(temp_mother_div)+','+str(temp_mother_time)+'\n')
+		dict_files['sampled_times'].write(sim_number+','+str(0)+','+str(temp_daughter_time)+'\n')
+		
+		# Save difference in doubling time
+		cont_gen = input_variables.get('current_generation', 0)
+		dict_files['diff_d_t'].write(sim_number+","+str(cont_gen)+","+str(abs(temp_mother_time-temp_daughter_time))+"\n")
+
+	# Remove the processed timepoint
+	cells_to_divide.pop(0)
+	
+	return [cont_ids, cells_to_divide]
 
 #Function to save the degree distribution of the network, the degree distribution is saved as a
 #probability distribution to be normalized for network size
@@ -167,7 +150,6 @@ def save_degree_distribution_to_csv(network, num_generations):
 	for i in range(len(degree_counts)):
 		dict_files['degree_dist'].write(",".join([str(j) for j in degree_counts.iloc[i]])+"\n")
 
-
 #Function to remove the next doubling times of the cells of the parent propagule that is being
 #discarded
 def remove_cells_by_component(list_cells, component):
@@ -175,19 +157,25 @@ def remove_cells_by_component(list_cells, component):
 	
 	# Iterate through the list of lists and save the positions to remove
 	for i, cell_data in enumerate(list_cells):
-		if(cell_data[1] in component):
+		# Check if any cell in the timepoint belongs to the component
+		cells_in_timepoint = cell_data[1]
+		remaining_cells = [cell for cell in cells_in_timepoint if cell not in component]
+		
+		if len(remaining_cells) == 0:
+			# All cells in this timepoint should be removed
 			positions_to_remove.append(i)
+		elif len(remaining_cells) < len(cells_in_timepoint):
+			# Some cells should be removed, update the list
+			list_cells[i][1] = remaining_cells
 	
-	# Remove the entries from the list of lists in reverse order to avoid index issues
+	# Remove empty timepoints in reverse order to avoid index issues
 	for pos in reversed(positions_to_remove):
 		list_cells.pop(pos)
 	
-	return(list_cells)
-
+	return list_cells
 
 #function to save intermediate networks
 def save_intermediate_networks(network, temp_generation_cluster):
-
 	output_dir=input_variables["output_dir"]
 	sim_number=input_variables["sim_number"]
 	network_dir=input_variables["network_dir"]
@@ -206,8 +194,6 @@ def save_intermediate_networks(network, temp_generation_cluster):
 	dict_files['diameter'].write(sim_number+","+str(temp_generation_cluster)+","+temp_diameter_network+"\n")
 
 	save_degree_distribution_to_csv(network, temp_generation_cluster)
-
-
 
 def save_fragmentation_summary(propagule, edge_to_remove, temp_generation_cluster, size_network, curr_identity):
 	output_dir=input_variables["output_dir"]
@@ -235,7 +221,6 @@ def calculate_max_edge_degree(network):
 			max_edge = edge
 
 	return([max_edge, max_edge_degree])
-
 
 #Function that does the fragmentation of the cluster and saves information about the cluster
 def break_cluster(snowflake, cells_to_divide, temp_generation_cluster, cont_updates, edge_to_remove, max_num_generations):
@@ -291,39 +276,15 @@ def break_cluster(snowflake, cells_to_divide, temp_generation_cluster, cont_upda
 	#Save how many updates have passed
 	dict_files['snowflakes_update'].write(sim_number+","+str(temp_generation_cluster)+","+str(cont_updates)+"\n")
 
+	# to finish the simulation the cells_to_divide variable is cleared
 	if(temp_generation_cluster>max_num_generations):
-		# cells_to_divide=remove_cells_by_component(cells_to_divide, snowflake.nodes())
 		cells_to_divide=[]
 
 	return(cells_to_divide)
 
-
-#Function to save properties of the final network
-def save_final_networks(network, cont_gen, cont_updates):
-	network_dir=input_variables["network_dir"]
-	sim_number=input_variables["sim_number"]
-
-
-	global list_flags_saved_network
-
-	#save cluster before if it is the first cluster of this generation
-	if(cont_gen%10==0):
-		if(list_flags_saved_network[int(cont_gen/10)]==False):
-			nx.write_graphml(network, os.path.join(network_dir,str(sim_number)+"_"+str(cont_gen)+".graphml"))
-			
-			list_flags_saved_network[int(cont_gen/10)]=True
-
-	temp_diameter_network=str(nx.diameter(network))
-	dict_files['diameter'].write(sim_number+","+str(cont_gen)+","+temp_diameter_network+"\n")
-
-	save_degree_distribution_to_csv(network, cont_gen)
-
-
-
 #Main loop where the growth of one cluster is simulated until it reaches the desired amount of
 #generations
 def simulate_one_cluster_growth(input_variables):
-
 	#defining general use variables
 	output_dir=input_variables['output_dir']
 	num_generations=input_variables['num_generations']
@@ -336,85 +297,47 @@ def simulate_one_cluster_growth(input_variables):
 
 	#creating graph and adding first cell
 	snowflake=nx.Graph() #creating graph
-
 	snowflake.add_node(cont_ids,number_divisions=0, identity='parent') #adding the first cell
-	#generations=1, cluster_id='m'
-	cells_to_divide=[[sample_doub_t(first_div_params, second_div_params, 0),1,0, 'm']] #sampling doubling time of the first cell
-	#cells to divide structure, [time to division, cell_id, num_generations, cluster_id]
-	cont_ids+=1
+	
+	# Initialize cells to divide with new structure: [[time, [cell_ids]], ...]
+	temp_next_doub = sample_doub_t(first_div_params, second_div_params, 0)
+	cells_to_divide = []
+	cells_to_divide = add_cells_list(temp_next_doub, cont_ids, cells_to_divide)
+	cont_ids += 1
 
-	t_sim=0
+	t_sim = 0
+	cont_updates = 1
+	cont_gen = 0
 
-	cont_updates=1
+	# Store current generation in input_variables for access in divide_cells
+	input_variables['current_generation'] = cont_gen
 
-	cluster_fract_size=-1
-
-	cont_gen=0
-
-	# while reached_max_generations==False:
-	while len(cells_to_divide)>0:
-
-		#Part 1: Update division time and select cell to divide
-		#check if the first element is 0, if not do the substraction of the first element to the whole 
-		#list, it could be that the first element was 0 if there where several cells that were going
-		#to divide at the same time
-		if(cells_to_divide[0][0]!=0):
-			t_sim+=cells_to_divide[0][0]
-			cells_to_divide=subtract_time(cells_to_divide[0][0], cells_to_divide)
-
-		#print(t_sim)
-		# print(cells_to_divide)
-
-		mother_id=cells_to_divide[0][1]
-
-		temp_mother_identity=snowflake.nodes[mother_id]['identity']
+	while len(cells_to_divide) > 0:
+		# Update simulation time
+		curr_time = cells_to_divide[0][0]
+		t_sim = curr_time
 		
-		#Part 2: Create daughter cell and generate next sample times
-		#create daughter cell
-		daughter_id=cont_ids
-		snowflake.add_node(daughter_id, number_divisions=0, identity=temp_mother_identity)
-		snowflake.add_edge(mother_id, daughter_id)
-		temp_daughter_time=sample_doub_t(first_div_params, second_div_params, 0) #using 0 instead of snowflake.nodes[daughter_id]["number_divisions"]
-		cells_to_divide=add_to_ordered_list([temp_daughter_time, daughter_id], cells_to_divide)
-		cont_ids+=1
+		# Update current generation in input_variables
+		input_variables['current_generation'] = cont_gen
 
-		#mother cell division
-		snowflake.nodes[mother_id]["number_divisions"]+=1 #adding that the mother divided one more time (because of the step before)
+		# Divide all cells at the current timepoint
+		cont_ids, cells_to_divide = divide_cells(snowflake, cells_to_divide, cont_ids, curr_time)
 
-		temp_mother_div=snowflake.nodes[mother_id]["number_divisions"]
-		temp_mother_time=sample_doub_t(first_div_params, second_div_params, temp_mother_div)
-		cells_to_divide=add_to_ordered_list([temp_mother_time, mother_id], cells_to_divide)
-		#print("mother next doub ",mother_id, t_sim+temp_mother_time)
+		# Check for fragmentation after all cells at this timepoint have divided
+		edge_to_remove, edge_degree = calculate_max_edge_degree(snowflake)
 
-		#removing first element of the list
-		cells_to_divide.pop(0)
-
-
-		#Part 3: save doubling information
-		dict_files['sampled_times'].write(sim_number+','+str(temp_mother_div)+','+str(temp_mother_time)+'\n')
-		dict_files['sampled_times'].write(sim_number+','+str(0)+','+str(temp_daughter_time)+'\n')
-		#saving difference in doubling time
-		dict_files['diff_d_t'].write(sim_number+","+str(cont_gen)+","+str(abs(temp_mother_time-temp_daughter_time))+"\n")
-
-		#Part 4, calculate first order edge degree
-		edge_to_remove, edge_degree=calculate_max_edge_degree(snowflake)
-
-		if(edge_degree>=edge_degree_threshold):
-
-			#find if the edge to remove is formed by the highest degree nodes
+		if(edge_degree >= edge_degree_threshold):
+			# Test fragmentation if enabled
 			if(input_variables['test_frag']):
 				is_fractured_edge_between_highest_degree_nodes(snowflake, edge_to_remove, cont_gen)
 
-			#Calling function to break clusters, update list of cells_to_divide, and save intermediate networks
-			cells_to_divide=break_cluster(snowflake, cells_to_divide, cont_gen, cont_updates, edge_to_remove, num_generations)
+			# Break cluster and update cells_to_divide
+			cells_to_divide = break_cluster(snowflake, cells_to_divide, cont_gen, cont_updates, edge_to_remove, num_generations)
+			cont_gen += 1
 
-			cont_gen+=1
+		cont_updates += 1
 
-		cont_updates+=1
-
-	#save final networks and their information
-	# save_final_networks(snowflake, cont_gen, cont_updates)
-
+# Rest of the functions remain the same as in original code...
 
 '''
 Steps to find if the nodes of highest degree are forming the edge that is getting fractured:
@@ -423,7 +346,6 @@ Steps to find if the nodes of highest degree are forming the edge that is gettin
 3.- Compare all possible pairs to the actual edge deleted
 '''
 def is_fractured_edge_between_highest_degree_nodes(network, edge_to_remove, cont_gen):
-
 	sim_number=input_variables["sim_number"]
 
 	#1
@@ -440,7 +362,6 @@ def is_fractured_edge_between_highest_degree_nodes(network, edge_to_remove, cont
 
 #1.- Get list of nodes of the highest degree
 def get_nodes_with_highest_degrees(graph):
-
 	# Get a dictionary with nodes as keys and degrees as values
 	degree_dict = dict(graph.degree())
 
@@ -551,40 +472,21 @@ def initialize_files(input_variables):
 
 	return(dict_files)
 
-
 #function to close all files opened in the dictionary
 def close_all_files(dict_files):
 	for file_obj in dict_files.values():
 		file_obj.close()
 
-
-
-
-
-
-
-
 #### MAIN ####
 
-'''
-
-
-'''
-
 #initializing variables
-#Loading doubling time distributions
-# dict_doub_t_dist=load_doubling_time(args.doubling_t, "minutes")
-
 #doubling time distribution parameters
 first_div_params=[float(elem) for elem in args.first_dist_params.split(",")]
 second_div_params=[float(elem) for elem in args.second_dist_params.split(",")]
 
 output_dir=args.output_dir
-
 num_generations=int(args.generations)
-
 num_iterations=int(args.number_sims)
-
 edge_degree_threshold=int(args.edge_degree)
 
 cluster_to_keep=args.cluster_to_keep.lower()
@@ -603,7 +505,6 @@ network_dir=os.path.join(output_dir, 'network_dir')
 if(not os.path.exists(network_dir)):
 	os.mkdir(network_dir)
 
-
 #For testing if the edge of the fragmentation is formed by the nodes of highest edge degree
 test_edge_of_fragmentation=False
 
@@ -612,25 +513,17 @@ test_edge_of_fragmentation=False
 input_variables={"output_dir":output_dir, "network_dir":network_dir, "num_generations":num_generations, 
 "edge_degree_threshold":edge_degree_threshold, "test_frag":test_edge_of_fragmentation, 
 "first_div_params":first_div_params, "second_div_params":second_div_params, "cluster_to_keep":cluster_to_keep}
-# "dict_doub_t_dist":dict_doub_t_dist
-
 
 #Initializing all output files. Note: this variable is accesed as a global variable
 dict_files=initialize_files(input_variables)
 
-
-
 #this list is to save if the network has already been saved in the network files,
 #only the first network and the final networks are going to be saved
-#note: this variable is used as a global variable to avoid having to pass it in all functions
-#and return it after being modified
-#file name (sim_number)_(generation).graphml
 list_flags_saved_network=[False for i in range(num_generations+1) if i%10==0]
 
 #creating and writing information of the program in the log file
 log_file=open(os.path.join(output_dir,"log.txt"), "a")
-log_file.write("sim_frag_clust_edge_degree_20oct2023.py\nInputs received:\n")
-# log_file.write("-d: "+args.doubling_t+"\n")
+log_file.write("sim_frag_clust_diff_mean_dists_24apr2024_modified.py\nInputs received:\n")
 log_file.write("-i: "+args.first_dist_params+"\n")
 log_file.write("-j: "+args.second_dist_params+"\n")
 log_file.write("-n: "+args.number_sims+"\n")
@@ -641,9 +534,6 @@ log_file.write("-c: "+args.cluster_to_keep+"\n")
 log_file.write("\nExecution times:\n")
 
 for i in range(1, num_iterations+1):
-
-	# print(i)
-
 	input_variables["sim_number"]=str(i) #changing variable type as it is only used as a character for saving results of the simulation
 
 	#counting execution time
@@ -655,12 +545,11 @@ for i in range(1, num_iterations+1):
 	end_time=time.time()
 	elapsed_time=end_time-start_time
 
-
 	log_file.write("Simulation "+str(i)+" completed in "+str(elapsed_time)+" seconds.\n")
-
 
 log_file.write("\nProgram finished execution without any errors.")
 log_file.close()
 
 #closing all files from the dictionary
 close_all_files(dict_files)
+
