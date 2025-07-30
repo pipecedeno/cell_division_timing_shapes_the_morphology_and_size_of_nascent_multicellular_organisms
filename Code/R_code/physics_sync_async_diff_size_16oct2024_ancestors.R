@@ -95,8 +95,8 @@ summ_clust_size %>%
             mean_gyration=mean(mean_diam))
 #overlap threshold 30
 #   strain     mean_fracture_size   mean_cluster_volume     mean_gyration
-# 1 Petite               312.              39294.          30.7
-# 2 Grande               335.              46741.          32.0
+# 1 Petite               312.4077              39293.82          30.7
+# 2 Grande               335.4728              46740.75          32.0
 # 23 cell difference between grande and petite
 
 # Strain accumulation ####

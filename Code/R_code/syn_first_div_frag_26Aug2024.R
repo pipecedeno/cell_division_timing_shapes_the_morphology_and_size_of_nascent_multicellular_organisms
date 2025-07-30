@@ -151,6 +151,14 @@ mean_clust_size=frag_df %>%
             min_size=min(cluster_size),
             max_size=max(cluster_size))
 
+mean_clust_size %>%
+  group_by(experiment_name) %>%
+  summarise(mean_mean_size=mean(mean_size))
+
+#   experiment_name     mean_mean_size
+# 1 Slow First Division           174.6287
+# 2 Synchronous                   339.0940
+# 3 Fast First Division           951.8482
 
 ggplot(mean_clust_size, aes(x=generation, y=mean_size, col=experiment_name))+
   geom_line()+
@@ -259,7 +267,13 @@ summ_diam=diam_size %>%
             sd_diam=sd(norm_diameter),
             median_diam=median(norm_diameter))
 
-
+summ_diam %>%
+  group_by(experiment_name) %>%
+  summarise(mean_mean_diam=mean(mean_diam))
+#   experiment_name     mean_mean_diam
+# 1 Slow First Division          0.886
+# 2 Synchronous                  0.992
+# 3 Fast First Division          1.20
 
 ggplot(summ_diam, aes(x=generation, y=mean_diam, col=experiment_name))+
   geom_line()+

@@ -8,28 +8,28 @@ reach a maximum size. For each simulation, it records:
 - Network diameter
 - Number of mother cells with 2+ undivided daughter cells
 - Max edge degree
+- Number of filamentous branches
 
 The first simulation saves all networks after each division event.
 
 Inputs:
-	-first_dist_params: mean and variance of lognormal distribution for first division
-	-second_dist_params: mean and variance of lognormal distribution for second or more divisions
+	-i: first_dist_params: parameters (mean,variance) for lognormal distribution for first division
+	-j: second_dist_params: parameters (mean,variance) for lognormal distribution for second or more divisions
 	-number_sims: number of simulations
 	-output_dir: output directory 
 	-max_clust_size: maximum number of cells the clusters are allowed to have
 
 Outputs:
-	-diameter: columns "sim_number,diameter,cases_mother_with_undivided_cells,max_edge_degree,num_nodes"
+	-diameter: columns "sim_number,diameter,cases_mother_with_undivided_cells,max_edge_degree,num_nodes,num_filamentous_branches"
 	-diff_d_t: columns "sim_number,diff_minutes"
 	-graphml files for all networks in first simulation
-	-sampled_times: columns "sim_number,number_divisions,minutes"
 
 Modifications:
 29may2025:
 Made the simulation to save the network properties every 5 cells added instead of doing it every time all the cells off a specific time
 are added.
 
-Modified to use log-normal distributions instead of empirical distributions for doubling time sampling.
+Modified to use log-normal distribution parameters instead of empirical data file and added filamentous branches counting.
 
 '''
 
@@ -43,15 +43,15 @@ import numpy as np
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i','--first_dist_params',dest="first_dist_params",required=True, help="mean and variance of lognormal distribution for first division (comma-separated)")
-parser.add_argument('-j','--second_dist_params',dest="second_dist_params",required=True, help="mean and variance of lognormal distribution for second or more divisions (comma-separated)")
+parser.add_argument('-i','--first_dist_params',dest="first_dist_params",required=True) #mean and variance of lognormal distribution for first division
+parser.add_argument('-j','--second_dist_params',dest="second_dist_params",required=True) #mean and variance of lognormal distribution for second or more divisions
 parser.add_argument('-n','--number_sims',dest="number_sims",required=True)
 parser.add_argument('-o','--output_dir',dest="output_dir",required=True)
 parser.add_argument('-m','--max_clust_size',dest="max_clust_size",required=True)
 args = parser.parse_args()
 
 def sample_doub_t(first_div_params, second_div_params, divisions_cell, curr_time):
-	"""Sample doubling time using log-normal distribution"""
+	"""Sample doubling time from log-normal distribution based on division number"""
 	if divisions_cell == 0:
 		dist_mu = first_div_params[0]
 		dist_sigma = first_div_params[1]
@@ -59,8 +59,8 @@ def sample_doub_t(first_div_params, second_div_params, divisions_cell, curr_time
 		dist_mu = second_div_params[0]
 		dist_sigma = second_div_params[1]
 	
-	sampled_time = round(float(np.random.lognormal(dist_mu, dist_sigma, 1)[0]), 4)
-	return curr_time + sampled_time
+	doubling_time = round(float(np.random.lognormal(dist_mu, dist_sigma, 1)[0]), 4)
+	return curr_time + doubling_time
 
 def add_cells_list(input_time, cell_id, ordered_list):
 	if not ordered_list:
@@ -77,6 +77,63 @@ def add_cells_list(input_time, cell_id, ordered_list):
 	
 	ordered_list.insert(0, [input_time, [cell_id]])
 	return ordered_list
+
+# Function to identify filament nodes
+def identify_filament_nodes(graph, min_length=3):
+	filament_nodes = set()
+	visited = set()
+	
+	def traverse_filament(node):
+		path = [node]
+		current = node
+		visited.add(current)
+		while True:
+			neighbors = list(graph.neighbors(current))
+			unvisited_neighbors = [n for n in neighbors if n not in visited]
+			if len(unvisited_neighbors) == 1 and graph.degree(unvisited_neighbors[0]) <= 2:
+				next_node = unvisited_neighbors[0]
+				path.append(next_node)
+				visited.add(next_node)
+				current = next_node
+			else:
+				break
+		return path if len(path) >= min_length else []
+	
+	for node, degree in dict(graph.degree()).items():
+		if degree == 1 and node not in visited:
+			filament = traverse_filament(node)
+			filament_nodes.update(filament)
+	
+	return filament_nodes
+
+def count_filamentous_branches(graph, min_length=3):
+	"""Count the number of filamentous branches in the network"""
+	filament_nodes = identify_filament_nodes(graph, min_length)
+	visited = set()
+	branch_count = 0
+	
+	for node in filament_nodes:
+		if node not in visited and graph.degree(node) == 1:
+			# Start from a terminal node and traverse the filament
+			current = node
+			path = [current]
+			visited.add(current)
+			
+			while True:
+				neighbors = list(graph.neighbors(current))
+				unvisited_neighbors = [n for n in neighbors if n not in visited and n in filament_nodes]
+				if len(unvisited_neighbors) == 1:
+					next_node = unvisited_neighbors[0]
+					path.append(next_node)
+					visited.add(next_node)
+					current = next_node
+				else:
+					break
+			
+			if len(path) >= min_length:
+				branch_count += 1
+	
+	return branch_count
 
 # This function adds all the cells that are going to divide for that specific time
 def divide_cells(cluster_population, cells_to_divide, first_div_params, second_div_params, cont_ids, sim_number, division_step):
@@ -120,10 +177,6 @@ def divide_cells(cluster_population, cells_to_divide, first_div_params, second_d
 		if cluster_population.number_of_nodes() < max_size:
 			cells_to_divide = add_cells_list(temp_mother_time, mother_id, cells_to_divide)
 
-		# Save sampled times
-		dict_files['sampled_times'].write(f"{sim_number},{temp_mother_div},{temp_mother_time-curr_time}\n")
-		dict_files['sampled_times'].write(f"{sim_number},0,{temp_daughter_time-curr_time}\n")
-
 		# Save doubling time difference
 		dict_files['diff_d_t'].write(input_variables["sim_number"] + "," + 
 								   str(abs(temp_mother_time-temp_daughter_time)) + "\n")
@@ -166,7 +219,7 @@ def calculate_max_edge_degree(network):
 	return([max_edge, max_edge_degree])
 
 def save_network_parameters(network, sim_number, division_step=None):
-	"""Save network diameter, mothers with undivided cells, number of nodes, and max edge degree"""
+	"""Save network diameter, mothers with undivided cells, number of nodes, max edge degree, and filamentous branches"""
 	if network.number_of_nodes() > 1:  # Need at least 2 nodes for diameter
 		network_diameter = nx.diameter(network)
 	else:
@@ -181,8 +234,11 @@ def save_network_parameters(network, sim_number, division_step=None):
 	else:
 		max_edge_degree = -1
 	
+	# Count filamentous branches
+	num_filamentous_branches = count_filamentous_branches(network)
+	
 	# Save parameters
-	dict_files['diameter'].write(f"{sim_number},{network_diameter},{mothers_with_undivided},{num_nodes},{max_edge_degree}\n")
+	dict_files['diameter'].write(f"{sim_number},{network_diameter},{mothers_with_undivided},{num_nodes},{max_edge_degree},{num_filamentous_branches}\n")
 
 # function to save the graphml files of the network for each step only for the first simulation
 def save_network_if_needed(network, sim_number, division_step=None):
@@ -240,7 +296,7 @@ def initialize_files(input_variables):
 		dict_files['diameter'] = open(diam_file, "a")
 	else:
 		dict_files['diameter'] = open(diam_file, "w")
-		dict_files['diameter'].write("sim_number,diameter,cases_mother_with_undivided_cells,num_nodes,max_edge_degree\n")
+		dict_files['diameter'].write("sim_number,diameter,cases_mother_with_undivided_cells,num_nodes,max_edge_degree,num_filamentous_branches\n")
 	
 	# Initialize doubling time difference file
 	diff_d_t_file = os.path.join(output_dir, "diff_doub_t.csv")
@@ -250,14 +306,6 @@ def initialize_files(input_variables):
 		dict_files['diff_d_t'] = open(diff_d_t_file, "w")
 		dict_files['diff_d_t'].write("sim_number,diff_minutes\n")
 	
-	# Initialize sampled times file
-	sampled_times_file = os.path.join(output_dir, "sampled_times.csv")
-	if os.path.exists(sampled_times_file):
-		dict_files['sampled_times'] = open(sampled_times_file, "a")
-	else:
-		dict_files['sampled_times'] = open(sampled_times_file, "w")
-		dict_files['sampled_times'].write("sim_number,number_divisions,minutes\n")
-	
 	return dict_files
 
 def close_all_files(dict_files):
@@ -266,7 +314,7 @@ def close_all_files(dict_files):
 
 #### MAIN ####
 
-# Parse distribution parameters
+# Parse doubling time distribution parameters
 first_div_params = [float(elem) for elem in args.first_dist_params.split(",")]
 second_div_params = [float(elem) for elem in args.second_dist_params.split(",")]
 
@@ -298,7 +346,7 @@ dict_files = initialize_files(input_variables)
 
 # Create and write to log file
 log_file = open(os.path.join(output_dir, "log.txt"), "a")
-log_file.write("sim_clust_no_fragmentation_27may2025.py (modified for log-normal distributions)\nInputs received:\n")
+log_file.write("sim_clust_no_fragmentation_27may2025_modified.py\nInputs received:\n")
 log_file.write("-i: " + args.first_dist_params + "\n")
 log_file.write("-j: " + args.second_dist_params + "\n")
 log_file.write("-n: " + args.number_sims + "\n")

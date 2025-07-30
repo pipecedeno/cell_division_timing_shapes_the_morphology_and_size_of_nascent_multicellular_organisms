@@ -23,11 +23,31 @@ mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
 
+setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/supp_fig5_frag_clusters_random/')
+
 # Fragmentation summary ####
 
-frag_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/supp_fig_4_growth_with_fragmentation_all/growth_frag_random_frag_df_3dec2024.csv", header=TRUE)
+# frag_df=data.frame()
+# 
+# for(j in c("petite", "grande", "petite-second-only")){
+#   temp_df=read.csv(paste(j, "_15e_100g_random/fragmentation_inf.csv", sep=""), header=TRUE)
+#   temp_df$strain=j
+#   frag_df=rbind(frag_df, temp_df)
+# }
+# frag_df$strain <- ifelse(frag_df$strain=='petite', 'Petite', frag_df$strain)
+# frag_df$strain <- ifelse(frag_df$strain=='petite-second-only', 'Petite w/o Delay', frag_df$strain)
+# frag_df$strain <- ifelse(frag_df$strain=='grande', 'Grande', frag_df$strain)
+# frag_df$strain=factor(frag_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
+# summary(frag_df)
+# 
+# table(frag_df$generation)
+# 
+# write.csv(frag_df, file="growth_frag_random_frag_df_25june2025.csv", row.names = FALSE)
 
-frag_df$strain=factor(frag_df$strain, levels=c('Petite', 'Petite w/o delay', 'Grande'))
+
+frag_df=read.csv("growth_frag_random_frag_df_25june2025.csv", header=TRUE)
+
+frag_df$strain=factor(frag_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
 summary(frag_df)
 
 table(frag_df$generation)
@@ -55,9 +75,9 @@ frag_df %>%
   group_by(strain) %>%
   summarise(mean=mean(cluster_size))
 #   strain            mean
-# 1 Petite            159.0316
-# 2 Petite w/o delay  247.7587
-# 3 Grande            224.2786
+# 1 Petite            217.8538
+# 2 Petite w/o delay  354.8998
+# 3 Grande            340.3699
 
 pairwise.t.test(frag_df$cluster_size, frag_df$strain, method="bonferroni")
 #                  Petite Petite w/o delay
@@ -128,21 +148,38 @@ frag_df %>%
   group_by(strain) %>%
   summarise(mean=mean(proportion_propagule))
 #  strain            mean
-# 1 Petite           0.400
+# 1 Petite           0.398
 # 2 Petite w/o delay 0.397
-# 3 Grande           0.454
+# 3 Grande           0.455
 
 pairwise.t.test(frag_df$proportion_propagule, frag_df$strain)
 #                   Petite  Petite w/o delay
-# Petite w/o delay 5.4e-08 -               
+# Petite w/o delay 6.2e-05 -               
 # Grande           < 2e-16 < 2e-16 
 
 
 # Network Diameter ####
 
-diameter_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/supp_fig_4_growth_with_fragmentation_all/growth_frag_random_diameter_df_3dec2024.csv", header=TRUE)
+# diameter_df=data.frame()
+# 
+# for(j in c("petite", "grande", "petite-second-only")){
+#   temp_df=read.csv(paste(j, "_15e_100g_random/networks_diameter.csv", sep=""), header=TRUE)
+#   temp_df$strain=j
+#   diameter_df=rbind(diameter_df, temp_df)
+# }
+# diameter_df$strain <- ifelse(diameter_df$strain=='petite', 'Petite', diameter_df$strain)
+# diameter_df$strain <- ifelse(diameter_df$strain=='petite-second-only', 'Petite w/o Delay', diameter_df$strain)
+# diameter_df$strain <- ifelse(diameter_df$strain=='grande', 'Grande', diameter_df$strain)
+# diameter_df$strain=factor(diameter_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
+# summary(diameter_df)
+# summary(frag_df)
+# 
+# write.csv(diameter_df, file='growth_frag_random_diameter_df_26june2025.csv', row.names = FALSE)
 
-diameter_df$strain=factor(diameter_df$strain, levels=c('Petite', 'Petite w/o delay', 'Grande'))
+
+diameter_df=read.csv("growth_frag_random_diameter_df_26june2025.csv", header=TRUE)
+
+diameter_df$strain=factor(diameter_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
 summary(diameter_df)
 summary(frag_df)
 
@@ -181,9 +218,9 @@ diam_size %>%
   group_by(strain) %>%
   summarise(mean=mean(norm_diameter, na.rm=TRUE))
 #  strain            mean
-# 1 Petite           0.910
-# 2 Petite w/o delay 0.995
-# 3 Grande           0.988
+# 1 Petite           0.912
+# 2 Petite w/o delay 0.997
+# 3 Grande           0.990
 
 pairwise.t.test(diam_size$norm_diameter, diam_size$strain)
 #                  Petite Petite w/o delay
@@ -249,9 +286,6 @@ supp_p3_gen=ggplot(summ_diam)+
   guides(col='none', fill='none')+
   NULL
 supp_p3_gen
-
-figure_supp_v1=plot_grid(supp_p1_gen,supp_p2_gen,supp_p3_gen, labels=c('A)', 'B)', 'C)'), ncol=1, align='hv', label_size=16)
-figure_supp_v1
 
 
 supp_p1_dist=ggplot(frag_df[frag_df$generation%%20==0,],

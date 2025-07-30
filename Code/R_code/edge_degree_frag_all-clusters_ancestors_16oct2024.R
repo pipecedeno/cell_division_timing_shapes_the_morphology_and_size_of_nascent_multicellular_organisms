@@ -352,10 +352,10 @@ mean_frag_sim %>%
 # 3 Grande            224.1929    0.453
 # The means are the same as if all the data was used at the same time
 # edge degree: 15
-#   strain           mean_frac mean_prop
-# 1 Petite                218.     0.393
-# 2 Petite w/o Delay      354.     0.394
-# 3 Grande                340.     0.454
+#   strain              mean_frac  mean_prop
+# 1 Petite                218.1666     0.393
+# 2 Petite w/o Delay      353.9265     0.394
+# 3 Grande                340.0217     0.454
 
 anova_frac_sim=aov(mean_clust_size~strain, data=mean_frag_sim)
 summary(anova_frac_sim)

@@ -25,10 +25,13 @@ syn_data_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli
 
 std_vector=seq(0, 15, 5)
 delay_vector=seq(0, 60, 20)
+delay_percentages=c(0, 33, 66, 100)
 
 
 color_diff_mean=list(scale_color_gradient(name = "Delay", low = "lightblue", high = "darkblue", 
                                           breaks = delay_vector, limits = c(min(delay_vector), max(delay_vector))))
+color_diff_mean_perc=list(scale_color_gradient(name = "Delay", low = "lightblue", high = "darkblue", 
+                                          breaks = delay_percentages, limits = c(min(delay_percentages), max(delay_percentages))))
 color_variation=list(scale_color_gradient( name = "Variation", low = "pink", high = "darkred", 
                                            breaks = std_vector, limits = c(min(std_vector), max(std_vector))))
 
@@ -49,10 +52,9 @@ setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/resu
 # 
 # summary(frag_df)
 # 
-# write.csv(frag_df, "frag_syn_frag_df_29may2025.csv", row.names = FALSE)
+# write.csv(frag_df, "frag_syn_frag_df_2june2025.csv", row.names = FALSE)
 
-# frag_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_5_delay_variation_in_cluster_properties/frag_syn_frag_df_17oct2024.csv", header=TRUE)
-frag_df=read.csv("frag_syn_frag_df_29may2025.csv", header=TRUE)
+frag_df=read.csv("frag_syn_frag_df_2june2025.csv", header=TRUE)
 summary(frag_df)
 
 
@@ -261,22 +263,22 @@ ggplot(mean_summ_diam, aes(x=variation, y=mean_d, col=diff_mean, group=diff_mean
 
 
 # Fracture size
-clust_var=ggplot(mean_mean_clust_size, aes(x=variation, y=mean, col=diff_mean, group=diff_mean))+
+clust_var=ggplot(mean_mean_clust_size, aes(x=variation, y=mean, col=floor(diff_mean/60*100), group=floor(diff_mean/60*100)))+
   geom_point()+
   geom_line()+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
   xlab('Variation')+
   ylab('Mean fracture size')+
   guides(col = guide_legend(title = "Delay"))+
-  color_diff_mean+
+  color_diff_mean_perc+
   theme_classic(base_size = 10)+
   NULL
 clust_var
 
-clust_delay=ggplot(mean_mean_clust_size, aes(x=diff_mean, y=mean, col=variation, group=variation))+
+clust_delay=ggplot(mean_mean_clust_size, aes(x=diff_mean/60*100, y=mean, col=variation, group=variation))+
   geom_point()+
   geom_line()+
-  xlab('Delay First Division')+
+  xlab('Delay (% Second Division)')+
   ylab('Mean fracture size')+
   guides(col = guide_legend(title = "Variation"))+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
@@ -287,10 +289,10 @@ clust_delay
 
 
 # Fracture Proportion
-prop_delay=ggplot(mean_mean_frag_prop, aes(x=diff_mean, y=mean_prop, col=variation, group=variation))+
+prop_delay=ggplot(mean_mean_frag_prop, aes(x=diff_mean/60*100, y=mean_prop, col=variation, group=variation))+
   geom_point()+
   geom_line()+
-  xlab('Delay First Division')+
+  xlab('Delay (% Second Division)')+
   ylab('Mean propagule\nproportion')+
   guides(col = guide_legend(title = "Variation"))+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
@@ -299,24 +301,24 @@ prop_delay=ggplot(mean_mean_frag_prop, aes(x=diff_mean, y=mean_prop, col=variati
   NULL
 prop_delay
 
-prop_var=ggplot(mean_mean_frag_prop, aes(x=variation, y=mean_prop, col=diff_mean, group=diff_mean))+
+prop_var=ggplot(mean_mean_frag_prop, aes(x=variation, y=mean_prop, col=floor(diff_mean/60*100), group=floor(diff_mean/60*100)))+
   geom_point()+
   geom_line()+
   xlab('Variation')+
   ylab('Mean propagule\nproportion')+
   guides(col = guide_legend(title = "Delay"))+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
-  color_diff_mean+
+  color_diff_mean_perc+
   theme_classic(base_size = 10)+
   NULL
 prop_var
 
 
 #Network diameter
-diam_delay=ggplot(mean_summ_diam, aes(x=diff_mean, y=mean_d, col=variation, group=variation))+
+diam_delay=ggplot(mean_summ_diam, aes(x=diff_mean/60*100, y=mean_d, col=variation, group=variation))+
   geom_point()+
   geom_line()+
-  xlab('Delay First Division')+
+  xlab('Delay (% Second Division)')+
   ylab('Mean Network\nDiameter')+
   guides(col = guide_legend(title = "Variation"))+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
@@ -325,14 +327,14 @@ diam_delay=ggplot(mean_summ_diam, aes(x=diff_mean, y=mean_d, col=variation, grou
   NULL
 diam_delay
 
-diam_var=ggplot(mean_summ_diam, aes(x=variation, y=mean_d, col=diff_mean, group=diff_mean))+
+diam_var=ggplot(mean_summ_diam, aes(x=variation, y=mean_d, col=floor(diff_mean/60*100), group=floor(diff_mean/60*100)))+
   geom_point()+
   geom_line()+
   xlab('Variation')+
   ylab('Mean Network\nDiameter')+
   guides(col = guide_legend(title = "Delay"))+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
-  color_diff_mean+
+  color_diff_mean_perc+
   theme_classic(base_size = 10)+
   NULL
 diam_var
@@ -347,7 +349,7 @@ supp_net_prop_v3=plot_grid(clust_delay,clust_var, prop_delay,prop_var,
                            align='hv', label_size=12)
 supp_net_prop_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_frag_syn_network_prop_2june2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_frag_syn_network_prop_30july2025.png',
        plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
 
 
@@ -388,13 +390,13 @@ clust_p2=ggplot(clust_size_var, aes(x=variation, y=mean))+
   NULL
 clust_p2
 
-clust_p1=ggplot(clust_size_diff, aes(x=diff_mean, y=mean))+
+clust_p1=ggplot(clust_size_diff, aes(x=diff_mean/60*100, y=mean))+
   geom_line(col='#92BBD9FF')+
   # geom_point(col='#92BBD9FF')+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
   ylim(c(clust_size_min, clust_size_max))+
   theme_classic(base_size = 10)+
-  labs(y='Mean Fracture\nSize', x='First Division Delay')+
+  labs(y='Mean Fracture\nSize', x='Delay (% Second Division)')+
   NULL
 clust_p1
 
@@ -433,13 +435,13 @@ propagule_p2=ggplot(propag_prop_var, aes(x=variation, y=mean_prop))+
   NULL
 propagule_p2
 
-propagule_p1=ggplot(propag_prop_diff, aes(x=diff_mean, y=mean_prop))+
+propagule_p1=ggplot(propag_prop_diff, aes(x=diff_mean/60*100, y=mean_prop))+
   geom_line(col='#92BBD9FF')+
   # geom_point(col='#92BBD9FF')+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
   ylim(c(prop_propag_min, prop_propag_max))+
   theme_classic(base_size = 10)+
-  labs(y='Mean Propagule\nProportion', x='First Division Delay')+
+  labs(y='Mean Propagule\nProportion', x='Delay (% Second Division)')+
   NULL
 propagule_p1
 
@@ -478,13 +480,13 @@ diameter_p2=ggplot(net_diam_var, aes(x=variation, y=mean_d))+
   NULL
 diameter_p2
 
-diameter_p1=ggplot(net_diam_diff, aes(x=diff_mean, y=mean_d))+
+diameter_p1=ggplot(net_diam_diff, aes(x=diff_mean/60*100, y=mean_d))+
   geom_line(col='#92BBD9FF')+
   # geom_point(col='#92BBD9FF')+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
   ylim(c(net_diam_min, net_diam_max))+
   theme_classic(base_size = 10)+
-  labs(y='Mean Diameter', x='First Division Delay')+
+  labs(y='Mean Diameter', x='Delay (% Second Division)')+
   NULL
 diameter_p1
 
@@ -510,7 +512,7 @@ plot_summary_effects_temp <- plot_grid(clust_p1, clust_p2, diameter_p1, diameter
 plot_summary_effects_temp
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_syn_summ_doub_t_effects_2june2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_syn_summ_doub_t_effects_30july2025.png',
        plot=plot_summary_effects_temp, dpi='retina', width=6, height=6, bg='white')
 
 

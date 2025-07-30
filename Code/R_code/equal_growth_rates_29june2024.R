@@ -17,10 +17,26 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
+setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/settling_selection_simulations/")
+
+# Random Position ####
 
 #### Growth phase ####
 
-growth_prop=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_growth_registry_equal_growth_rate_15apr2024.csv", header=TRUE)
+# growth_prop=data.frame()
+# 
+# temp_df=read.csv("petite_second-15min_10mill_50sim/proportions_growth_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Equal Growth Rates'
+# growth_prop=rbind(growth_prop, temp_df)
+# temp_df=read.csv("petite_second_10mill_50sim/proportions_growth_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Normal'
+# growth_prop=rbind(growth_prop, temp_df)
+# growth_prop$experiment=factor(growth_prop$experiment, levels=c('Normal', 'Equal Growth Rates'))
+# summary(growth_prop)
+# 
+# write.csv(growth_prop, file="set_sim_growth_registry_equal_growth_rate_30june2025.csv", row.names = FALSE)
+
+growth_prop=read.csv("set_sim_growth_registry_equal_growth_rate_30june2025.csv", header=TRUE)
 
 growth_prop$experiment=factor(growth_prop$experiment, levels=c('Normal', 'Equal Growth Rates'))
 summary(growth_prop)
@@ -38,6 +54,8 @@ ggplot(growth_prop,
   stat_summary(fun='mean', geom='crossbar')+
   NULL
 
+#### Transfers to extinction ####
+
 extinction_inf=growth_prop %>%
   group_by(sim_number, experiment) %>%
   summarize(total_transfers=max(transfer))
@@ -45,19 +63,51 @@ extinction_inf=growth_prop %>%
 extinction_inf %>%
   group_by(experiment) %>%
   summarize(mean_transfers=mean(total_transfers))
+#   experiment         mean_transfers
+# 1 Normal                       9.32
+# 2 Equal Growth Rates          23.8
 
-ggplot(extinction_inf[extinction_inf$experiment=="Normal",], 
+ggplot(extinction_inf[extinction_inf$experiment=='Equal Growth Rates',], 
        aes(x=total_transfers, col=experiment, fill=experiment))+
   geom_histogram(position="identity", alpha=0.5, bins=10)+
   theme_classic(base_size=16)+
   guides(fill='none', col='none')+
   labs(x="Transfers until Fixation", y="Count")+
   # facet_wrap(~experiment)+
-  geom_vline(xintercept=6.62, linetype='dashed', size=1.2)+
+  geom_vline(xintercept=mean(extinction_inf[extinction_inf$experiment=='Equal Growth Rates',]$total_transfers), linetype='dashed', size=1.2)+
   NULL
 
+
+ggplot(extinction_inf, 
+       aes(x=total_transfers, col=experiment, fill=experiment))+
+  geom_histogram(position="identity", alpha=0.5, bins=10)+
+  theme_classic(base_size=16)+
+  # guides(fill='none', col='none')+
+  labs(x="Transfers until Fixation", y="Count")+
+  # facet_wrap(~experiment)+
+  # geom_vline(xintercept=mean(extinction_inf[extinction_inf$experiment=='Equal Growth Rates',]$total_transfers), linetype='dashed', size=1.2)+
+  NULL
+
+
 #### Settling fitness ####
-settling_prop=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_settling_registry_equal_growth_rate_15apr2024.csv", header=TRUE)
+
+# settling_prop=data.frame()
+# 
+# temp_df=read.csv("petite_second-15min_10mill_50sim/proportions_settling_selec_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Equal Growth Rates'
+# temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+# settling_prop=rbind(settling_prop, temp_df)
+# temp_df=read.csv("petite_second_10mill_50sim/proportions_settling_selec_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Normal'
+# temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+# settling_prop=rbind(settling_prop, temp_df)
+# settling_prop$experiment=factor(settling_prop$experiment, levels=c('Normal', 'Equal Growth Rates'))
+# summary(settling_prop)
+# 
+# write.csv(settling_prop, file="set_sim_settling_registry_equal_growth_rate_30june2025.csv", row.names=FALSE)
+
+
+settling_prop=read.csv("set_sim_settling_registry_equal_growth_rate_30june2025.csv", header=TRUE)
 
 settling_prop$experiment=factor(settling_prop$experiment, levels=c('Normal', 'Equal Growth Rates'))
 summary(settling_prop)
@@ -84,7 +134,7 @@ ggplot(growth_prop,
   guides(col='none')+
   ylab("Growth Selection Rate \n(Ancestor w/o delay / Ancestor)")+
   xlab('Transfer')+
-  scale_x_continuous(breaks = seq(1, 20, by = 1))+
+  # scale_x_continuous(breaks = seq(1, 20, by = 1))+
   facet_wrap(~experiment, ncol=1)+
   NULL
 
@@ -105,7 +155,7 @@ ggplot(settling_prop,
   guides(col='none')+
   ylab("Settling Selection Rate \n(Ancestor w/o delay / Ancestor)")+
   xlab('Transfer')+
-  scale_x_continuous(breaks = seq(1, 20, by = 1))+
+  # scale_x_continuous(breaks = seq(1, 20, by = 1))+
   facet_wrap(~experiment, ncol=1)+
   NULL
 
@@ -167,9 +217,9 @@ filt_combined_sel_r[filt_combined_sel_r$phase=='Settling',] %>%
             var=var(sel_r),
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
-# experiment          mean   var    sd    CV
-# 1 Normal             0.382 0.594 0.771  2.02
-# 2 Equal Growth Rates 0.460 0.429 0.655  1.42
+#   experiment          mean   var    sd    CV
+# 1 Normal             0.434 0.367 0.605  1.40
+# 2 Equal Growth Rates 0.448 0.236 0.486  1.08
 
 # Using mean of the simulations
 
@@ -193,9 +243,9 @@ ggplot(mean_filt_sel_r[mean_filt_sel_r$phase=='Growth',],
 mean_filt_sel_r[mean_filt_sel_r$phase=='Growth',] %>%
   group_by(experiment) %>%
   summarise(mean=mean(mean_sel_r))
-# experiment            mean
-# 1 Normal              0.644 
-# 2 Equal Growth Rates -0.0670
+#   experiment            mean
+# 1 Normal              0.643 
+# 2 Equal Growth Rates -0.0668
 
 ggplot(mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',], 
        aes(x=experiment, y=mean_sel_r, col=experiment))+
@@ -212,9 +262,9 @@ ggplot(mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',],
 mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',] %>%
   group_by(experiment) %>%
   summarise(mean=mean(mean_sel_r))
-# experiment          mean
-# 1 Normal             0.450
-# 2 Equal Growth Rates 0.493
+#   experiment          mean
+# 1 Normal             0.466
+# 2 Equal Growth Rates 0.457
 
 
 ggplot(mean_filt_sel_r, 
@@ -232,11 +282,11 @@ ggplot(mean_filt_sel_r,
 mean_filt_sel_r %>%
   group_by(experiment, phase) %>%
   summarise(mean=mean(mean_sel_r))
-# experiment         phase       mean
-# 1 Normal             Growth    0.644 
-# 2 Normal             Settling  0.450 
-# 3 Equal Growth Rates Growth   -0.0670
-# 4 Equal Growth Rates Settling  0.493 
+#   experiment         phase       mean
+# 1 Normal             Growth    0.643 
+# 2 Normal             Settling  0.466 
+# 3 Equal Growth Rates Growth   -0.0668
+# 4 Equal Growth Rates Settling  0.457
 
 mean_filt_sel_r %>%
   group_by(experiment, phase) %>%
@@ -250,6 +300,10 @@ mean_filt_sel_r %>%
             upper_ci = mean + qt(0.975, df = n - 1) * se)
 
 t.test(mean_sel_r~experiment, mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',])
+# t = 0.25753, df = 58.945, p-value = 0.7977
+# The settling selection rate when the clusters have a growth delay is the same as
+# with the normal data
+
 
 
 # Top Settling selection ####
@@ -259,7 +313,21 @@ t.test(mean_sel_r~experiment, mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',
 
 #### Growth phase ####
 
-growth_prop_top=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_top_growth_registry_equal_growth_rate_15apr2024.csv", header=TRUE)
+# growth_prop_top=data.frame()
+# 
+# temp_df=read.csv("petite_second-15min_10mill_50sim_top/proportions_growth_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Equal Growth Rates'
+# growth_prop_top=rbind(growth_prop_top, temp_df)
+# temp_df=read.csv("petite_second_10mill_50sim_top/proportions_growth_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Normal'
+# growth_prop_top=rbind(growth_prop_top, temp_df)
+# growth_prop_top$experiment=factor(growth_prop_top$experiment, levels=c('Normal', 'Equal Growth Rates'))
+# summary(growth_prop_top)
+# 
+# write.csv(growth_prop_top, file="set_sim_top_growth_registry_equal_growth_rate_30june2025.csv", row.names = FALSE)
+
+
+growth_prop_top=read.csv("set_sim_top_growth_registry_equal_growth_rate_30june2025.csv", header=TRUE)
 
 growth_prop_top$experiment=factor(growth_prop_top$experiment, levels=c('Normal', 'Equal Growth Rates'))
 summary(growth_prop_top)
@@ -275,9 +343,60 @@ ggplot(growth_prop_top,
   stat_summary(fun='mean', geom='crossbar')+
   NULL
 
+
+#### Transfers to extinction ####
+
+extinction_inf_top=growth_prop_top %>%
+  group_by(sim_number, experiment) %>%
+  summarize(total_transfers=max(transfer))
+
+extinction_inf_top %>%
+  group_by(experiment) %>%
+  summarize(mean_transfers=mean(total_transfers))
+#   experiment         mean_transfers
+# 1 Normal                       2.14
+# 2 Equal Growth Rates           2.62
+
+ggplot(extinction_inf_top[extinction_inf_top$experiment=='Equal Growth Rates',], 
+       aes(x=total_transfers, col=experiment, fill=experiment))+
+  geom_histogram(position="identity", alpha=0.5, bins=10)+
+  theme_classic(base_size=16)+
+  guides(fill='none', col='none')+
+  labs(x="Transfers until Fixation", y="Count")+
+  # facet_wrap(~experiment)+
+  geom_vline(xintercept=mean(extinction_inf_top[extinction_inf_top$experiment=='Equal Growth Rates',]$total_transfers), linetype='dashed', size=1.2)+
+  NULL
+
+
+ggplot(extinction_inf_top, 
+       aes(x=total_transfers, col=experiment, fill=experiment))+
+  geom_histogram(position="identity", alpha=0.5, bins=10)+
+  theme_classic(base_size=16)+
+  # guides(fill='none', col='none')+
+  labs(x="Transfers until Fixation", y="Count")+
+  # facet_wrap(~experiment)+
+  # geom_vline(xintercept=mean(extinction_inf_top[extinction_inf_top$experiment=='Equal Growth Rates',]$total_transfers), linetype='dashed', size=1.2)+
+  NULL
+
 #### Settling fitness ####
 
-settling_prop_top=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/settling_simulation_data/set_sim_top_settling_registry_equal_growth_rate_15apr2024.csv", header=TRUE)
+# settling_prop_top=data.frame()
+# 
+# temp_df=read.csv("petite_second-15min_10mill_50sim_top/proportions_settling_selec_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Equal Growth Rates'
+# temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+# settling_prop_top=rbind(settling_prop_top, temp_df)
+# temp_df=read.csv("petite_second_10mill_50sim_top/proportions_settling_selec_registry_all_sim.csv", header=TRUE)
+# temp_df$experiment='Normal'
+# temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+# settling_prop_top=rbind(settling_prop_top, temp_df)
+# settling_prop_top$experiment=factor(settling_prop_top$experiment, levels=c('Normal', 'Equal Growth Rates'))
+# summary(settling_prop_top)
+# 
+# write.csv(settling_prop_top, file="set_sim_top_settling_registry_equal_growth_rate_30june2025.csv", row.names = FALSE)
+
+
+settling_prop_top=read.csv("set_sim_top_settling_registry_equal_growth_rate_30june2025.csv", header=TRUE)
 
 settling_prop_top$experiment=factor(settling_prop_top$experiment, levels=c('Normal', 'Equal Growth Rates'))
 summary(settling_prop_top)
@@ -379,11 +498,11 @@ ggplot(mean_filt_sel_r_top,
 mean_filt_sel_r_top %>%
   group_by(experiment, phase) %>%
   summarise(mean=mean(mean_sel_r))
-# experiment         phase       mean
+#   experiment         phase       mean
 # 1 Normal             Growth    0.639 
-# 2 Normal             Settling  4.28  
-# 3 Equal Growth Rates Growth   -0.0664
-# 4 Equal Growth Rates Settling  3.80 
+# 2 Normal             Settling  4.95  
+# 3 Equal Growth Rates Growth   -0.0667
+# 4 Equal Growth Rates Settling  4.16 
 
 mean_filt_sel_r_top %>%
   group_by(experiment, phase) %>%
@@ -397,9 +516,9 @@ mean_filt_sel_r_top %>%
             upper_ci = mean + qt(0.975, df = n - 1) * se)
 
 t.test(mean_sel_r~experiment, mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',])
-# p-value = 0.01578
+# t = 5.6297, df = 70.613, p-value = 3.412e-07
 # The mean between using the unmodified doubling time and increasing the mean for the Ancestor w/o
-# Delay make the settling selection rate have significantly different means (p-value = 0.01578)
+# Delay make the settling selection rate have significantly different means (p-value = 3.412e-07)
 
 
 
@@ -409,6 +528,15 @@ mean_sim_sel_r=filt_combined_sel_r %>%
   group_by(phase, sim_number, experiment) %>%
   summarise(mean_sel_r=mean(sel_r))
 
+mean_filt_sel_r %>%
+  group_by(experiment, phase) %>%
+  summarise(mean=mean(mean_sel_r))
+#   experiment         phase       mean
+# 1 Normal             Growth    0.643 
+# 2 Normal             Settling  0.466 
+# 3 Equal Growth Rates Growth   -0.0668
+# 4 Equal Growth Rates Settling  0.457
+
 fig5c_v2=ggplot(mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',], 
              aes(x=phase, y=mean_sel_r, col=phase))+
   geom_jitter(alpha=0.5)+
@@ -416,8 +544,8 @@ fig5c_v2=ggplot(mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',]
   ylab('Mean Selection Rate \n(Petite w/o delay +15 min vs \nPetite) per selection phase')+
   xlab('Selection phase')+
   guides(col='none')+
-  scale_y_continuous(breaks = seq(0, 6, by = 1))+
-  coord_cartesian(ylim = c(0, 6))+
+  scale_y_continuous(breaks = seq(0, 5.5, by = 1))+
+  coord_cartesian(ylim = c(0, 5.5))+
   scale_x_discrete(labels=c('Growth'='Growth',
                             'Settling'='Settling'))+
   ggtitle('Random Starting Position')+
@@ -435,8 +563,8 @@ fig5d_v2=ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growt
   # ylab('')+
   xlab('Selection phase')+
   guides(col='none')+
-  scale_y_continuous(breaks = seq(0, 6, by = 1))+
-  coord_cartesian(ylim = c(0, 6))+
+  scale_y_continuous(breaks = seq(0, 5.5, by = 1))+
+  coord_cartesian(ylim = c(0, 5.5))+
   scale_x_discrete(labels=c('Growth'='Growth',
                             'Settling'='Settling'))+
   ggtitle("Top Starting Position")+

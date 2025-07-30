@@ -53,21 +53,11 @@ print(results)
 
 
 default_mean=60
-# used to create 5 means and standard deviations
-# delays=seq(default_mean, default_mean+120, 30)
-# std_devs=seq(0,20,5)
 
 #to create only 4 levels
-# delays=seq(default_mean, default_mean+60, 20)
-# std_devs=seq(0,15,5)
+delays=seq(default_mean, default_mean+60, 20)
+std_devs=seq(0,15,5)
 
-#to create 15 levels every 5 minutes
-# delays=seq(default_mean, default_mean+75, 5)
-# std_devs=seq(0,15,1)
-
-#to create 15 levels every 2 minutes
-delays=seq(default_mean, default_mean+30, 2)
-std_devs=seq(0,15,1)
 
 table_parameters=data.frame()
 
@@ -105,10 +95,7 @@ for (std_i in std_devs){
 summary(table_parameters)
 
 # This files are used for simulations using this synthetic data distributions
-# write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/5_diffs_5_stds_16oct2024/params_5diffs_5stds_16oct2024.csv", row.names=FALSE)
 # write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/4_diffs_4_stds_17oct2024/params_4diffs_4stds_17oct2024.csv", row.names=FALSE)
-# write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/15_diffs_15_stds_17oct2024_every_5_minutes/params_15diffs_15stds_17oct2024.csv", row.names=FALSE)
-# write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/15_diffs_15_stds_17oct2024_every_2_minutes/params_15diffs_15stds_2min_17oct2024.csv", row.names=FALSE)
 
 
 #### Making plot of distributions ####
@@ -194,6 +181,92 @@ grid.newpage()
 grid.draw(g)
 
 
+#### Making plot of PDF distributions ####
+default_mean <- 60
+means <- c(60, 80, 100, 120)
+delay_names <- c("0", "20", "40", "60")
+std_devs <- c(0, 5, 10, 15)
+std_names <- c("0", "5", "10", "15")
+delay_percentages=c("0", "33", "66", "100")
+
+# Define range for PDF evaluation
+x_min <- 10  # Minimum doubling time to consider
+x_max <- 300 # Maximum doubling time to consider
+n_points <- x_max-x_min+1  # Number of points to evaluate PDF
+
+df_pdf_data <- data.frame()
+
+for (i in seq(1, length(std_devs))) {
+  
+  first_std <- TRUE
+  
+  for (j in seq(1, length(means))) {
+    first_div_params <- normal_to_lognormal_direct(means[j], means[j]/default_mean*std_devs[i])
+    
+    if(first_std) {
+      second_div_params <- first_div_params
+      first_std <- FALSE
+    }
+    
+    # Create x values for PDF evaluation
+    x_values <- seq(x_min, x_max, length.out = n_points)
+    
+    # Calculate PDF values for both distributions
+    first_div_pdf <- dlnorm(x_values, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
+    second_div_pdf <- dlnorm(x_values, meanlog = second_div_params$meanlog, sdlog = second_div_params$sdlog)
+    
+    # Create dataframe with PDF values
+    temp_df <- data.frame(
+      delay = delay_names[j], 
+      std = std_names[i], 
+      delay_perc = delay_percentages[j],
+      div_num = c(rep("1", n_points), rep("2", n_points)), 
+      doub_t = c(x_values, x_values),
+      pdf_value = c(first_div_pdf, second_div_pdf)
+    )
+    
+    df_pdf_data <- rbind(df_pdf_data, temp_df)
+  }
+}
+
+# Set factor levels
+df_pdf_data$std <- factor(df_pdf_data$std, levels = c("0", "5", "10", "15"))
+df_pdf_data$delay_perc <- factor(df_pdf_data$delay_perc, levels = c("0", "33", "66", "100"))
+
+# Create the PDF plot
+p_pdf=ggplot(df_pdf_data, aes(x = doub_t, y = pdf_value, color = div_num)) +
+  geom_line(alpha = 0.75) +
+  facet_grid(std ~ delay_perc) +
+  theme_classic() +
+  xlim(c(0, 225))+
+  scale_y_continuous(breaks = c(0, 0.05)) +
+  scale_x_continuous(breaks = c(100, 200))+
+  coord_flip() +
+  labs(x = "Doubling Time (min)", y = "Probability Density", color = "Division") +
+  scale_color_discrete(name = "Number of\nDivisions") +
+  NULL
+p_pdf
+
+# Convert to grob
+g_pdf <- ggplotGrob(p_pdf)
+
+# Add top label (reduced height)
+top_margin <- unit(0.5, "cm")  # Adjust this value to change the top gap
+g_pdf <- gtable_add_rows(g_pdf, heights = top_margin, pos = 0)
+g_pdf <- gtable_add_grob(g_pdf, 
+                     grob = textGrob("Delay (% Second Division)", gp = gpar(fontsize = 11)), 
+                     t = 1, l = 3, r = ncol(g_pdf) - 1)
+
+# Add right label (reduced width)
+right_margin <- unit(0.5, "cm")  # Adjust this value to change the right gap
+g_pdf <- gtable_add_cols(g_pdf, widths = right_margin, pos = -1)
+g_pdf <- gtable_add_grob(g_pdf, 
+                     grob = textGrob("Standard Deviation", rot = -90, gp = gpar(fontsize = 11)), 
+                     t = 3, b = nrow(g_pdf) - 1, l = ncol(g_pdf))
+
+# Draw the plot
+grid.newpage()
+grid.draw(g_pdf)
 
 # Heatmap of delay times ####
 
@@ -277,6 +350,18 @@ contour_plot=ggplot(df_divisions_diff, aes(x = delay, y = std, z = ld50))+
   NULL
 contour_plot
 
+contour_plot=ggplot(df_divisions_diff, aes(x = delay/60*100, y = std, z = ld50))+
+  geom_contour_filled(breaks = seq(0, 1, by = 0.1))+
+  scale_fill_brewer(palette = "Purples")+
+  labs(x = "Delay (% Second Division)", 
+       y = "Doubling Time Standard Deviation",
+       fill = "Median\nDoubling\nTime\nDifference")+
+  theme_classic()+
+  scale_x_continuous(expand = c(0, 0))+
+  scale_y_continuous(expand = c(0, 0))+
+  NULL
+contour_plot
+
 summary(df_divisions_diff)
 
 # df_divisions_diff[df_divisions_diff$delay%%20==0 & df_divisions_diff$delay%%5==0,]
@@ -290,14 +375,14 @@ divisions_diff_delay=df_divisions_diff[df_divisions_diff$std==0 |
                                          df_divisions_diff$std==unique(df_divisions_diff$std)[34] |
                                          df_divisions_diff$std==unique(df_divisions_diff$std)[50],]
 
-p_test_delay=ggplot(divisions_diff_delay, aes(x=delay, y=ld50, col=as.factor(round(std,0)), group=as.factor(round(std,0))))+
+p_test_delay=ggplot(divisions_diff_delay, aes(x=delay/60*100, y=ld50, col=as.factor(round(std,0)), group=as.factor(round(std,0))))+
   geom_line()+
   theme_classic()+
-  labs(color="Std", x="Delay (min)", y="Median Doubling\nTime Difference")+
+  labs(color="Std", x="Delay (% Second Division)", y="Median Doubling\nTime Difference")+
   NULL
 p_test_delay
 
-p_test_var=ggplot(divisions_diff_var, aes(x=std, y=ld50, col=as.factor(delay), group=as.factor(delay)))+
+p_test_var=ggplot(divisions_diff_var, aes(x=std, y=ld50, col=as.factor(floor(delay/60*100)), group=as.factor(round(delay/60*100))))+
   geom_line()+
   theme_classic()+
   labs(color="Delay", x="Standard Deviation", y="Median Doubling\nTime Difference")+
@@ -311,15 +396,15 @@ plot_grid(p_test_delay, p_test_var)
 # Paper Figure ####
 
 
-figure_2_v3=plot_grid(g, p_test_delay, p_test_var,
+figure_2_v3=plot_grid(g_pdf, p_test_delay, p_test_var,
                       labels=c('A', 'B', 'C'), ncol=1, label_size=12, rel_heights=c(2.5,2,2))
 figure_2_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_causes_asynchrony_median_diff_23apr2025.svg',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_causes_asynchrony_median_diff_30july2025.svg',
        plot=figure_2_v3, dpi='retina', width=4.2, height=7, bg='white')
 # Note: this image is saved as an svg to later modify the label of Delay to center align it correctly in the plot
 
 # Supplementary figure of the contour map
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig2_causes_async_contour_map_14feb2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig2_causes_async_contour_map_30july2025.png',
        plot=contour_plot, width=4, height=3)
 

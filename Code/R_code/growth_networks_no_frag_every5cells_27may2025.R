@@ -29,14 +29,14 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
-setwd("~/Desktop/results_edge_degree_15/fig4_growth_no_frag_every5_discrete")
+setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig4_growth_no_frag_18june2025/")
 
 # Loading the data ####
 
 # sim_df=data.frame()
 # 
 # for(j in c("petite", "grande", "petite-second-only")){
-#   temp_df=read.csv(paste(j, "_300n_1200m/network_information.csv", sep=""), header=TRUE)
+#   temp_df=read.csv(paste(j, "_300n_1300m/network_information.csv", sep=""), header=TRUE)
 #   temp_df$strain=j
 #   sim_df=rbind(sim_df, temp_df)
 # }
@@ -247,8 +247,8 @@ p_diam = ggplot(summ_diameter, aes(x=num_nodes, y=mean_diameter, col=strain, fil
   guides(col='none', fill='none')+
   NULL
 p_diam
-# Grande, mean: 13.24667, observed: 13
-# Petite, mean: 12.24333, observed: 12
+# Grande, mean: 13.33, observed: 13
+# Petite, mean: 12.22667, observed: 12
 
 p_undivided=ggplot(summ_undivided, aes(x=num_nodes, y=mean_undivided, col=strain, fill=strain))+
   geom_ribbon(aes(ymin=ci_lower, ymax=ci_upper), alpha=0.5, color=NA)+
@@ -266,12 +266,13 @@ p_undivided=ggplot(summ_undivided, aes(x=num_nodes, y=mean_undivided, col=strain
   petite_t200_colors+
   theme_classic(base_size = 10)+
   scale_x_continuous(breaks = seq(0, 1200, 200)) +
+  scale_y_continuous(breaks = seq(0, 110, 30)) +
   labs(y = "Mean Mothers with\nDelayed Daughter", x = "Number of Nodes") +
   guides(col='none', fill='none')+
   NULL
 p_undivided
-# Grande, mean: 2.933333, observed: 3
-# Petite, mean 9.043333, observed: 12
+# Grande, mean: 3.106667, observed: 3
+# Petite, mean 8.806667, observed: 12
 
 p_edge_degree=ggplot(summ_max_edge, aes(x=num_nodes, y=mean_max_edge, col=strain, fill=strain))+
   geom_ribbon(aes(ymin=ci_lower, ymax=ci_upper), alpha=0.5, color=NA)+
@@ -293,8 +294,8 @@ p_edge_degree=ggplot(summ_max_edge, aes(x=num_nodes, y=mean_max_edge, col=strain
   guides(col='none', fill='none')+
   NULL
 p_edge_degree
-# Grande, mean: 12.33, observed: 12
-# Petite, mean: 13.49, observed: 14
+# Grande, mean: 12.38, observed: 12
+# Petite, mean: 13.51667, observed: 14
 
 fig=plot_grid(dt_distributions_v2, p_undivided, p_diam, p_edge_degree,
               labels=c('A', 'B', 'C', 'D'), ncol=2, label_size=12)

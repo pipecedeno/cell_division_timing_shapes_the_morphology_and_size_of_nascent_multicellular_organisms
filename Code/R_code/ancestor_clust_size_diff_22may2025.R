@@ -84,28 +84,17 @@ median_volume=data_clust %>%
 # Cluster Volume
 grande_mean_volume=mean(data_clust[data_clust$strain=='grande',]$volume)
 grande_mean_volume
-# New measurements May 19: 
-# 106836.2 um^3
-# all data combined:
 # 105010.9 um^3
 
 petite_mean_volume=mean(data_clust[data_clust$strain=='petite',]$volume)
 petite_mean_volume
-# New measurements May 19: 
-# 54170.07 um^3
-# all data combined:
 # 58179.76 um^3
 
 # Cluster Radius
 mean(data_clust[data_clust$strain=='grande',]$Major)/2
-# New measurements May 19:
-# 27.59116
-# all data combined:
 # 27.4061
+
 mean(data_clust[data_clust$strain=='petite',]$Major)/2
-# New measurements May 19:
-# 21.89868
-# all data combined:
 # 22.61826
 
 
@@ -192,7 +181,6 @@ summary(cell_data)
 
 # Number of cells characterized in the second day
 table(cell_data$replicate, cell_data$strain)
-# Combined all data:
 #   petite grande
 # 1   2095   4398
 # 2   2640   3871
@@ -213,18 +201,10 @@ median_ar=cell_data %>%
 
 grande_mean_ar=mean(cell_data[cell_data$strain=='grande',]$AR)
 grande_mean_ar
-# New data May 19:
-# mean: 1.19564
-# median: 1.18784
-# all data:
 # mean: 1.197828
 # median: 1.18955
 petite_mean_ar=mean(cell_data[cell_data$strain=='petite',]$AR)
 petite_mean_ar
-# New data May 19:
-# mean: 1.222915
-# median: 1.21388
-# all data:
 # mean: 1.221764
 # median: 1.21154
 
@@ -261,18 +241,11 @@ summ_diam=cell_data %>%
 
 grande_mean_diam=mean(cell_data[cell_data$strain=='grande',]$Major)
 grande_mean_diam
-# New data may 19:
-# mean: 5.170423 um
-# median: 5.14785 um
-# all data:
 # mean: 5.085207
 # median: 5.067465
+
 petite_mean_diam=mean(cell_data[cell_data$strain=='petite',]$Major)
 petite_mean_diam
-# New data may 19:
-# mean: 4.844126 um
-# median: 4.82025 um
-# all data:
 # mean: 4.844297
 # median: 4.81492
 
@@ -520,6 +493,9 @@ p_cluster_vol=ggplot(data_clust, aes(x=volume, fill=strain))+
   NULL
 p_cluster_vol
 
+t.test(data_clust$volume~data_clust$strain)
+# t = 27.786, df = 7532.1, p-value < 2.2e-16
+
 p_ar=ggplot(cell_data, 
             aes(x=AR, fill=strain))+
   geom_histogram(alpha=0.75, position="identity", bins=30) +
@@ -538,6 +514,9 @@ p_ar=ggplot(cell_data,
              color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   NULL
 p_ar
+
+t.test(cell_data$AR~cell_data$strain)
+# t = -23.724, df = 24654, p-value < 2.2e-16
 
 
 p_diam=ggplot(cell_data, 
@@ -558,6 +537,9 @@ p_diam=ggplot(cell_data,
              color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   NULL
 p_diam
+
+t.test(cell_data$Major~cell_data$strain)
+# t = 52.253, df = 27391, p-value < 2.2e-16
 
 
 img_petite_clust <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/gob21-2_day2_001_620x620_100um-scale.png")

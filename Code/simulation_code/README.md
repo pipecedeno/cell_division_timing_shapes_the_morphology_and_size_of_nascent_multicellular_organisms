@@ -13,11 +13,11 @@ sim_clust_no_fragmentation_15nov2024.py -d grande_doubling_time_dist_2024dec2.cs
 
 ### updated code for figure 3:
 ```
-sim_clust_no_fragmentation_27may2025.py -d petite_doubling_time_dist_2023may30.csv -n 300 -o petite_300n_1200m -m 1200
+sim_clust_no_fragmentation_27may2025.py -d petite_doubling_time_dist_2023may30.csv -n 300 -o petite_300n_1300m -m 1300
 
-sim_clust_no_fragmentation_27may2025.py -d grande_doubling_time_dist_2024dec2.csv -n 300 -o grande_300n_1200m -m 1200
+sim_clust_no_fragmentation_27may2025.py -d grande_doubling_time_dist_2024dec2.csv -n 300 -o grande_300n_1300m -m 1300
 
-sim_clust_no_fragmentation_27may2025.py -d petite_only_second_doubling_8feb2024.csv -n 300 -o petite-second-only_300n_1200m -m 1200 
+sim_clust_no_fragmentation_27may2025.py -d petite_only_second_doubling_8feb2024.csv -n 300 -o petite-second-only_300n_1300m -m 1300 
 ```
 
 ### Code for figure 4: Network growth with fragmentation keeping track of all cluster fractures
@@ -94,6 +94,14 @@ sim_frag_clust_diff_mean_dists_24apr2024.py -n 100 -o slow_first_div -g 100 -e 1
 ```
 
 Note: this is the same code used for figure 5, just with different parameters.
+
+## Modified
+
+```
+exec_sim_fast_first_div_frag_from_file_params.sh -n 30 -g 50 -u 5 -x 15 -c random -i params_distributions_mean_90_7july2025.csv
+
+exec_sim_fast_first_div_no_frag_from_file_params_parallel.sh -n 300 -m 1300 -i ../params_distributions_mean_90_7july2025.csv -t 7
+```
 
 
 ### Table 1
