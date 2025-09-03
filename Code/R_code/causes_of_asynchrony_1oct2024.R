@@ -98,102 +98,116 @@ summary(table_parameters)
 # write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/4_diffs_4_stds_17oct2024/params_4diffs_4stds_17oct2024.csv", row.names=FALSE)
 
 
-#### Making plot of distributions ####
-
-default_mean=60
-means <- c(60, 80, 100, 120)
-delay_names=c("0", "20", "40", "60")
-std_devs <- c(0, 5, 10, 15)
-std_names=c("0", "5", "10", "15")
-
-n_times=1000
-
-df_doub_times=data.frame()
-
-for (i in seq(1,length(std_devs))){
-  
-  first_std=TRUE
-  
-  for (j in seq(1,length(means))){
-    first_div_params=normal_to_lognormal_direct(means[j], means[j]/default_mean*std_devs[i])
-    
-    if(first_std){
-      second_div_params=first_div_params
-      first_std=FALSE
-    }
-    
-    first_div_times=rlnorm(n_times, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
-    
-    second_div_times=rlnorm(n_times, meanlog = second_div_params$meanlog, sdlog = second_div_params$sdlog)
-    
-    temp_df=data.frame(delay=delay_names[j], std=std_names[i], div_num=c(rep("1", n_times), rep("2", n_times)), 
-                       doub_t=c(first_div_times, second_div_times))
-    
-    df_doub_times=rbind(df_doub_times, temp_df)
-  }
-}
-
-df_doub_times$std=factor(df_doub_times$std, levels=c("0", "5", "10", "15"))
-
-summary(df_doub_times)
-
-ggplot(df_doub_times, aes(x=div_num, y=doub_t, fill=div_num))+
-  geom_violin()+
-  facet_grid(std~delay)+
-  # stat_summary(fun='mean', geom='crossbar')+
-  theme_classic()+
-  labs(x="Number of Divisions", y="Doubling Time (min)")+
-  guides(fill='none')+
-  NULL
 
 
 
-# Create the base plot
-p <- ggplot(df_doub_times, aes(x=div_num, y=doub_t, fill=div_num)) +
-  geom_violin() +
-  facet_grid(std~delay) +
-  theme_classic() +
-  labs(x="Number of Divisions", y="Doubling Time (min)") +
-  guides(fill='none') +
-  theme(plot.margin = unit(c(0.3, 0.3, 0.3, 0.3), "cm"))+ # Reduced plot margins
-  scale_y_continuous(breaks = c(100, 200))+
-  NULL
-
-# Convert to grob
-g <- ggplotGrob(p)
-
-# Add top label (reduced height)
-top_margin <- unit(0.5, "cm")  # Adjust this value to change the top gap
-g <- gtable_add_rows(g, heights = top_margin, pos = 0)
-g <- gtable_add_grob(g, 
-                     grob = textGrob("Delay (min)", gp = gpar(fontsize = 11)), 
-                     t = 1, l = 3, r = ncol(g) - 1)
-
-# Add right label (reduced width)
-right_margin <- unit(0.5, "cm")  # Adjust this value to change the right gap
-g <- gtable_add_cols(g, widths = right_margin, pos = -1)
-g <- gtable_add_grob(g, 
-                     grob = textGrob("Standard Deviation", rot = -90, gp = gpar(fontsize = 11)), 
-                     t = 3, b = nrow(g) - 1, l = ncol(g))
-
-# Draw the plot
-grid.newpage()
-grid.draw(g)
 
 
 #### Making plot of PDF distributions ####
+# default_mean <- 60
+# means <- c(60, 80, 100, 120)
+# delay_names <- c("0", "20", "40", "60")
+# std_devs <- c(0, 5, 10, 15)
+# std_names <- c("0", "5", "10", "15")
+# delay_percentages=c("0", "33", "66", "100")
+# 
+# # Define range for PDF evaluation
+# x_min <- 10  # Minimum doubling time to consider
+# x_max <- 300 # Maximum doubling time to consider
+# n_points <- x_max-x_min+1  # Number of points to evaluate PDF
+# 
+# df_pdf_data <- data.frame()
+# 
+# for (i in seq(1, length(std_devs))) {
+#   
+#   first_std <- TRUE
+#   
+#   for (j in seq(1, length(means))) {
+#     first_div_params <- normal_to_lognormal_direct(means[j], means[j]/default_mean*std_devs[i])
+#     
+#     if(first_std) {
+#       second_div_params <- first_div_params
+#       first_std <- FALSE
+#     }
+#     
+#     # Create x values for PDF evaluation
+#     x_values <- seq(x_min, x_max, length.out = n_points)
+#     
+#     # Calculate PDF values for both distributions
+#     first_div_pdf <- dlnorm(x_values, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
+#     second_div_pdf <- dlnorm(x_values, meanlog = second_div_params$meanlog, sdlog = second_div_params$sdlog)
+#     
+#     # Create dataframe with PDF values
+#     temp_df <- data.frame(
+#       delay = delay_names[j], 
+#       std = std_names[i], 
+#       delay_perc = delay_percentages[j],
+#       div_num = c(rep("1", n_points), rep("2", n_points)), 
+#       doub_t = c(x_values, x_values),
+#       pdf_value = c(first_div_pdf, second_div_pdf)
+#     )
+#     
+#     df_pdf_data <- rbind(df_pdf_data, temp_df)
+#   }
+# }
+# 
+# # Set factor levels
+# df_pdf_data$std <- factor(df_pdf_data$std, levels = c("0", "5", "10", "15"))
+# df_pdf_data$delay_perc <- factor(df_pdf_data$delay_perc, levels = c("0", "33", "66", "100"))
+# 
+# # Create the PDF plot
+# p_pdf=ggplot(df_pdf_data, aes(x = doub_t, y = pdf_value, color = div_num)) +
+#   geom_line(alpha = 0.75) +
+#   facet_grid(std ~ delay_perc) +
+#   theme_classic() +
+#   xlim(c(0, 225))+
+#   scale_y_continuous(breaks = c(0, 0.05)) +
+#   scale_x_continuous(breaks = c(100, 200))+
+#   coord_flip() +
+#   labs(x = "Doubling Time (min)", y = "Probability Density", color = "Division") +
+#   scale_color_discrete(name = "Number of\nDivisions") +
+#   NULL
+# p_pdf
+# 
+# # Convert to grob
+# g_pdf <- ggplotGrob(p_pdf)
+# 
+# # Add top label (reduced height)
+# top_margin <- unit(0.5, "cm")  # Adjust this value to change the top gap
+# g_pdf <- gtable_add_rows(g_pdf, heights = top_margin, pos = 0)
+# g_pdf <- gtable_add_grob(g_pdf, 
+#                      grob = textGrob("Delay (% Second Division)", gp = gpar(fontsize = 11)), 
+#                      t = 1, l = 3, r = ncol(g_pdf) - 1)
+# 
+# # Add right label (reduced width)
+# right_margin <- unit(0.5, "cm")  # Adjust this value to change the right gap
+# g_pdf <- gtable_add_cols(g_pdf, widths = right_margin, pos = -1)
+# g_pdf <- gtable_add_grob(g_pdf, 
+#                      grob = textGrob("Standard Deviation", rot = -90, gp = gpar(fontsize = 11)), 
+#                      t = 3, b = nrow(g_pdf) - 1, l = ncol(g_pdf))
+# 
+# # Draw the plot
+# grid.newpage()
+# grid.draw(g_pdf)
+
+
+
+
+
+# Your original parameters
 default_mean <- 60
 means <- c(60, 80, 100, 120)
 delay_names <- c("0", "20", "40", "60")
 std_devs <- c(0, 5, 10, 15)
 std_names <- c("0", "5", "10", "15")
-delay_percentages=c("0", "33", "66", "100")
+delay_percentages <- c("0", "33", "66", "100")
 
 # Define range for PDF evaluation
-x_min <- 10  # Minimum doubling time to consider
-x_max <- 300 # Maximum doubling time to consider
-n_points <- x_max-x_min+1  # Number of points to evaluate PDF
+x_min <- 10
+x_max <- 300
+n_points <- x_max - x_min + 1
 
+# Create PDF data (modified to handle std = 0 case)
 df_pdf_data <- data.frame()
 
 for (i in seq(1, length(std_devs))) {
@@ -201,29 +215,69 @@ for (i in seq(1, length(std_devs))) {
   first_std <- TRUE
   
   for (j in seq(1, length(means))) {
-    first_div_params <- normal_to_lognormal_direct(means[j], means[j]/default_mean*std_devs[i])
     
-    if(first_std) {
-      second_div_params <- first_div_params
-      first_std <- FALSE
+    # Special handling for std_dev = 0 case
+    if (std_devs[i] == 0) {
+      # When std = 0, the distribution is deterministic (single point)
+      # Create just 3 points very close together to make an extremely thin violin
+      
+      # The exact value where all probability mass is located
+      exact_value <- means[j]
+      
+      if(first_std) {
+        second_div_params_exact <- exact_value
+        first_std <- FALSE
+      }
+      
+      # Create only 3 points: center and two very close neighbors
+      tiny_offset <- 0.01  # Extremely small offset
+      spike_x <- c(exact_value - tiny_offset, exact_value, exact_value + tiny_offset)
+      spike_pdf <- c(0.001, 1, 0.001)  # Center has all the mass, neighbors almost nothing
+      
+      # Same for second division
+      second_spike_x <- c(second_div_params_exact - tiny_offset, 
+                          second_div_params_exact, 
+                          second_div_params_exact + tiny_offset)
+      second_spike_pdf <- c(0.001, 1, 0.001)
+      
+      # Create dataframe for the spike
+      temp_df <- data.frame(
+        delay = delay_names[j], 
+        std = std_names[i], 
+        delay_perc = delay_percentages[j],
+        div_num = c(rep("1", 3), rep("2", 3)), 
+        doub_t = c(spike_x, second_spike_x),
+        pdf_value = c(spike_pdf, second_spike_pdf),
+        is_deterministic = TRUE
+      )
+      
+    } else {
+      # Normal case with std > 0
+      first_div_params <- normal_to_lognormal_direct(means[j], means[j]/default_mean*std_devs[i])
+      
+      if(first_std) {
+        second_div_params <- first_div_params
+        first_std <- FALSE
+      }
+      
+      # Create x values for PDF evaluation
+      x_values <- seq(x_min, x_max, length.out = n_points)
+      
+      # Calculate PDF values for both distributions
+      first_div_pdf <- dlnorm(x_values, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
+      second_div_pdf <- dlnorm(x_values, meanlog = second_div_params$meanlog, sdlog = second_div_params$sdlog)
+      
+      # Create dataframe with PDF values
+      temp_df <- data.frame(
+        delay = delay_names[j], 
+        std = std_names[i], 
+        delay_perc = delay_percentages[j],
+        div_num = c(rep("1", n_points), rep("2", n_points)), 
+        doub_t = c(x_values, x_values),
+        pdf_value = c(first_div_pdf, second_div_pdf),
+        is_deterministic = FALSE
+      )
     }
-    
-    # Create x values for PDF evaluation
-    x_values <- seq(x_min, x_max, length.out = n_points)
-    
-    # Calculate PDF values for both distributions
-    first_div_pdf <- dlnorm(x_values, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
-    second_div_pdf <- dlnorm(x_values, meanlog = second_div_params$meanlog, sdlog = second_div_params$sdlog)
-    
-    # Create dataframe with PDF values
-    temp_df <- data.frame(
-      delay = delay_names[j], 
-      std = std_names[i], 
-      delay_perc = delay_percentages[j],
-      div_num = c(rep("1", n_points), rep("2", n_points)), 
-      doub_t = c(x_values, x_values),
-      pdf_value = c(first_div_pdf, second_div_pdf)
-    )
     
     df_pdf_data <- rbind(df_pdf_data, temp_df)
   }
@@ -233,40 +287,117 @@ for (i in seq(1, length(std_devs))) {
 df_pdf_data$std <- factor(df_pdf_data$std, levels = c("0", "5", "10", "15"))
 df_pdf_data$delay_perc <- factor(df_pdf_data$delay_perc, levels = c("0", "33", "66", "100"))
 
-# Create the PDF plot
-p_pdf=ggplot(df_pdf_data, aes(x = doub_t, y = pdf_value, color = div_num)) +
-  geom_line(alpha = 0.75) +
+# Create violin data by expanding PDF data points
+df_violin_data <- data.frame()
+
+for (std_val in unique(df_pdf_data$std)) {
+  for (delay_val in unique(df_pdf_data$delay_perc)) {
+    for (div_val in unique(df_pdf_data$div_num)) {
+      
+      subset_data <- df_pdf_data[df_pdf_data$std == std_val & 
+                                   df_pdf_data$delay_perc == delay_val & 
+                                   df_pdf_data$div_num == div_val, ]
+      
+      if (nrow(subset_data) > 0) {
+        
+        # Check if this is a deterministic case (std = 0)
+        if (unique(subset_data$is_deterministic)) {
+          # For deterministic case, create very few points with minimal expansion
+          max_pdf <- max(subset_data$pdf_value)
+          if (max_pdf > 0) {
+            normalized_pdf <- subset_data$pdf_value / max_pdf
+            
+            # For deterministic cases, use very minimal expansion
+            # Only expand the center point significantly
+            n_samples_per_point <- ifelse(normalized_pdf >= 0.9, 50, 1)  # Only center gets many points
+            
+            expanded_data <- data.frame()
+            for (k in 1:nrow(subset_data)) {
+              if (n_samples_per_point[k] > 0) {
+                temp_expanded <- data.frame(
+                  std = rep(std_val, n_samples_per_point[k]),
+                  delay_perc = rep(delay_val, n_samples_per_point[k]),
+                  div_num = rep(div_val, n_samples_per_point[k]),
+                  doub_t = rep(subset_data$doub_t[k], n_samples_per_point[k])
+                )
+                expanded_data <- rbind(expanded_data, temp_expanded)
+              }
+            }
+            
+            df_violin_data <- rbind(df_violin_data, expanded_data)
+          }
+          
+        } else {
+          # Normal case with std > 0
+          max_pdf <- max(subset_data$pdf_value)
+          if (max_pdf > 0) {
+            normalized_pdf <- subset_data$pdf_value / max_pdf
+            
+            # Create expanded data points based on PDF density
+            n_samples_per_point <- pmax(1, round(normalized_pdf * 50))
+            
+            expanded_data <- data.frame()
+            for (k in 1:nrow(subset_data)) {
+              if (n_samples_per_point[k] > 0) {
+                temp_expanded <- data.frame(
+                  std = rep(std_val, n_samples_per_point[k]),
+                  delay_perc = rep(delay_val, n_samples_per_point[k]),
+                  div_num = rep(div_val, n_samples_per_point[k]),
+                  doub_t = rep(subset_data$doub_t[k], n_samples_per_point[k])
+                )
+                expanded_data <- rbind(expanded_data, temp_expanded)
+              }
+            }
+            
+            df_violin_data <- rbind(df_violin_data, expanded_data)
+          }
+        }
+      }
+    }
+  }
+}
+
+# Ensure factor levels are maintained
+df_violin_data$std <- factor(df_violin_data$std, levels = c("0", "5", "10", "15"))
+df_violin_data$delay_perc <- factor(df_violin_data$delay_perc, levels = c("0", "33", "66", "100"))
+
+# Create the violin plot
+p_violin <- ggplot(df_violin_data, aes(x = div_num, y = doub_t, color = div_num)) +
+  geom_violinhalf(trim = FALSE, alpha = 0.7) +
   facet_grid(std ~ delay_perc) +
   theme_classic() +
-  xlim(c(0, 225))+
-  scale_y_continuous(breaks = c(0, 0.05)) +
-  scale_x_continuous(breaks = c(100, 200))+
-  coord_flip() +
-  labs(x = "Doubling Time (min)", y = "Probability Density", color = "Division") +
+  scale_y_continuous(limits = c(0, 225), breaks = c(100, 200)) +
+  labs(x = "Number of Divisions", y = "Doubling Time (min)") +
+  guides(col='none') +
   scale_color_discrete(name = "Number of\nDivisions") +
+  theme(strip.text = element_text(size = 10), axis.text = element_text(size = 9)) +
   NULL
-p_pdf
+p_violin
 
-# Convert to grob
-g_pdf <- ggplotGrob(p_pdf)
 
-# Add top label (reduced height)
-top_margin <- unit(0.5, "cm")  # Adjust this value to change the top gap
-g_pdf <- gtable_add_rows(g_pdf, heights = top_margin, pos = 0)
-g_pdf <- gtable_add_grob(g_pdf, 
-                     grob = textGrob("Delay (% Second Division)", gp = gpar(fontsize = 11)), 
-                     t = 1, l = 3, r = ncol(g_pdf) - 1)
+g_violin <- ggplotGrob(p_violin)
 
-# Add right label (reduced width)
-right_margin <- unit(0.5, "cm")  # Adjust this value to change the right gap
-g_pdf <- gtable_add_cols(g_pdf, widths = right_margin, pos = -1)
-g_pdf <- gtable_add_grob(g_pdf, 
-                     grob = textGrob("Standard Deviation", rot = -90, gp = gpar(fontsize = 11)), 
-                     t = 3, b = nrow(g_pdf) - 1, l = ncol(g_pdf))
+# Add top label
+top_margin <- unit(0.5, "cm")
+g_violin <- gtable_add_rows(g_violin, heights = top_margin, pos = 0)
+g_violin <- gtable_add_grob(g_violin, 
+                            grob = textGrob("Delay (% Second Division)", gp = gpar(fontsize = 11)), 
+                            t = 1, l = 3, r = ncol(g_violin) - 1)
 
-# Draw the plot
+# Add right label
+right_margin <- unit(0.5, "cm")
+g_violin <- gtable_add_cols(g_violin, widths = right_margin, pos = -1)
+g_violin <- gtable_add_grob(g_violin, 
+                            grob = textGrob("Standard Deviation", rot = -90, gp = gpar(fontsize = 11)), 
+                            t = 3, b = nrow(g_violin) - 1, l = ncol(g_violin))
+
+# Draw the final plot
 grid.newpage()
-grid.draw(g_pdf)
+grid.draw(g_violin)
+
+
+
+
 
 # Heatmap of delay times ####
 
@@ -396,11 +527,11 @@ plot_grid(p_test_delay, p_test_var)
 # Paper Figure ####
 
 
-figure_2_v3=plot_grid(g_pdf, p_test_delay, p_test_var,
+figure_2_v3=plot_grid(g_violin, p_test_delay, p_test_var,
                       labels=c('A', 'B', 'C'), ncol=1, label_size=12, rel_heights=c(2.5,2,2))
 figure_2_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_causes_asynchrony_median_diff_30july2025.svg',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_causes_asynchrony_median_diff_6aug2025.svg',
        plot=figure_2_v3, dpi='retina', width=4.2, height=7, bg='white')
 # Note: this image is saved as an svg to later modify the label of Delay to center align it correctly in the plot
 

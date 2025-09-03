@@ -523,7 +523,7 @@ list_flags_saved_network=[False for i in range(num_generations+1) if i%10==0]
 
 #creating and writing information of the program in the log file
 log_file=open(os.path.join(output_dir,"log.txt"), "a")
-log_file.write("sim_frag_clust_diff_mean_dists_24apr2024_modified.py\nInputs received:\n")
+log_file.write("sim_frag_clust_diff_mean_dists_24apr2024.py\nInputs received:\n")
 log_file.write("-i: "+args.first_dist_params+"\n")
 log_file.write("-j: "+args.second_dist_params+"\n")
 log_file.write("-n: "+args.number_sims+"\n")

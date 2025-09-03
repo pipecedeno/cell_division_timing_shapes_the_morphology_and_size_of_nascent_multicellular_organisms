@@ -51,8 +51,8 @@ directory_path = folder_path+"test_"+strain+"_1000m_100n/edges_sim_files/";
 
 
 % Open output file
-output_folder=folder_path;
-
+% output_folder=folder_path;
+output_folder='~/Desktop/results_edge_degree_15/supp_fig3_physics_sim';
 
 
 clust_filename = strain+"_clust_size_50sim_500n_1.2aspr.csv";
@@ -84,6 +84,16 @@ overlap_size_filename=fullfile(output_folder, overlap_size_file);
 save_cell_overlap_each_size=0; % 1 = Y, 0 = N
 cell_overlap_size_file=strain+"_cell_overlap_clust_size_1.2ar.csv";
 cell_overlap_size_filename=fullfile(output_folder, cell_overlap_size_file);
+
+
+% Cell budding angle information
+use_cell_angles = 1;
+
+cell_angle_path = '/Users/pipe/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/cell_budding_angles_grande_ancestor_30july2025.csv';
+cell_angle_data = readtable(cell_angle_path, 'Delimiter', ',', 'ReadVariableNames', true);
+cell_angles_degrees = cell_angle_data.angle_to_bud_scar;
+cell_angles_radians = deg2rad(cell_angles_degrees);  % Convert to radians
+
 
 max_network_size=500;
 add_cell_after_all_attempts=0; % 1 it always add the cell, 0 only adds it if there was space in the first 10 attempts
@@ -206,6 +216,8 @@ input_variables('save_cell_overlap_each_size')=save_cell_overlap_each_size;
 input_variables('cell_overlap_size_output')=cell_overlap_size_output;
 input_variables('after_how_many_divisions')=after_how_many_divisions;
 input_variables('add_cell_after_all_attempts')=add_cell_after_all_attempts;
+input_variables('use_cell_angles')=use_cell_angles;
+input_variables('cell_angles_radians')=cell_angles_radians;
 
 %# inputs necesary to execute include_forces function in the ELYES_sim function
 input_variables('NEIGHBOR_THRESH')=NEIGHBOR_THRESH;
@@ -482,6 +494,8 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
     save_cell_overlap_each_size=input_variables('save_cell_overlap_each_size');
     after_how_many_divisions=input_variables('after_how_many_divisions');
     add_cell_after_all_attempts=input_variables('add_cell_after_all_attempts');
+    use_cell_angles=input_variables('use_cell_angles');
+    cell_angles_radians=input_variables('cell_angles_radians');
 
     NEIGHBOR_THRESH=input_variables('NEIGHBOR_THRESH');
     STERIC_MAG=input_variables('STERIC_MAG');
@@ -581,25 +595,38 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
                 cont_attempts=0;
                 newBud=0; %# Default value of new bud, it is assigned here as this would be the first time it is assigned
 
-                while cont_attempts<10 & newBud == 0 %if one of this conditions is met then it needs to stop
-                    %# This may need to be outside the loop, now we are only sampling 1 value because it is processing one cell at a time
-                    variedTheta = theta + thetaVariance * randn(1); %theta value corresponding to the cell
-                    %# To test if variedtheta gets different values or not when
-                    %# thetaVariance is 0
-                    % fprintf(['variedTheta: ', num2str(variedTheta), '\n']); %# it prints always the same value
+                if use_cell_angles==0
+                    % Sampling buds without using cell budding distributions
+                    force_selection=0;
+                    while cont_attempts<10 & newBud == 0 %if one of this conditions is met then it needs to stop
+                        %# This may need to be outside the loop, now we are only sampling 1 value because it is processing one cell at a time
+                        variedTheta = theta + thetaVariance * randn(1); %theta value corresponding to the cell
+                        %# To test if variedtheta gets different values or not when
+                        %# thetaVariance is 0
+                        % fprintf(['variedTheta: ', num2str(variedTheta), '\n']); %# it prints always the same value
 
-                    [newBud, newBudRel, newAxis] = getDaughterPos(cell_list(n), pole_theta, variedTheta, distance_thresh, new_bud_prob); % finds the new bud xyz position and relative position to the old cell
-                    cont_attempts=cont_attempts+1;
-                end
+                        [newBud, newBudRel, newAxis] = getDaughterPos(cell_list(n), pole_theta, variedTheta, distance_thresh, new_bud_prob, force_selection); % finds the new bud xyz position and relative position to the old cell
+                        cont_attempts=cont_attempts+1;
+                    end
 
-                % If there wasn't space for the cell then it is just sampled randomly if add_cell_after_all_attempts is 1
-                if newBud==0 & add_cell_after_all_attempts==1
-                    variedTheta = theta + thetaVariance * randn(1);
-                    [newBud, newBudRel, newAxis] = getDaughterPos_always(cell_list(n), pole_theta, variedTheta, distance_thresh, new_bud_prob); % finds the new bud xyz position and relative position to the old cell
-                end
+                    % If there wasn't space for the cell then it is just sampled randomly if add_cell_after_all_attempts is 1
+                    force_selection=1;
+                    if newBud==0 & add_cell_after_all_attempts==1
+                        variedTheta = theta + thetaVariance * randn(1);
+                        [newBud, newBudRel, newAxis] = getDaughterPos(cell_list(n), pole_theta, variedTheta, distance_thresh, new_bud_prob, force_selection); % finds the new bud xyz position and relative position to the old cell
+                    end
+                else
+                    % Sample buds using cell budding distributions
+                    force_selection=0;
+                    while cont_attempts<10 & newBud == 0 %if one of this conditions is met then it needs to stop
+                        [newBud, newBudRel, newAxis] = getDaughterPos_measured_angles(cell_list(n), distance_thresh, cell_angles_radians, force_selection); % finds the new bud xyz position and relative position to the old cell
+                    end
 
-                if newBud==0
-                    cont_failed_to_add_edge=cont_failed_to_add_edge+1;
+                    % If there wasn't space for the cell then it is just sampled randomly if add_cell_after_all_attempts is 1
+                    force_selection=1;
+                    if newBud==0 & add_cell_after_all_attempts==1
+                        [newBud, newBudRel, newAxis] = getDaughterPos_measured_angles(cell_list(n), distance_thresh, cell_angles_radians, force_selection); % finds the new bud xyz position and relative position to the old cell
+                    end
                 end
 
 
@@ -742,11 +769,10 @@ function [S, R, T] = GET_SURFACE_MATRICES(cell_of_interest, scaling)
 end
 
 
-function [newPos, relativePos, axis] = getDaughterPos(CELL, POLE_TH, TH, DISTANCE_THRESH, NEW_BUD_PROB_THRESH)
-
+function [newPos, relativePos, axis] = getDaughterPos(CELL, POLE_TH, TH, DISTANCE_THRESH, NEW_BUD_PROB_THRESH, force_selection)
     % Surface definition for possible mother cell:
     [Sm, Rm, Tm] = GET_SURFACE_MATRICES(CELL, .1);
-
+    
     % Determine where on cell body to bud the next scar:
     if isempty(CELL.Daughters) % reproduce near the pole with prob 0.7
         frac = rand;
@@ -754,8 +780,7 @@ function [newPos, relativePos, axis] = getDaughterPos(CELL, POLE_TH, TH, DISTANC
             % bud at pole
             th = POLE_TH * rand;
             ph = 2 * pi * rand;
-            ix_too_close = [];
-            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
+            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2 ).^(-1));
             x = r * cos(th);
             y = r * sin(th) * cos(ph);
             z = r * sin(th) * sin(ph);
@@ -763,15 +788,16 @@ function [newPos, relativePos, axis] = getDaughterPos(CELL, POLE_TH, TH, DISTANC
             % bud on the polar angle
             ph = 2 * pi * rand;
             th = TH;
-            ix_too_close = [];
-            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
+            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2 ).^(-1));
             x = r * cos(th);
             y = r * sin(th) * cos(ph);
             z = r * sin(th) * sin(ph);
         end
-
-    else % reproduce based upon the polar angle theta, sometimes back bud (if 3 or more bud scars)
         
+        
+        ix_too_close = [];  % No need to check distances as it is the first cell added
+        
+    else % reproduce based upon the polar angle theta, sometimes back bud (if 3 or more bud scars)
         nDaughters = size(CELL.BudXYZ,2);
         if nDaughters < 4
             ph = 2 * pi * rand;
@@ -786,94 +812,81 @@ function [newPos, relativePos, axis] = getDaughterPos(CELL, POLE_TH, TH, DISTANC
                 th = deg2rad(180) - TH;
             end
         end
-
-        % Check if new location is too close to existing scars:
-        r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
+        
+        % Calculate position
+        r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2 ).^(-1));
         x = r * cos(th);
         y = r * sin(th) * cos(ph);
         z = r * sin(th) * sin(ph);
-        t = [x; y; z];
-        s = CELL.BudXYZ - t;
-        d = sqrt(s(1,:).^2 + s(2,:).^2 + s(3,:).^2);
-        ix_too_close = find(d < DISTANCE_THRESH);
+        
+        % Apply force_selection logic for subsequent daughters
+        if force_selection == 1
+            ix_too_close = [];  % Force selection - ignore distance checks
+        else
+            % Check if new location is too close to existing scars:
+            t = [x; y; z];
+            s = CELL.BudXYZ - t;
+            d = sqrt(s(1,:).^2 + s(2,:).^2 + s(3,:).^2);
+            ix_too_close = find(d < DISTANCE_THRESH);
+        end
     end
-
+    
     if isempty(ix_too_close) % new bud is successful
         relativePos = [x; y; z];
-        newPos      = Tm * Rm * [relativePos; 1];
-        normal      = 2 * [x/Sm(1,1)^2; y/Sm(2,2)^2; z/Sm(3,3)^2];
-        axis        = normal./norm(normal);
+        newPos = Tm * Rm * [relativePos; 1];
+        normal = 2 * [x/Sm(1,1)^2; y/Sm(2,2)^2; z/Sm(3,3)^2];
+        axis = normal./norm(normal);
     else % this bud is too close, loses its chance
         relativePos = 0;
-        newPos      = 0;
-        axis        = 0;
+        newPos = 0;
+        axis = 0;
     end
-
 end
 
-% function modified to always return a budding cell position no matter of the distance to other budding cells
-function [newPos, relativePos, axis] = getDaughterPos_always(CELL, POLE_TH, TH, DISTANCE_THRESH, NEW_BUD_PROB_THRESH)
-
+% Simplified getDaughterPos function - uses only measured angles
+function [newPos, relativePos, axis] = getDaughterPos_measured_angles(CELL, DISTANCE_THRESH, cell_angles_radians, force_selection)
     % Surface definition for possible mother cell:
     [Sm, Rm, Tm] = GET_SURFACE_MATRICES(CELL, .1);
-
-    % Determine where on cell body to bud the next scar:
-    if isempty(CELL.Daughters) % reproduce near the pole with prob 0.7
-        frac = rand;
-        if frac < NEW_BUD_PROB_THRESH
-            % bud at pole
-            th = POLE_TH * rand;
-            ph = 2 * pi * rand;
-            ix_too_close = [];
-            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
-            x = r * cos(th);
-            y = r * sin(th) * cos(ph);
-            z = r * sin(th) * sin(ph);
+    
+    % Sample angle from measured distribution
+    th = cell_angles_radians(randi(length(cell_angles_radians)));
+    ph = 2 * pi * rand;  % Random azimuthal angle for 3D positioning
+    
+    % Calculate position on ellipsoid surface
+    r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2 ).^(-1));
+    x = r * cos(th);
+    y = r * sin(th) * cos(ph);
+    z = r * sin(th) * sin(ph);
+    
+    % Check distance to existing buds only if force_selection is 0
+    if force_selection == 1
+        ix_too_close = [];  % Force selection - ignore distance checks
+    else
+        % Normal behavior - check if new location is too close to existing scars
+        if ~isempty(CELL.BudXYZ)
+            t = [x; y; z];
+            s = CELL.BudXYZ - t;
+            d = sqrt(s(1,:).^2 + s(2,:).^2 + s(3,:).^2);
+            ix_too_close = find(d < DISTANCE_THRESH);
         else
-            % bud on the polar angle
-            ph = 2 * pi * rand;
-            th = TH;
-            ix_too_close = [];
-            r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
-            x = r * cos(th);
-            y = r * sin(th) * cos(ph);
-            z = r * sin(th) * sin(ph);
+            ix_too_close = [];  % No existing buds, so no distance check needed
         end
-
-    else % reproduce based upon the polar angle theta, sometimes back bud (if 3 or more bud scars)
-        
-        nDaughters = size(CELL.BudXYZ,2);
-        if nDaughters < 4
-            ph = 2 * pi * rand;
-            th = TH;
-        else
-            frac = rand;
-            if frac < 1 % bud at the distal pole
-                ph = 2 * pi * rand;
-                th = TH;
-            else % bud at proximal pole
-                ph = 2 * pi * rand;
-                th = deg2rad(180) - TH;
-            end
-        end
-
-        % Check if new location is too close to existing scars:
-        r = sqrt(( (cos(th)/Sm(1,1))^2 + (sin(th)*cos(ph)/Sm(2,2))^2 + (sin(th)*sin(ph)/Sm(3,3))^2  ).^(-1));
-        x = r * cos(th);
-        y = r * sin(th) * cos(ph);
-        z = r * sin(th) * sin(ph);
-        t = [x; y; z];
-        s = CELL.BudXYZ - t;
-        d = sqrt(s(1,:).^2 + s(2,:).^2 + s(3,:).^2);
-        ix_too_close = find(d < DISTANCE_THRESH);
     end
-
-    relativePos = [x; y; z];
-    newPos      = Tm * Rm * [relativePos; 1];
-    normal      = 2 * [x/Sm(1,1)^2; y/Sm(2,2)^2; z/Sm(3,3)^2];
-    axis        = normal./norm(normal);
-
+    
+    if isempty(ix_too_close) % new bud is successful
+        relativePos = [x; y; z];
+        newPos = Tm * Rm * [relativePos; 1];
+        normal = 2 * [x/Sm(1,1)^2; y/Sm(2,2)^2; z/Sm(3,3)^2];
+        axis = normal./norm(normal);
+    else % this bud is too close, loses its chance
+        relativePos = 0;
+        newPos = 0;
+        axis = 0;
+    end
 end
+
+
+
 
 
 function [total_overlap] = return_CHECK_OVERLAPS2(cell_list)

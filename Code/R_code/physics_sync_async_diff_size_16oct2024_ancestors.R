@@ -115,10 +115,16 @@ summ_clust_size %>%
 #   }
 # }
 
-
 petite_overlap=read.csv("overlap_accumulation_2dec2024/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 petite_overlap$strain="Petite"
 grande_overlap=read.csv("overlap_accumulation_2dec2024/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+grande_overlap$strain="Grande"
+overlap_size_df=rbind(grande_overlap, petite_overlap)
+
+# Test sampling budding sites from time lapse distributions budding distributions
+petite_overlap=read.csv("/Users/pipe/Desktop/results_edge_degree_15/supp_fig3_physics_sim/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+petite_overlap$strain="Petite"
+grande_overlap=read.csv("/Users/pipe/Desktop/results_edge_degree_15/supp_fig3_physics_sim/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 grande_overlap$strain="Grande"
 overlap_size_df=rbind(grande_overlap, petite_overlap)
 
@@ -161,7 +167,7 @@ ggplot(mean_summ_overlap_size,
   ylab('Mean Overlap')+
   NULL
 
-mean_summ_overlap_size[mean_summ_overlap_size$cluster_size==200,]
+mean_summ_overlap_size[mean_summ_overlap_size$cluster_size==330,]
 
 
 # Overlap Positions ####

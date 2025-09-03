@@ -98,9 +98,9 @@ Note: this is the same code used for figure 5, just with different parameters.
 ## Modified
 
 ```
-exec_sim_fast_first_div_frag_from_file_params.sh -n 30 -g 50 -u 5 -x 15 -c random -i params_distributions_mean_90_7july2025.csv
+exec_sim_fast_first_div_frag_from_file_params.sh -n 30 -g 50 -u 5 -x 15 -c random -i ../params_distributions_50percent_15var_7july2025.csv
 
-exec_sim_fast_first_div_no_frag_from_file_params_parallel.sh -n 300 -m 1300 -i ../params_distributions_mean_90_7july2025.csv -t 7
+exec_sim_fast_first_div_no_frag_from_file_params_parallel.sh -n 300 -m 1300 -i ../params_distributions_50percent_15var_7july2025.csv -t 8
 ```
 
 

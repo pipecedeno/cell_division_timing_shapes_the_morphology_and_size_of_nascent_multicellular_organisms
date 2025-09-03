@@ -16,6 +16,7 @@ library(ggnewscale)
 library(cowplot)
 library(png)
 library(grid)
+library(see)
 
 theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$YesterdayMedium)
@@ -111,18 +112,45 @@ normal_to_lognormal_direct <- function(mean, sd) {
   return(list(meanlog = meanlog, sdlog = sdlog))
 }
 
-# Create table of parameter v2 ####
+# Create table of parameter ####
 default_mean <- 90
 default_std <- 15
 # Create delays as percentages: -50% to +50% in steps of 5%
 delay_percentages <- seq(-50, 50, 5)
 delays <- default_mean * (1 + delay_percentages/100)
 
+# Function to find x limits where PDF drops below threshold
+find_pdf_limits <- function(meanlog, sdlog, threshold = 0.0001) {
+  # Start with a reasonable range to search
+  x_search_min <- 1
+  x_search_max <- 1000
+  
+  # Find approximate limits using quantiles first (more efficient)
+  # Use very small and large quantiles to get approximate bounds
+  approx_min <- qlnorm(0.001, meanlog = meanlog, sdlog = sdlog)
+  approx_max <- qlnorm(0.999, meanlog = meanlog, sdlog = sdlog)
+  
+  # Refine the search around these approximate values
+  x_test_min <- seq(max(0.1, approx_min * 0.1), approx_min * 2, length.out = 100)
+  x_test_max <- seq(approx_max * 0.5, approx_max * 3, length.out = 100)
+  
+  # Find where PDF drops below threshold on the left side
+  pdf_min <- dlnorm(x_test_min, meanlog = meanlog, sdlog = sdlog)
+  x_min <- min(x_test_min[pdf_min >= threshold])
+  
+  # Find where PDF drops below threshold on the right side  
+  pdf_max <- dlnorm(x_test_max, meanlog = meanlog, sdlog = sdlog)
+  x_max <- max(x_test_max[pdf_max >= threshold])
+  
+  return(list(x_min = x_min, x_max = x_max))
+}
+
+
 # For creating the plot of the PDF distributions
-# Define a range of x values to evaluate the PDF
-x_min <- 10  # Minimum doubling time to consider
-x_max <- 300 # Maximum doubling time to consider
+# pdf_threshold <- 0.000001  # Threshold for PDF cutoff
 n_points <- 500  # Number of points to evaluate PDF
+y_min=25
+y_max=225
 
 df_pdf_data <- data.frame()
 table_parameters <- data.frame()
@@ -145,8 +173,18 @@ for (i_cont in seq(length(delays))) {
   
   table_parameters <- rbind(table_parameters, df_temp)
   
-  # Create x values for PDF evaluation
-  x_values <- seq(x_min, x_max, length.out = n_points)
+  # # Find limits for each distribution
+  # first_limits <- find_pdf_limits(first_div_params$meanlog, first_div_params$sdlog, pdf_threshold)
+  # second_limits <- find_pdf_limits(second_div_params$meanlog, second_div_params$sdlog, pdf_threshold)
+  # 
+  # # Use the broader range to encompass both distributions
+  # overall_x_min <- min(first_limits$x_min, second_limits$x_min)
+  # overall_x_max <- max(first_limits$x_max, second_limits$x_max)
+  # 
+  # # Create x values for PDF evaluation using the dynamic range
+  # x_values <- seq(overall_x_min, overall_x_max, length.out = n_points)
+  
+  x_values=seq(y_min, y_max, length.out=n_points)
   
   # Calculate PDF values for both distributions
   first_div_pdf <- dlnorm(x_values, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
@@ -210,41 +248,13 @@ df_violin_data$percentage_diff <- factor(df_violin_data$percentage_diff,
                                          levels = unique(df_violin_data$percentage_diff))
 
 
-ggplot(df_violin_data, aes(x = div_num, y = doub_t, fill = div_num)) +
-  geom_violin() +
+ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', '-25', '0', '25', '50'),], 
+       aes(x = div_num, y = doub_t, col = div_num)) +
+  geom_violinhalf(trim = FALSE) +
   facet_wrap(~percentage_diff, nrow = 1) +
   theme_classic() +
   labs(x = "Number of Divisions", y = "Doubling Time (min)") +
-  guides(fill = 'none') +
-  NULL
-
-ggplot(df_violin_data[df_violin_data$percentage_diff %in% c("-50", "-25", "0", "25", "50"),], 
-       aes(x = div_num, y = doub_t, fill = div_num)) +
-  geom_violin() +
-  facet_wrap(~percentage_diff, nrow = 1) +
-  theme_classic() +
-  labs(x = "Number of Divisions", y = "Doubling Time (min)") +
-  guides(fill = 'none') +
-  NULL
-
-# Plot the PDFs directly as lines
-ggplot(df_pdf_data, aes(x = doub_t, y = pdf_value, color = div_num)) +
-  geom_line(size = 1) +
-  facet_wrap(~percentage_diff, nrow = 1) +
-  theme_classic() +
-  labs(x = "Doubling Time (min)", y = "Probability Density", color = "Division") +
-  scale_color_discrete(name = "Number of\nDivisions") +
-  NULL
-
-ggplot(df_pdf_data[df_pdf_data$percentage_diff %in% c("-50", "-25", "0", "25", "50"),], 
-       aes(x = doub_t, y = pdf_value, color = div_num)) +
-  geom_line(alpha=0.75) +
-  facet_wrap(~percentage_diff, nrow = 1) +
-  theme_classic() +
-  xlim(c(0, 225))+
-  coord_flip()+
-  labs(x = "Doubling Time (min)", y = "Probability Density", color = "Division") +
-  scale_color_discrete(name = "Number of\nDivisions") +
+  guides(col = 'none') +
   NULL
 
 
@@ -477,6 +487,34 @@ ggplot(summ_filamentous, aes(x = num_nodes, y = percentage_diff, z = mean_filame
   NULL
 
 
+#### Motif Difference ####
+
+summ_motif_diff <- summ_filamentous %>%
+  left_join(summ_undivided, 
+            by = c("percentage_diff", "num_nodes"),
+            suffix = c("_filamentous", "_undivided")) %>%
+  mutate(mean_motif_difference = mean_filament - mean_undivided,
+         mean_motif_difference_norm = (mean_filament - mean_undivided)/num_nodes)
+
+summary(summ_motif_diff$mean_motif_difference)
+
+
+ggplot(summ_motif_diff,
+       aes(x = num_nodes, y = percentage_diff, z = mean_motif_difference)) +
+  geom_contour_filled() +
+  scale_fill_brewer(palette = "Purples", name = "Mean\nMotif\nDifference")+
+  labs(x = "Network Size", y = "Delay (% Second Division)") +
+  theme_classic()+
+  NULL
+
+ggplot(summ_motif_diff,
+       aes(x = num_nodes, y = percentage_diff, z = mean_motif_difference_norm)) +
+  geom_contour_filled() +
+  scale_fill_brewer(palette = "Purples", name = "Mean\nMotif\nDifference\nNorm")+
+  labs(x = "Network Size", y = "Delay (% Second Division)") +
+  theme_classic()+
+  NULL
+
 # Fragmentation Size ####
 
 # frag_df=data.frame()
@@ -570,8 +608,8 @@ img_fast_first <- readPNG("~/emergence_of_coordinated_cell_division_during_the_e
 img_plot_fast_first_net <- rasterGrob(img_fast_first, interpolate = TRUE)
 
 # Create text annotations
-text_sync <- textGrob("Synchronous", gp = gpar(fontsize = 10, fontface = "bold", col="red"))
-text_fast_first <- textGrob("Fast First Division", gp = gpar(fontsize = 10, fontface = "bold", col='blue'))
+text_sync <- textGrob("Synchronous (0% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col="green"))
+text_fast_first <- textGrob("Fast First Division (-30% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col='blue'))
 
 # Create ggplot objects for the images with annotations
 p_sync_net <- ggplot() + 
@@ -600,16 +638,13 @@ p_fast_first
 #   NULL
 # p_doub_times
 
-p_doub_times=ggplot(df_pdf_data[df_pdf_data$percentage_diff %in% c("-50", "-25", "0", "25", "50"),], 
-                    aes(x = doub_t, y = pdf_value, color = div_num)) +
-  geom_line(alpha=0.75) +
+p_doub_times=ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', '-25', '0', '25', '50'),], 
+                    aes(x = div_num, y = doub_t, col = div_num)) +
+  geom_violinhalf(trim = FALSE) +
   facet_wrap(~percentage_diff, nrow = 1) +
   theme_classic() +
-  xlim(c(0, 225))+
-  scale_y_continuous(breaks = c(0, 0.03)) +
-  coord_flip()+
-  labs(x = "Doubling Time (min)", y = "Probability Density", color = "Division") +
-  scale_color_discrete(name = "Number of\nDivisions") +
+  labs(x = "Number of Divisions", y = "Doubling Time (min)") +
+  guides(col = 'none') +
   NULL
 p_doub_times
 
@@ -643,7 +678,7 @@ p_delayed=ggplot(summ_undivided, aes(x = num_nodes, y = percentage_diff, z = mea
   scale_y_continuous(breaks = seq(-50, 50, 10)) +
   geom_point(data = data.frame(x = c(200, 200), y = c(0, -30)), 
              aes(x = x, y = y), 
-             color = c("red", "blue"), 
+             color = c("green", "blue"), 
              shape = 15,  # cross shape
              size = 2,   # adjust size as needed
              inherit.aes = FALSE) +  # don't inherit the z aesthetic
@@ -659,7 +694,7 @@ p_filament=ggplot(summ_filamentous, aes(x = num_nodes, y = percentage_diff, z = 
   scale_y_continuous(breaks = seq(-50, 50, 10)) +
   geom_point(data = data.frame(x = c(200, 200), y = c(0, -30)), 
              aes(x = x, y = y), 
-             color = c("red", "blue"), 
+             color = c("green", "blue"), 
              shape = 15,  # cross shape
              size = 2,   # adjust size as needed
              inherit.aes = FALSE) +  # don't inherit the z aesthetic
@@ -677,14 +712,22 @@ p_fragmentation=ggplot(mean_mean_clust_size, aes(x = edge_degree, y = percentage
   NULL
 p_fragmentation
 
-figure_first_div_net=plot_grid(p_doub_times, p_diameter, 
-                               p_edge_degree, p_delayed, 
-                               p_filament, p_sync_net,
-                               p_fast_first,
-                               p_fragmentation,
+# figure_first_div_net=plot_grid(p_doub_times, p_diameter, 
+#                                p_edge_degree, p_delayed, 
+#                                p_filament, p_sync_net,
+#                                p_fast_first,
+#                                p_fragmentation,
+#                                labels=c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'), ncol=2, 
+#                                align='hv', label_size=12)
+# figure_first_div_net
+
+figure_first_div_net=plot_grid(p_doub_times, p_fast_first, 
+                               p_filament, p_delayed,
+                               p_sync_net, p_diameter, 
+                               p_edge_degree, p_fragmentation,
                                labels=c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'), ncol=2, 
                                align='hv', label_size=12)
 figure_first_div_net
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/temp_fig_9_first_div_30july2025_15_var_2_step_pdf.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_9_first_div_6aug2025_15_var_2_step_pdf.png',
        plot=figure_first_div_net, dpi='retina', height=12, width=10, bg='white')
