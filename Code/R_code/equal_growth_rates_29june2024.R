@@ -577,11 +577,210 @@ fig5d_v2
 supp_fig=plot_grid(fig5c_v2, fig5d_v2, labels=c('A', 'B'), ncol=1, align='hv')
 supp_fig
 
-ggsave(filename="~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_selection_rates_equal_growth_23apr2025.png",
-       plot=supp_fig, dpi='retina', width=4, height=6)
+# ggsave(filename="~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_selection_rates_equal_growth_23apr2025.png",
+#        plot=supp_fig, dpi='retina', width=4, height=6)
 
 
+# Figure 7 updated merged with supplement ####
+
+fig_a=ggplot(mean_sim_sel_r[mean_sim_sel_r$experiment=='Normal',], 
+             aes(x=phase, y=mean_sel_r, col=phase))+
+  geom_jitter(alpha=0.5)+
+  stat_summary(fun = 'mean', geom = 'crossbar', linetype = 'dashed', alpha = 0.5, col = 'black')+
+  ylab('Mean Selection Rate')+
+  xlab('Selection phase')+
+  guides(col='none')+
+  scale_color_manual(values = rev(ghibli_palette("MarnieMedium2"))) +
+  scale_y_continuous(breaks = seq(0, 7, by = 1)) +
+  coord_cartesian(ylim = c(0, 7)) +
+  scale_x_discrete(labels=c('Growth'='Growth',
+                            'Settling'='Settling'))+
+  theme_classic(base_size = 11)+
+  theme(plot.title = element_text(hjust = 0.5, size=11))+
+  NULL
+fig_a
+
+t.test(mean_sim_sel_r[mean_sim_sel_r$experiment=='Normal',]$mean_sel_r~mean_sim_sel_r[mean_sim_sel_r$experiment=='Normal',]$phase)
+# p-value = 1.168e-06
+
+cohen.d(mean_sim_sel_r[mean_sim_sel_r$experiment=='Normal',]$mean_sel_r~mean_sim_sel_r[mean_sim_sel_r$experiment=='Normal',]$phase)
+# d estimate: 1.108787 (large)
+
+fig_b=ggplot(mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',], 
+                aes(x=phase, y=mean_sel_r, col=phase))+
+  geom_jitter(alpha=0.5)+
+  stat_summary(fun = 'mean', geom = 'crossbar', linetype = 'dashed', alpha = 0.5, col = 'black')+
+  ylab('Mean Selection Rate')+
+  xlab('Selection phase')+
+  guides(col='none')+
+  scale_color_manual(values = rev(ghibli_palette("MarnieMedium2"))) +
+  scale_y_continuous(breaks = seq(0, 7, by = 1)) +
+  coord_cartesian(ylim = c(0, 7)) +
+  scale_x_discrete(labels=c('Growth'='Growth',
+                            'Settling'='Settling'))+
+  theme_classic(base_size = 11)+
+  theme(plot.title = element_text(hjust = 0.5, size=11))+
+  NULL
+fig_b
 
 
+t.test(mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',]$mean_sel_r~mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',]$phase)
+# p-value < 2.2e-16
+
+cohen.d(mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',]$mean_sel_r~mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',]$phase)
+# d estimate: -10.27796 (large)
+
+
+fig_c=ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal',], 
+             aes(x=phase, y=mean_sel_r, col=phase))+
+  geom_jitter(alpha=0.5)+
+  stat_summary(fun = 'mean', geom = 'crossbar', linetype = 'dashed', alpha = 0.5, col = 'black')+
+  ylab('Mean Selection Rate')+
+  # ylab('')+
+  xlab('Selection phase')+
+  guides(col='none')+
+  scale_color_manual(values = rev(ghibli_palette("MarnieMedium2"))) +
+  scale_y_continuous(breaks = seq(0, 7, by = 1)) +
+  coord_cartesian(ylim = c(0, 7)) +
+  scale_x_discrete(labels=c('Growth'='Growth',
+                            'Settling'='Settling'))+
+  theme_classic(base_size = 11)+
+  theme(plot.title = element_text(hjust = 0.5, size=11))+
+  NULL
+fig_c
+
+
+t.test(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal',]$mean_sel_r~mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal',]$phase)
+# p-value < 2.2e-16
+
+cohen.d(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal',]$mean_sel_r~mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal',]$phase)
+# d estimate: -6.834881 (large)
+
+
+fig_d=ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth Rates',], 
+                aes(x=phase, y=mean_sel_r, col=phase))+
+  geom_jitter(alpha=0.5)+
+  stat_summary(fun = 'mean', geom = 'crossbar', linetype = 'dashed', alpha = 0.5, col = 'black')+
+  ylab('Mean Selection Rate')+
+  # ylab('')+
+  xlab('Selection phase')+
+  guides(col='none')+
+  scale_color_manual(values = rev(ghibli_palette("MarnieMedium2"))) +
+  scale_y_continuous(breaks = seq(0, 7, by = 1)) +
+  coord_cartesian(ylim = c(0, 7)) +
+  scale_x_discrete(labels=c('Growth'='Growth',
+                            'Settling'='Settling'))+
+  theme_classic(base_size = 11)+
+  theme(plot.title = element_text(hjust = 0.5, size=11))+
+  NULL
+fig_d
+
+
+t.test(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth Rates',]$mean_sel_r~mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth Rates',]$phase)
+# p-value < 2.2e-16
+
+cohen.d(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth Rates',]$mean_sel_r~mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth Rates',]$phase)
+# d estimate: -13.90406 (large)
+
+#Comparison settling top starting standard and equal growth rates
+t.test(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth Rates' & mean_filt_sel_r_top$phase=='Settling',]$mean_sel_r, mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal' & mean_filt_sel_r_top$phase=='Settling',]$mean_sel_r)
+# p-value = 3.412e-07
+cohen.d(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth Rates' & mean_filt_sel_r_top$phase=='Settling',]$mean_sel_r, mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal' & mean_filt_sel_r_top$phase=='Settling',]$mean_sel_r)
+# d estimate: -1.125938 (large)
+
+
+figure_7=plot_grid(fig_a, fig_b, fig_c, fig_d, labels=c('A', 'B', 'C', 'D'), ncol=2, align='hv')
+figure_7
+
+
+# Add column labels at the top
+column_labels <- plot_grid(
+  NULL,
+  ggdraw() + draw_label("Standard Growth Rates", size = 11),
+  ggdraw() + draw_label("Equal Growth Rates", size = 11),
+  NULL,
+  ncol = 4,
+  rel_widths = c(0.05, 1, 1, 0.05)
+)
+
+# Add row labels on the right
+row_labels <- plot_grid(
+  ggdraw() + draw_label("Random Starting Position", angle = 270, size = 11),
+  ggdraw() + draw_label("Top Starting Position", angle = 270, size = 11),
+  ncol = 1
+)
+
+# Combine everything
+figure_7_annotated <- plot_grid(
+  column_labels,
+  plot_grid(
+    figure_7,
+    row_labels,
+    ncol = 2,
+    rel_widths = c(1, 0.05)
+  ),
+  ncol = 1,
+  rel_heights = c(0.05, 1)
+)
+
+figure_7_annotated
+
+
+# ggsave(filename="~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_selection_rates_28jan2026.png",
+#        plot=figure_7_annotated, dpi='retina', width=8, height=6)
+
+#### updated figure 7 ####
+
+# Merge the datasets
+# Add 'top' column to each dataset
+mean_sim_sel_r$top <- FALSE
+mean_filt_sel_r_top$top <- TRUE
+
+# Combine the datasets (keeping only relevant columns)
+combined_data <- rbind(
+  mean_sim_sel_r[, c("experiment", "phase", "mean_sel_r", "top")],
+  mean_filt_sel_r_top[, c("experiment", "phase", "mean_sel_r", "top")]
+)
+
+# Create labels for facets
+combined_data$top_label <- ifelse(combined_data$top, 
+                                  "Top Starting Position", 
+                                  "Random Starting Position")
+
+# Ensure proper ordering of facets
+combined_data$top_label <- factor(combined_data$top_label, 
+                                  levels = c("Random Starting Position", 
+                                             "Top Starting Position"))
+
+combined_data$experiment <- factor(combined_data$experiment,
+                                   levels = c("Normal", "Equal Growth Rates"),
+                                   labels = c("Standard Growth Rates", "Equal Growth Rates"))
+
+# Create the combined plot with facet_grid
+figure_7 <- ggplot(combined_data, 
+                   aes(x=phase, y=mean_sel_r, col=phase)) +
+  geom_hline(yintercept = -0.34, color = "black", linewidth = 0.5) +
+  geom_jitter(alpha=0.5) +
+  stat_summary(fun = 'mean', geom = 'crossbar', 
+               linetype = 'dashed', alpha = 0.5, col = 'black') +
+  facet_grid(top_label ~ experiment) +
+  ylab('Mean Selection Rate') +
+  xlab('Selection phase') +
+  guides(col='none') +
+  scale_color_manual(values = rev(ghibli_palette("MarnieMedium2"))) +
+  scale_y_continuous(breaks = seq(0, 7, by = 1)) +
+  coord_cartesian(ylim = c(0, 7)) +
+  scale_x_discrete(labels=c('Growth'='Growth',
+                            'Settling'='Settling')) +
+  theme_classic(base_size = 11) +
+  theme(plot.title = element_text(hjust = 0.5, size=11),
+        strip.background = element_rect(fill = "white", color = "black"),
+        strip.text = element_text(size = 10),
+        panel.spacing = unit(0.5, "lines")) +
+  NULL
+figure_7
+
+# ggsave(filename="~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_selection_rates_3oct2025.png",
+#        plot=figure_7, dpi='retina', width=8, height=6)
 
 

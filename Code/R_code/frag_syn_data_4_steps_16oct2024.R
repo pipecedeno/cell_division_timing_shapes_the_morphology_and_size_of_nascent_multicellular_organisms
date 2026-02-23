@@ -23,7 +23,7 @@ mycolors <- rev(ghibli_palettes$YesterdayMedium)
 syn_data_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("YesterdayMedium", direction = -1))
 
 
-std_vector=seq(0, 15, 5)
+std_vector=seq(0, 30, 10)
 delay_vector=seq(0, 60, 20)
 delay_percentages=c(0, 33, 66, 100)
 
@@ -35,7 +35,9 @@ color_diff_mean_perc=list(scale_color_gradient(name = "Delay", low = "lightblue"
 color_variation=list(scale_color_gradient( name = "Variation", low = "pink", high = "darkred", 
                                            breaks = std_vector, limits = c(min(std_vector), max(std_vector))))
 
-setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig6_effects_delay_and_variation")
+# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig6_effects_delay_and_variation")
+setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig6_effects_delay_and_variation_more_variation")
+
 
 # Fragmentation summary ####
 
@@ -52,9 +54,11 @@ setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/resu
 # 
 # summary(frag_df)
 # 
-# write.csv(frag_df, "frag_syn_frag_df_2june2025.csv", row.names = FALSE)
+# write.csv(frag_df, "frag_syn_frag_df_24sep2025.csv", row.names = FALSE)
 
-frag_df=read.csv("frag_syn_frag_df_2june2025.csv", header=TRUE)
+# frag_df=read.csv("frag_syn_frag_df_2june2025.csv", header=TRUE)
+frag_df=read.csv("frag_syn_frag_df_24sep2025.csv", header=TRUE)
+
 summary(frag_df)
 
 
@@ -186,10 +190,11 @@ ggplot(mean_mean_frag_prop, aes(x=variation, y=mean_prop, col=diff_mean, group=d
 # 
 # summary(diameter_df)
 # 
-# write.csv(diameter_df, "frag_syn_diameter_df_2june2025.csv", row.names = FALSE)
+# write.csv(diameter_df, "frag_syn_diameter_df_24sep2025.csv", row.names = FALSE)
 
 
-diameter_df=read.csv("frag_syn_diameter_df_2june2025.csv", header=TRUE)
+# diameter_df=read.csv("frag_syn_diameter_df_2june2025.csv", header=TRUE)
+diameter_df=read.csv("frag_syn_diameter_df_24sep2025.csv", header=TRUE)
 
 summary(diameter_df)
 
@@ -349,7 +354,7 @@ supp_net_prop_v3=plot_grid(clust_delay,clust_var, prop_delay,prop_var,
                            align='hv', label_size=12)
 supp_net_prop_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig6_frag_syn_network_prop_30july2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_effects_delay_variation_25sep2025.png',
        plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
 
 

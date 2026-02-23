@@ -78,20 +78,9 @@ to the matlab path, here are the commands needed to do that:
 # You may need to edit the file pathdef.m in /Applications/MATLAB_R2023b.app/toolbox/local
 
 
-Modifications needed:
--Instead of iterating through all the unique ids, iterate until the number of cells sampled is reached
-    Save in vectors the volume, diameter, and number of cells (use sum() to know how many cells have been 
-    sampled in total) DONE
--Add part to sample a cluster at ramdom from all the unique ids DONE
--Check how the outputs are saved and also the python program that processes the results as for example, the
-    cluster ids is not going to be unique and also I don't need to process the surviving networks into a file
-    just save the values to calculate the selection rates DONE
-
--Add input of how many bootstraps I need to perform DONE
-
--Find a way of knowing which ids are from which strain so that I can count in here how many cells of each strain 
-survive, so create the proportions settling file in here DONE
-
+Date: 30Jan2026
+-Corrected how the diameter of the clusters is calculated, now the gyration radius of the clusters is calculated and 
+then converted in the radius of a sphere to calculate the diameter of the clusters assuming that they have spherical shapes
 
 
 %}
@@ -262,8 +251,11 @@ for i = 1:length(unique_cluster_ids)
     % Grow cluster of the snowflake
     [cell_list] = ELYES_SIM_fixed_daughter(diam, err_diam, aspRat, err_AR, pole_theta, theta, thetaVariance, distance_thresh, new_bud_prob, NEIGHBOR_THRESH, check_overlap, overlap_thresh, node1_vals, node2_vals);
 
-    %Calculating cluster diameter using the gyration radius
-    temp_diameter=gyration_diameter(cell_list);
+    %Calculating the gyration radius
+    temp_gyr_rad=gyration_radius(cell_list);
+
+    % Transforming the gyration radius to a spherical radius, and obtaining the diameter
+    temp_diameter=2*(sqrt(5*(temp_gyr_rad^2)/3));
 
     list_diameters(i)=temp_diameter;
     temp_V=(1/6) * pi * (temp_diameter^3);
@@ -717,9 +709,8 @@ function [survivors, initial_pos, final_pos, distance_travelled, final_time, spe
 end
 
 
-% Function to obtain the gyration diameter of a cluster, it calculates the radius, converts it to meters and then
-%multiplies by two to get the diameter
-function [diameter]=gyration_diameter(cell_list)
+% Function to obtain the gyration radius of a cluster, it calculates the radius, converts it to meters
+function [diameter]=gyration_radius(cell_list)
     % Number of points (cells)
     num_points = length(cell_list);
     
@@ -737,7 +728,7 @@ function [diameter]=gyration_diameter(cell_list)
     
     % Gyration radius
     Rg = sqrt(sum(distances.^2) / num_points)*10^-6;
-    diameter=Rg*2;
+    diameter=Rg;
 end
 
 

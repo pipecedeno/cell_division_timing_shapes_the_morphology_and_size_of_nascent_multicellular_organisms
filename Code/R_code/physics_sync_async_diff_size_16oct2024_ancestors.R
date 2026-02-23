@@ -250,6 +250,10 @@ p_grande
 
 
 
+wilcox.test(summ_clust_size$mean_size~summ_clust_size$strain)
+# p-value < 2.2e-16
+
+
 p_frac_size=ggplot(summ_clust_size, aes(x=strain, y=mean_size, fill=strain))+
   geom_violin()+
   stat_summary(fun='mean', geom='crossbar')+
@@ -258,6 +262,9 @@ p_frac_size=ggplot(summ_clust_size, aes(x=strain, y=mean_size, fill=strain))+
   labs(x='Strain', y='Mean Fracture Size\n(Number of Cells)')+
   NULL
 p_frac_size
+
+wilcox.test(summ_clust_size$mean_volume~summ_clust_size$strain)
+# p-value < 2.2e-16
 
 p_overlap=ggplot(mean_summ_overlap_size, 
                  aes(x=cluster_size, y=mean_overlap, col=strain))+

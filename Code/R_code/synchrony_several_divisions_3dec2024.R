@@ -108,10 +108,11 @@ div_num_t600=ggplot(t600_doubled,
   guides(fill='none')+
   theme_classic()+
   stat_summary(fun='mean', geom='crossbar')+
-  petite_t200_colors+
+  # petite_t200_colors+
+  scale_fill_manual(values=c("#BBA78CFF", "#333544FF", "#B50A2AFF", "#44A57CFF"))+
   NULL
 div_num_t600
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_3dec2024.png',
-       plot=div_num_t600, dpi='retina', width=6, height=4, bg='white')
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_3oct2025.png',
+#        plot=div_num_t600, dpi='retina', width=6, height=4, bg='white')
 

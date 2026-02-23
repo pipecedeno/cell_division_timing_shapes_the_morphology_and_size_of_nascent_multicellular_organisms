@@ -18,6 +18,8 @@ library(ggnewscale)
 library(cowplot)
 library(png)
 library(grid)
+library(effsize)
+
 
 
 
@@ -470,6 +472,9 @@ quantile(sqrt(data_clust$Area/pi), c(0.75, 0.9, 0.95, 0.97))
 #### version 2 ####
 
 
+grande_median_volume=median(data_clust[data_clust$strain=='grande',]$volume) # 98756.51
+petite_median_volume=median(data_clust[data_clust$strain=='petite',]$volume) # 55187.52
+
 p_cluster_vol=ggplot(data_clust, aes(x=volume, fill=strain))+
   # geom_density(aes(fill=strain, alpha=0.5))+
   geom_histogram(position="identity", alpha=0.75, bins=30) +
@@ -479,11 +484,11 @@ p_cluster_vol=ggplot(data_clust, aes(x=volume, fill=strain))+
   xlab(expression("Cluster Volume"~(µ*m^3)))+
   scale_fill_manual(labels = c("Grande", "Petite"),
                     values = c("#AE93BEFF", "#F0D77BFF")) +
-  geom_vline(xintercept=grande_mean_volume, col="#AE93BEFF", linetype='dashed') +
-  geom_vline(xintercept=petite_mean_volume, col="#F0D77BFF", linetype='dashed') +
-  geom_point(aes(x=grande_mean_volume, y=Inf), 
+  geom_vline(xintercept=grande_median_volume, col="#AE93BEFF", linetype='dashed') +
+  geom_vline(xintercept=petite_median_volume, col="#F0D77BFF", linetype='dashed') +
+  geom_point(aes(x=grande_median_volume, y=Inf), 
              color="#AE93BEFF", fill="#AE93BEFF", shape=25, size=3, inherit.aes=FALSE) +
-  geom_point(aes(x=petite_mean_volume, y=Inf), 
+  geom_point(aes(x=petite_median_volume, y=Inf), 
              color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   xlim(c(0, 250000))+
   ylim(c(0, 880))+
@@ -496,6 +501,18 @@ p_cluster_vol
 t.test(data_clust$volume~data_clust$strain)
 # t = 27.786, df = 7532.1, p-value < 2.2e-16
 
+cohen.d(data_clust$volume ~ data_clust$strain) # 0.5322532
+
+wilcox.test(data_clust$volume~data_clust$strain)
+# W = 23140055, p-value < 2.2e-16
+
+cliff.delta(data_clust$volume~data_clust$strain)
+# delta estimate: 0.5963949 (large)
+
+
+grande_median_ar=median(cell_data[cell_data$strain=='grande',]$AR) # 1.18955
+petite_median_ar=median(cell_data[cell_data$strain=='petite',]$AR) # 1.21154
+
 p_ar=ggplot(cell_data, 
             aes(x=AR, fill=strain))+
   geom_histogram(alpha=0.75, position="identity", bins=30) +
@@ -506,11 +523,11 @@ p_ar=ggplot(cell_data,
   ylim(c(0, 2600))+
   scale_fill_manual(labels = c("Grande", "Petite"),
                     values = c("#AE93BEFF", "#F0D77BFF")) +
-  geom_vline(xintercept=grande_mean_ar, col="#AE93BEFF", linetype='dashed')+
-  geom_vline(xintercept=petite_mean_ar, col="#F0D77BFF", linetype='dashed')+
-  geom_point(aes(x=grande_mean_ar, y=Inf), 
+  geom_vline(xintercept=grande_median_ar, col="#AE93BEFF", linetype='dashed')+
+  geom_vline(xintercept=petite_median_ar, col="#F0D77BFF", linetype='dashed')+
+  geom_point(aes(x=grande_median_ar, y=Inf), 
              color="#AE93BEFF", fill="#AE93BEFF", shape=25, size=3, inherit.aes=FALSE) +
-  geom_point(aes(x=petite_mean_ar, y=Inf), 
+  geom_point(aes(x=petite_median_ar, y=Inf), 
              color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   NULL
 p_ar
@@ -518,6 +535,17 @@ p_ar
 t.test(cell_data$AR~cell_data$strain)
 # t = -23.724, df = 24654, p-value < 2.2e-16
 
+cohen.d(cell_data$AR~cell_data$strain) # -0.2732772
+
+wilcox.test(cell_data$AR~cell_data$strain)
+# W = 116776972, p-value < 2.2e-16
+
+cliff.delta(cell_data$AR~cell_data$strain)
+# delta estimate: -0.1458846 (negligible)
+
+
+grande_median_diam=median(cell_data[cell_data$strain=='grande',]$Major) # 5.067465
+petite_median_diam=median(cell_data[cell_data$strain=='petite',]$Major) # 4.81492
 
 p_diam=ggplot(cell_data, 
               aes(x=Major, fill=strain))+
@@ -529,17 +557,25 @@ p_diam=ggplot(cell_data,
   ylim(c(0, 3600))+
   scale_fill_manual(labels = c("Grande", "Petite"),
                     values = c("#AE93BEFF", "#F0D77BFF")) +
-  geom_vline(xintercept=grande_mean_diam, col="#AE93BEFF", linetype='dashed')+
-  geom_vline(xintercept=petite_mean_diam, col="#F0D77BFF", linetype='dashed')+
-  geom_point(aes(x=grande_mean_diam, y=Inf), 
+  geom_vline(xintercept=grande_median_diam, col="#AE93BEFF", linetype='dashed')+
+  geom_vline(xintercept=petite_median_diam, col="#F0D77BFF", linetype='dashed')+
+  geom_point(aes(x=grande_median_diam, y=Inf), 
              color="#AE93BEFF", fill="#AE93BEFF", shape=25, size=3, inherit.aes=FALSE) +
-  geom_point(aes(x=petite_mean_diam, y=Inf), 
+  geom_point(aes(x=petite_median_diam, y=Inf), 
              color="#F0D77BFF", fill="#F0D77BFF", shape=25, size=3, inherit.aes=FALSE) +
   NULL
 p_diam
 
 t.test(cell_data$Major~cell_data$strain)
 # t = 52.253, df = 27391, p-value < 2.2e-16
+
+cohen.d(cell_data$Major~cell_data$strain) # 0.5831272
+
+wilcox.test(cell_data$Major~cell_data$strain)
+# W = 182249658, p-value < 2.2e-16
+
+cliff.delta(cell_data$Major~cell_data$strain)
+# delta estimate: 0.3329875 (medium)
 
 
 img_petite_clust <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/gob21-2_day2_001_620x620_100um-scale.png")
@@ -569,7 +605,7 @@ plot_c_ar_diam=plot_grid(p_ar, p_diam, nrow=1, labels=c('D', 'E'), label_size = 
 plot_c_ar_diam
 
 fig_1_v2=plot_grid(col_clust_vol, p_cluster_vol, col_ar, plot_c_ar_diam, 
-                   labels=c('A', 'C','B',''), nrow=2, label_size=16, rel_widths=c(0.35, 1), rel_heights=c(1,1))
+                   labels=c('A', 'B','C',''), nrow=2, label_size=16, rel_widths=c(0.35, 1), rel_heights=c(1,1))
 fig_1_v2
 
 ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_clust_size_ancestors_27may2025_v3.svg',

@@ -608,7 +608,7 @@ img_fast_first <- readPNG("~/emergence_of_coordinated_cell_division_during_the_e
 img_plot_fast_first_net <- rasterGrob(img_fast_first, interpolate = TRUE)
 
 # Create text annotations
-text_sync <- textGrob("Synchronous (0% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col="green"))
+text_sync <- textGrob("Synchronous (0% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col="black"))
 text_fast_first <- textGrob("Fast First Division (-30% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col='blue'))
 
 # Create ggplot objects for the images with annotations
@@ -643,6 +643,7 @@ p_doub_times=ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', 
   geom_violinhalf(trim = FALSE) +
   facet_wrap(~percentage_diff, nrow = 1) +
   theme_classic() +
+  scale_color_manual(values=c("#BBA78CFF", "#333544FF"))+
   labs(x = "Number of Divisions", y = "Doubling Time (min)") +
   guides(col = 'none') +
   NULL
@@ -678,7 +679,7 @@ p_delayed=ggplot(summ_undivided, aes(x = num_nodes, y = percentage_diff, z = mea
   scale_y_continuous(breaks = seq(-50, 50, 10)) +
   geom_point(data = data.frame(x = c(200, 200), y = c(0, -30)), 
              aes(x = x, y = y), 
-             color = c("green", "blue"), 
+             color = c("black", "blue"), 
              shape = 15,  # cross shape
              size = 2,   # adjust size as needed
              inherit.aes = FALSE) +  # don't inherit the z aesthetic
@@ -694,7 +695,7 @@ p_filament=ggplot(summ_filamentous, aes(x = num_nodes, y = percentage_diff, z = 
   scale_y_continuous(breaks = seq(-50, 50, 10)) +
   geom_point(data = data.frame(x = c(200, 200), y = c(0, -30)), 
              aes(x = x, y = y), 
-             color = c("green", "blue"), 
+             color = c("black", "blue"), 
              shape = 15,  # cross shape
              size = 2,   # adjust size as needed
              inherit.aes = FALSE) +  # don't inherit the z aesthetic
@@ -721,13 +722,13 @@ p_fragmentation
 #                                align='hv', label_size=12)
 # figure_first_div_net
 
-figure_first_div_net=plot_grid(p_doub_times, p_fast_first, 
-                               p_filament, p_delayed,
-                               p_sync_net, p_diameter, 
+figure_first_div_net=plot_grid(p_doub_times, p_diameter,
                                p_edge_degree, p_fragmentation,
+                               p_filament, p_delayed,
+                               p_fast_first, p_sync_net,
                                labels=c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'), ncol=2, 
                                align='hv', label_size=12)
 figure_first_div_net
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_9_first_div_6aug2025_15_var_2_step_pdf.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_9_first_div_3oct2025.png',
        plot=figure_first_div_net, dpi='retina', height=12, width=10, bg='white')

@@ -13,6 +13,7 @@ library(grid)
 library(cowplot)
 library(grid)
 library(gtable)
+library(see)
 
 
 # Function for Direct Parameter Conversion
@@ -447,9 +448,12 @@ for (std_i in std_devs){
     
     temp_median_diff=median(difference)
     
+    temp_correlation=cor(first_div_times, second_div_times)
+    
     df_temp=data.frame(delay=delay_j-default_mean, std=std_i, percentage=temp_ans, ld50=temp_median_diff,
                        first_div_mean=first_div_params$meanlog, first_div_sd=first_div_params$sdlog,
-                       second_div_mean=second_div_params$meanlog, second_div_sd=second_div_params$sdlog)
+                       second_div_mean=second_div_params$meanlog, second_div_sd=second_div_params$sdlog,
+                       correlation=temp_correlation)
     
     df_divisions_diff=rbind(df_divisions_diff, df_temp)
     
@@ -492,6 +496,22 @@ contour_plot=ggplot(df_divisions_diff, aes(x = delay/60*100, y = std, z = ld50))
   scale_y_continuous(expand = c(0, 0))+
   NULL
 contour_plot
+
+
+# test correlation plot
+
+ggplot(df_divisions_diff, aes(x = delay/60*100, y = std, z = correlation))+
+  geom_contour_filled()+
+  scale_fill_brewer(palette = "Purples")+
+  labs(x = "Delay (% Second Division)", 
+       y = "Doubling Time Standard Deviation",
+       fill = "Correlation")+
+  theme_classic()+
+  scale_x_continuous(expand = c(0, 0))+
+  scale_y_continuous(expand = c(0, 0))+
+  NULL
+
+
 
 summary(df_divisions_diff)
 

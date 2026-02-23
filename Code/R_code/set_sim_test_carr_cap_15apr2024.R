@@ -20,6 +20,11 @@
 # different carrying capacities when performing settling selection with the clusters starting at 
 # the top
 
+# Date: 2Feb2026 
+# Corrected how the volume was being calculated so now the diameter of a clusters is being obtained 
+# by calculating the radius of a sphere from the radius of gyration.
+
+
 library(plyr)  # load before dplyr
 library(dplyr)
 library(ggplot2)
@@ -33,7 +38,7 @@ library(cowplot)
 
 theme_set(theme_classic(base_size = 16))
 
-setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/settling_selection_simulations/')
+setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/settling_selection_simulations_30jan2026/')
 
 
 get_confidence_interval <- function(data) {
@@ -54,16 +59,17 @@ get_confidence_interval <- function(data) {
 
 # growth_prop=read.csv("proportions_growth_registry_all_sim.csv", header=TRUE)
 
-# growth_prop=data.frame()
-# 
-# for(j in c("10k", "100k", "1mill", "10mill")){
-#   temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_growth_registry_all_sim.csv", sep=""), header=TRUE)
-#   temp_df$carr_cap=j
-#   growth_prop=rbind(growth_prop, temp_df)
-# }
-# write.csv(growth_prop, file="set_sim_growth_registry_6june2025.csv", row.names=FALSE)
+growth_prop=data.frame()
 
-growth_prop=read.csv("set_sim_growth_registry_6june2025.csv", header = TRUE)
+# , "10mill"
+for(j in c("10k", "100k", "1mill")){
+  temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_growth_registry_all_sim.csv", sep=""), header=TRUE)
+  temp_df$carr_cap=j
+  growth_prop=rbind(growth_prop, temp_df)
+}
+write.csv(growth_prop, file="set_sim_growth_registry_30jan2026.csv", row.names=FALSE)
+
+growth_prop=read.csv("set_sim_growth_registry_30jan2026.csv", header = TRUE)
 growth_prop$carr_cap=factor(growth_prop$carr_cap, levels=c("10k", "100k", "1mill", "10mill"))
 summary(growth_prop)
 
@@ -84,18 +90,19 @@ ggplot(growth_prop,
 
 #### Settling fitness ####
 
-# settling_prop=data.frame()
-# 
-# for(j in c("10k", "100k", "1mill", "10mill")){
-#   temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
-#   temp_df$carr_cap=j
-#   #filtering out the row if any population went extinct
-#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
-#   settling_prop=rbind(settling_prop, temp_df)
-# }
-# write.csv(settling_prop, file="set_sim_settling_registry_6june2025.csv", row.names = FALSE)
+settling_prop=data.frame()
 
-settling_prop=read.csv("set_sim_settling_registry_6june2025.csv", header=TRUE)
+# , "10mill"
+for(j in c("10k", "100k", "1mill")){
+  temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+  temp_df$carr_cap=j
+  #filtering out the row if any population went extinct
+  temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+  settling_prop=rbind(settling_prop, temp_df)
+}
+write.csv(settling_prop, file="set_sim_settling_registry_30jan2026.csv", row.names = FALSE)
+
+settling_prop=read.csv("set_sim_settling_registry_30jan2026.csv", header=TRUE)
 settling_prop$carr_cap=factor(settling_prop$carr_cap, levels=c("10k", "100k", "1mill", "10mill"))
 summary(settling_prop)
 
@@ -126,6 +133,7 @@ ggplot(growth_prop,
   facet_wrap(~carr_cap, ncol=1)+
   NULL
 
+#Getting rid of the first growth selection rate
 ggplot(growth_prop[growth_prop$transfer>1,],
        aes(x=transfer, y=cell_sel_r, col=as.factor(sim_number)))+
   geom_line()+
@@ -137,7 +145,6 @@ ggplot(growth_prop[growth_prop$transfer>1,],
   facet_wrap(~carr_cap, ncol=1)+
   NULL
 
-#Getting rid of the first selection rate
 
 ggplot(settling_prop,
        aes(x=transfer, y=cell_sel_r, col=as.factor(sim_number)))+
@@ -167,20 +174,23 @@ mean_num_gen=growth_prop %>%
     mean_gen_all_pop = mean(num_generations),
     sd_pop_all=sd(num_generations)
   )
-  
+
+# this plot is meant for 10mill
+
+plot_carr_cap="1mill"
 ggplot()+
-  geom_line(data=growth_prop[growth_prop$carr_cap=="10mill",], 
+  geom_line(data=growth_prop[growth_prop$carr_cap==plot_carr_cap,], 
             aes(x=transfer, y=num_gen_1, col=as.factor(sim_number)))+
-  geom_line(data=mean_num_gen[mean_num_gen$carr_cap=="10mill",], 
+  geom_line(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,], 
             aes(x=transfer, y=mean_gen_pop_1), col='black')+
   guides(col='none')+
   facet_wrap(~carr_cap, ncol=1)+
   NULL
 
 ggplot()+
-  geom_line(data=growth_prop[growth_prop$carr_cap=="10mill",], 
+  geom_line(data=growth_prop[growth_prop$carr_cap==plot_carr_cap,], 
             aes(x=transfer, y=num_gen_2, col=as.factor(sim_number)))+
-  geom_line(data=mean_num_gen[mean_num_gen$carr_cap=="10mill",], 
+  geom_line(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,], 
             aes(x=transfer, y=mean_gen_pop_2), col='black')+
   guides(col='none')+
   facet_wrap(~carr_cap, ncol=1)+
@@ -188,9 +198,9 @@ ggplot()+
 
 
 mean_sel_r_test=data.frame(transfer=seq(1,max(mean_num_gen$transfer)),
-                           gen_petite=mean_num_gen[mean_num_gen$carr_cap=="10mill",]$mean_gen_pop_1,
-                           gen_second=mean_num_gen[mean_num_gen$carr_cap=="10mill",]$mean_gen_pop_2,
-                           gen_population=mean_num_gen[mean_num_gen$carr_cap=="10mill",]$mean_gen_all_pop)
+                           gen_petite=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,]$mean_gen_pop_1,
+                           gen_second=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,]$mean_gen_pop_2,
+                           gen_population=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,]$mean_gen_all_pop)
 
 mean_sel_r_test$gen_petite/mean_sel_r_test$gen_second
 
@@ -204,20 +214,20 @@ ggplot()+
 
 
 ggplot() +
-  geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',],
+  geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,],
               aes(x=transfer, ymin=mean_gen_pop_1-sd_pop1, ymax=mean_gen_pop_1+sd_pop1),
               alpha=0.2, fill='red') +
-  geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',],
+  geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,],
               aes(x=transfer, ymin=mean_gen_pop_2-sd_pop2, ymax=mean_gen_pop_2+sd_pop2),
               alpha=0.2, fill='blue') +
-  geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',],
+  geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,],
               aes(x=transfer, ymin=mean_gen_all_pop-sd_pop_all, ymax=mean_gen_all_pop+sd_pop_all),
               alpha=0.2, fill='black') +
-  geom_line(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',], 
+  geom_line(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,], 
             aes(x=transfer, y=mean_gen_pop_1, color="Petite")) +
-  geom_line(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',], 
+  geom_line(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,], 
             aes(x=transfer, y=mean_gen_pop_2, color="Petite w/o Delay")) +
-  geom_line(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',], 
+  geom_line(data=mean_num_gen[mean_num_gen$carr_cap==plot_carr_cap,], 
             aes(x=transfer, y=mean_gen_all_pop, color="Whole Population")) +
   scale_color_manual(values=c("Petite"="red", 
                               "Petite w/o Delay"="blue", 
@@ -232,7 +242,7 @@ ggplot() +
 
 growth_prop$percentage_petite_no_delay = growth_prop$cells_pop2_b/growth_prop$total_cells_b
 
-ggplot(growth_prop[growth_prop$carr_cap=='10mill',], 
+ggplot(growth_prop[growth_prop$carr_cap==plot_carr_cap,], 
        aes(x=transfer, y=percentage_petite_no_delay, group=as.factor(sim_number)))+
   geom_line(color='blue', alpha=0.1)+
   stat_summary(aes(group=1), fun=mean, geom='line', color='black', linewidth=1)+
@@ -285,8 +295,8 @@ ggplot(filt_combined_sel_r[filt_combined_sel_r$phase=='Settling',],
   ylab('Settling Selection Rate \n(Ancestor w/o delay - Ancestor)\nper selection phase')+
   xlab('Carrying Capacity')+
   guides(col='none')+
-  scale_y_continuous(breaks = seq(-1.5, 2.5, by = 0.5))+
-  coord_cartesian(ylim = c(-1.5, 2.5))+
+  # scale_y_continuous(breaks = seq(-1.5, 2.5, by = 0.5))+
+  # coord_cartesian(ylim = c(-1.5, 2.5))+
   scale_x_discrete(labels=c("10k" = paste('10k\nn=',sum(filt_combined_sel_r[filt_combined_sel_r$phase=='Settling',]$carr_cap=='10k')),
                             "100k" = paste('100k\nn=',sum(filt_combined_sel_r[filt_combined_sel_r$phase=='Settling',]$carr_cap=='100k')),
                             "1mill" = paste('1mill\nn=',sum(filt_combined_sel_r[filt_combined_sel_r$phase=='Settling',]$carr_cap=='1mill')),
@@ -299,11 +309,11 @@ filt_combined_sel_r[filt_combined_sel_r$phase=='Settling',] %>%
             var=var(sel_r),
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
-#   carr_cap    mean   var    sd     CV
-# 1 10k      -0.633 2.94  1.72  -2.71
-# 2 100k      0.264 1.87  1.37   5.18
-# 3 1mill     0.384 0.743 0.862  2.24
-# 4 10mill    0.434 0.367 0.605  1.40
+#   carr_cap   mean   var    sd    CV
+# 1 10k      -0.631 2.87  1.69  -2.68
+# 2 100k      0.307 1.61  1.27   4.14
+# 3 1mill     0.356 0.656 0.810  2.27
+# 4 10mill    
 # The variation and standard deviation clearly get reduced, but also the mean
 #continues increasing as the carrying capacity increases
 
@@ -334,10 +344,10 @@ filt_combined_sel_r[filt_combined_sel_r$phase=='Growth',] %>%
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
 #   carr_cap  mean      var     sd     CV
-# 1 10k      0.544 0.00483  0.0695 0.128 
-# 2 100k     0.639 0.00104  0.0322 0.0504
-# 3 1mill    0.641 0.000285 0.0169 0.0263
-# 4 10mill   0.643 0.000177 0.0133 0.0207
+# 1 10k      0.558 0.00588  0.0767 0.137 
+# 2 100k     0.644 0.000991 0.0315 0.0489
+# 3 1mill    0.641 0.000619 0.0249 0.038
+# 4 10mill   
 
 
 # Using mean of the simulations
@@ -367,10 +377,10 @@ mean_filt_sel_r[mean_filt_sel_r$phase=='Growth',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap  mean
-# 1 10k      0.544
-# 2 100k     0.638
-# 3 1mill    0.642
-# 4 10mill   0.643
+# 1 10k      0.546
+# 2 100k     0.643
+# 3 1mill    0.641
+# 4 10mill   
 
 ggplot(mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',], 
        aes(x=carr_cap, y=mean_sel_r, col=carr_cap))+
@@ -392,14 +402,14 @@ mean_filt_sel_r[mean_filt_sel_r$phase=='Settling',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap   mean
-# 1 10k      -0.633
-# 2 100k      0.537
-# 3 1mill     0.480
-# 4 10mill    0.466
+# 1 10k      -0.548
+# 2 100k      0.683
+# 3 1mill     0.431
+# 4 10mill    
 
 # Paper plot using mean of the simulations
 
-mean_sim_sel_r=filt_combined_sel_r[filt_combined_sel_r$carr_cap=='10mill',] %>%
+mean_sim_sel_r=filt_combined_sel_r[filt_combined_sel_r$carr_cap==plot_carr_cap,] %>%
   group_by(phase, sim_number) %>%
   summarise(mean_sel_r=mean(sel_r))
 
@@ -460,18 +470,18 @@ ggplot(time_top[time_top$sim_number<=1,],
 
 #### Settling fitness ####
 
-# settling_prop_boot=data.frame()
-# 
-# for(j in c("10mill-boot", "100mill-boot", "1bill-boot")){
-#   temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
-#   temp_df$carr_cap=j
-#   #filtering out the row if any population went extinct
-#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
-#   settling_prop_boot=rbind(settling_prop_boot, temp_df)
-# }
-# write.csv(settling_prop_boot, file='set_sim_bootstrap_settling_registry_6june2025.csv', row.names = FALSE)
+settling_prop_boot=data.frame()
 
-settling_prop_boot=read.csv('set_sim_bootstrap_settling_registry_6june2025.csv', header=TRUE)
+for(j in c("10mill-boot", "100mill-boot", "1bill-boot")){
+  temp_df=read.csv(paste('petite_second_', j, "_50sim/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+  temp_df$carr_cap=j
+  #filtering out the row if any population went extinct
+  temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+  settling_prop_boot=rbind(settling_prop_boot, temp_df)
+}
+write.csv(settling_prop_boot, file='set_sim_bootstrap_settling_registry_30jan2026.csv', row.names = FALSE)
+
+settling_prop_boot=read.csv('set_sim_bootstrap_settling_registry_30jan2026.csv', header=TRUE)
 settling_prop_boot$carr_cap=factor(settling_prop_boot$carr_cap, levels=c("10mill-boot", "100mill-boot", "1bill-boot"))
 summary(settling_prop_boot)
 
@@ -492,9 +502,9 @@ settling_prop_boot %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
 # carr_cap      mean
-# 1 10mill-boot  0.450
-# 2 100mill-boot 0.447
-# 3 1bill-boot   0.446
+# 1 10mill-boot  0.434
+# 2 100mill-boot 0.440
+# 3 1bill-boot   0.434
 
 mean_settling_prop_boot=settling_prop_boot %>%
   group_by(sim_number, carr_cap) %>%
@@ -512,9 +522,9 @@ mean_settling_prop_boot %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel))
 # carr_cap      mean
-# 1 10mill-boot  0.450
-# 2 100mill-boot 0.447
-# 3 1bill-boot   0.446
+# 1 10mill-boot  0.434
+# 2 100mill-boot 0.440
+# 3 1bill-boot   0.434
 
 
 #### Comparison to normal simulations ####
@@ -552,13 +562,13 @@ comp_sett_carr_cap %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
 # carr_cap        mean
-# 1 10k          -0.633
-# 2 100k          0.264
-# 3 1mill         0.384
-# 4 10mill        0.434
-# 5 10mill-boot   0.450
-# 6 100mill-boot  0.447
-# 7 1bill-boot    0.446 
+# 1 10k          -0.631
+# 2 100k          0.307
+# 3 1mill         0.356
+# 4 10mill        
+# 5 10mill-boot   0.434
+# 6 100mill-boot  0.440
+# 7 1bill-boot    0.434 
 
 
 mean_comp_sett_carr_cap=comp_sett_carr_cap %>%
@@ -596,13 +606,13 @@ mean_comp_sett_carr_cap %>%
             lower_ci = mean - qt(0.975, df = n - 1) * se,
             upper_ci = mean + qt(0.975, df = n - 1) * se)
 # carr_cap       mean
-# 1 10k          -0.633
-# 2 100k          0.537
-# 3 1mill         0.480
-# 4 10mill        0.466
-# 5 10mill-boot   0.450
-# 6 100mill-boot  0.447
-# 7 1bill-boot    0.446 
+# 1 10k          -0.548
+# 2 100k          0.683
+# 3 1mill         0.431
+# 4 10mill        
+# 5 10mill-boot   0.434
+# 6 100mill-boot  0.440
+# 7 1bill-boot    0.434 
 
 
 anova_random=aov(mean_sel_r~carr_cap, data=mean_comp_sett_carr_cap)
@@ -643,16 +653,17 @@ summary(anova_growth_random)
 
 #### Growth phase ####
 
-# growth_prop_top=data.frame()
-# 
-# for(j in c("100k", "10mill", "1mill")){
-#   temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_growth_registry_all_sim.csv", sep=""), header=TRUE)
-#   temp_df$carr_cap=j
-#   growth_prop_top=rbind(growth_prop_top, temp_df)
-# }
-# write.csv(growth_prop_top, file='set_sim_top_growth_registry_6june2025.csv', row.names = FALSE)
+growth_prop_top=data.frame()
 
-growth_prop_top=read.csv('set_sim_top_growth_registry_6june2025.csv', header=TRUE)
+# , "10mill"
+for(j in c("100k", "1mill")){
+  temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_growth_registry_all_sim.csv", sep=""), header=TRUE)
+  temp_df$carr_cap=j
+  growth_prop_top=rbind(growth_prop_top, temp_df)
+}
+write.csv(growth_prop_top, file='set_sim_top_growth_registry_30jan2026.csv', row.names = FALSE)
+
+growth_prop_top=read.csv('set_sim_top_growth_registry_30jan2026.csv', header=TRUE)
 growth_prop_top$carr_cap=factor(growth_prop_top$carr_cap, levels=c("100k", "1mill", "10mill"))
 summary(growth_prop_top)
 
@@ -672,18 +683,19 @@ ggplot(growth_prop_top,
 
 #### Settling fitness ####
 
-# settling_prop_top=data.frame()
-# 
-# for(j in c("100k", "1mill", "10mill")){
-#   temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
-#   temp_df$carr_cap=j
-#   #filtering out the row if any population went extinct
-#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
-#   settling_prop_top=rbind(settling_prop_top, temp_df)
-# }
-# write.csv(settling_prop_top, file='set_sim_top_settling_registry_6june2025.csv', row.names = FALSE)
+settling_prop_top=data.frame()
 
-settling_prop_top=read.csv("set_sim_top_settling_registry_6june2025.csv", header=TRUE)
+# , "10mill"
+for(j in c("100k", "1mill")){
+  temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+  temp_df$carr_cap=j
+  #filtering out the row if any population went extinct
+  temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+  settling_prop_top=rbind(settling_prop_top, temp_df)
+}
+write.csv(settling_prop_top, file='set_sim_top_settling_registry_30jan2026.csv', row.names = FALSE)
+
+settling_prop_top=read.csv("set_sim_top_settling_registry_30jan2026.csv", header=TRUE)
 settling_prop_top$carr_cap=factor(settling_prop_top$carr_cap, levels=c("100k", "1mill", "10mill"))
 summary(settling_prop_top)
 
@@ -798,9 +810,9 @@ filt_combined_sel_r_top[filt_combined_sel_r_top$phase=='Settling',] %>%
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
 #   carr_cap  mean   var    sd    CV
-# 1 100k      1.11 0.427 0.654 0.591
-# 2 1mill     3.66 1.25  1.12  0.306
-# 3 10mill    4.76 1.39  1.18  0.248
+# 1 100k      1.81 0.148 0.384 0.213
+# 2 1mill     3.82 1.76  1.33  0.347
+# 3 10mill    
 # The mean keeps going up so 1 million and 10 million are different values
 
 
@@ -828,9 +840,9 @@ filt_combined_sel_r_top[filt_combined_sel_r_top$phase=='Growth',] %>%
             sd=sd(sel_r),
             CV=sd(sel_r)/mean(sel_r))
 #   carr_cap  mean      var     sd     CV
-# 1 100k     0.632 0.000973 0.0312 0.0493
-# 2 1mill    0.637 0.000357 0.0189 0.0297
-# 3 10mill   0.639 0.000141 0.0119 0.0186
+# 1 100k     0.630 0.00122  0.0349 0.0554
+# 2 1mill    0.636 0.000296 0.0172 0.0271
+# 3 10mill   
 
 
 # Using mean of the simulations
@@ -859,9 +871,9 @@ mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Growth',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap  mean
-# 1 100k     0.632
-# 2 1mill    0.637
-# 3 10mill   0.639
+# 1 100k     0.630
+# 2 1mill    0.636
+# 3 10mill   
 
 ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',], 
        aes(x=carr_cap, y=mean_sel_r, col=carr_cap))+
@@ -881,9 +893,9 @@ mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',] %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel_r))
 # carr_cap  mean
-# 1 100k      1.11
-# 2 1mill     3.80
-# 3 10mill    4.95
+# 1 100k      1.81
+# 2 1mill     3.96
+# 3 10mill    
 
 
 
@@ -892,18 +904,18 @@ mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',] %>%
 
 #### Settling fitness
 
-# settling_prop_boot_top=data.frame()
-# 
-# for(j in c("10mill-boot", "100mill-boot", "1bill-boot")){
-#   temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
-#   temp_df$carr_cap=j
-#   #filtering out the row if any population went extinct
-#   temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
-#   settling_prop_boot_top=rbind(settling_prop_boot_top, temp_df)
-# }
-# write.csv(settling_prop_boot_top,file="set_sim_bootstrap_top_settling_registry_6june2025.csv", row.names = FALSE)
+settling_prop_boot_top=data.frame()
 
-settling_prop_boot_top=read.csv("set_sim_bootstrap_top_settling_registry_6june2025.csv", header=TRUE)
+for(j in c("10mill-boot", "100mill-boot", "1bill-boot")){
+  temp_df=read.csv(paste('petite_second_', j, "_50sim_top/proportions_settling_selec_registry_all_sim.csv", sep=""), header=TRUE)
+  temp_df$carr_cap=j
+  #filtering out the row if any population went extinct
+  temp_df=temp_df[temp_df$cells_pop1_a!=0 & temp_df$cells_pop2_a!=0,]
+  settling_prop_boot_top=rbind(settling_prop_boot_top, temp_df)
+}
+write.csv(settling_prop_boot_top,file="set_sim_bootstrap_top_settling_registry_30jan2026.csv", row.names = FALSE)
+
+settling_prop_boot_top=read.csv("set_sim_bootstrap_top_settling_registry_30jan2026.csv", header=TRUE)
 settling_prop_boot_top$carr_cap=factor(settling_prop_boot_top$carr_cap, levels=c("10mill-boot", "100mill-boot", "1bill-boot"))
 summary(settling_prop_boot_top)
 
@@ -924,9 +936,9 @@ settling_prop_boot_top %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
 # carr_cap      mean
-# 1 10mill-boot   4.95
-# 2 100mill-boot  5.00
-# 3 1bill-boot    5.00
+# 1 10mill-boot   4.50
+# 2 100mill-boot  4.62
+# 3 1bill-boot    4.53
 
 mean_settling_prop_boot_top=settling_prop_boot_top %>%
   group_by(sim_number, carr_cap) %>%
@@ -944,9 +956,9 @@ mean_settling_prop_boot_top %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(mean_sel))
 # carr_cap      mean
-# 1 10mill-boot   4.96
-# 2 100mill-boot  5.00
-# 3 1bill-boot    5.00
+# 1 10mill-boot   4.50
+# 2 100mill-boot  4.62
+# 3 1bill-boot    4.53
 
 
 #### Comparison to normal simulations ####
@@ -983,12 +995,12 @@ ggplot(comp_sett_carr_cap_top[comp_sett_carr_cap_top$carr_cap!='10k',],
 comp_sett_carr_cap_top %>%
   group_by(carr_cap) %>%
   summarise(mean=mean(cell_sel_r))
-# 1 100k          1.11
-# 2 1mill         3.66
-# 3 10mill        4.76
-# 4 10mill-boot   4.95
-# 5 100mill-boot  5.00
-# 6 1bill-boot    5.00
+# 1 100k          1.81
+# 2 1mill         3.82
+# 3 10mill
+# 4 10mill-boot   4.50
+# 5 100mill-boot  4.62
+# 6 1bill-boot    4.53
 
 mean_comp_sett_carr_cap_top=comp_sett_carr_cap_top %>%
   group_by(carr_cap, sim_number) %>%
@@ -1024,12 +1036,12 @@ mean_comp_sett_carr_cap_top %>%
             lower_ci = mean - qt(0.975, df = n - 1) * se,
             upper_ci = mean + qt(0.975, df = n - 1) * se)
 # carr_cap      mean
-# 1 100k          1.11
-# 2 1mill         3.80
-# 3 10mill        4.95
-# 4 10mill-boot   4.96
-# 5 100mill-boot  5.00
-# 6 1bill-boot    5.00 
+# 1 100k          1.81
+# 2 1mill         3.96
+# 3 10mill        
+# 4 10mill-boot   4.50
+# 5 100mill-boot  4.62
+# 6 1bill-boot    4.53 
 
 anova_growth_top=aov(mean_sel_r~carr_cap, data=mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Growth',])
 summary(anova_growth_top)
@@ -1155,15 +1167,15 @@ supp_carr_cap=plot_grid(supp_mean_settling, supp_mean_settling_top,
                         labels=c('A', 'B'), ncol=2, align='hv')
 supp_carr_cap
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig9_carrying_capacity_test_6june2025.png',
-       plot=supp_carr_cap, dpi='retina', width=9, height=3.5)
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig9_carrying_capacity_test_6june2025.png',
+#        plot=supp_carr_cap, dpi='retina', width=9, height=3.5)
 
 
 # Supplementary Figure 6 ####
 
 growth_s_rate=ggplot(growth_prop[growth_prop$carr_cap=='10mill',],
-                     aes(x=transfer, y=cell_sel_r, col=as.factor(sim_number)))+
-  geom_line()+
+                     aes(x=transfer, y=cell_sel_r, group=sim_number,))+
+  geom_line(color='#657060FF')+
   guides(col='none')+
   ylab("Growth Selection Rate \n(Petite w/o delay / Petite)")+
   xlab('Transfer')+
@@ -1173,8 +1185,8 @@ growth_s_rate=ggplot(growth_prop[growth_prop$carr_cap=='10mill',],
 growth_s_rate
 
 settling_s_rate=ggplot(settling_prop[growth_prop$carr_cap=='10mill',],
-                       aes(x=transfer, y=cell_sel_r, col=as.factor(sim_number)))+
-  geom_line()+
+                       aes(x=transfer, y=cell_sel_r, group=sim_number))+
+  geom_line(color='#657060FF')+
   guides(col='none')+
   ylab("Settling Selection Rate \n(Petite w/o delay / Petite)")+
   xlab('Transfer')+
@@ -1186,21 +1198,21 @@ settling_s_rate
 p_num_gen=ggplot() +
   geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',],
               aes(x=transfer, ymin=mean_gen_pop_1-sd_pop1, ymax=mean_gen_pop_1+sd_pop1),
-              alpha=0.2, fill='red') +
+              alpha=0.5, fill='#F0D77BFF') +
   geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',],
               aes(x=transfer, ymin=mean_gen_pop_2-sd_pop2, ymax=mean_gen_pop_2+sd_pop2),
-              alpha=0.2, fill='blue') +
+              alpha=0.5, fill='#B4DAE5FF') +
   geom_ribbon(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',],
               aes(x=transfer, ymin=mean_gen_all_pop-sd_pop_all, ymax=mean_gen_all_pop+sd_pop_all),
-              alpha=0.2, fill='black') +
+              alpha=0.5, fill='black') +
   geom_line(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',], 
             aes(x=transfer, y=mean_gen_pop_1, color="Petite")) +
   geom_line(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',], 
             aes(x=transfer, y=mean_gen_pop_2, color="Petite w/o Delay")) +
   geom_line(data=mean_num_gen[mean_num_gen$carr_cap=='10mill',], 
             aes(x=transfer, y=mean_gen_all_pop, color="Whole Population")) +
-  scale_color_manual(values=c("Petite"="red", 
-                              "Petite w/o Delay"="blue", 
+  scale_color_manual(values=c("Petite"="#F0D77BFF", 
+                              "Petite w/o Delay"="#B4DAE5FF", 
                               "Whole Population"="black"),
                      name="Population Type") +
   labs(x="Transfer", y="Mean Number of\nGenerations") +
@@ -1213,8 +1225,8 @@ supp_s_rate=plot_grid(growth_s_rate,settling_s_rate, p_num_gen,
                       labels=c('A', 'B', 'C'), ncol=1)
 supp_s_rate
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig7_selection_rate_per_transfer_23apr2025.png',
-       plot=supp_s_rate, dpi='retina', width=6, height=8)
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig7_selection_rate_per_transfer_3oct2025.png',
+#        plot=supp_s_rate, dpi='retina', width=6, height=8)
 
 
 
@@ -1260,7 +1272,42 @@ fig6b_v2
 figure_6_v3=plot_grid(fig6a_v2, fig6b_v2, labels=c('A', 'B'), ncol=1, align='hv')
 figure_6_v3
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_selection_rates_23apr2025.png',
-       plot=figure_6_v3, dpi='retina', width=4, height=6)
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_selection_rates_23apr2025.png',
+#        plot=figure_6_v3, dpi='retina', width=4, height=6)
+
+# Merged figure 7 and supp Fig 9 ####
+
+fig_a=ggplot(mean_sim_sel_r, 
+                aes(x=phase, y=mean_sel_r, col=phase))+
+  geom_jitter(alpha=0.5)+
+  stat_summary(fun = 'mean', geom = 'crossbar', linetype = 'dashed', alpha = 0.5, col = 'black')+
+  ylab('Mean Selection Rate \n(Petite w/o delay vs Petite)\nper selection phase')+
+  xlab('Selection phase')+
+  guides(col='none')+
+  scale_y_continuous(breaks = seq(0, 6, by = 1))+
+  coord_cartesian(ylim = c(0, 6))+
+  scale_x_discrete(labels=c('Growth'='Growth',
+                            'Settling'='Settling'))+
+  ggtitle('Random Starting Position')+
+  theme_classic(base_size = 10)+
+  theme(plot.title = element_text(hjust = 0.5, size=11))+
+  NULL
+fig_a
 
 
+fig_c=ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$carr_cap=='10mill',], 
+                aes(x=phase, y=mean_sel_r, col=phase))+
+  geom_jitter(alpha=0.5)+
+  stat_summary(fun = 'mean', geom = 'crossbar', linetype = 'dashed', alpha = 0.5, col = 'black')+
+  ylab('Mean Selection Rate \n(Petite w/o delay - Petite)\nper selection phase')+
+  xlab('Selection phase')+
+  guides(col='none')+
+  scale_y_continuous(breaks = seq(0, 6, by = 1))+
+  coord_cartesian(ylim = c(0, 6))+
+  scale_x_discrete(labels=c('Growth'='Growth',
+                            'Settling'='Settling'))+
+  ggtitle("Top Starting Position")+
+  theme_classic(base_size = 10)+
+  theme(plot.title = element_text(hjust = 0.5, size=11))+
+  NULL
+fig_c

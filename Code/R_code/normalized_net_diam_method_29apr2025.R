@@ -170,5 +170,89 @@ p3
 supp_fig_4=plot_grid(p1, p2, p3, labels=c('A', 'B', 'C'), ncol=3, align='hv')
 supp_fig_4
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_normalized_net_diam_method_29apr2025.png',
-       plot=supp_fig_4, dpi='retina', width=9, height=3)
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_normalized_net_diam_method_29apr2025.png',
+#        plot=supp_fig_4, dpi='retina', width=9, height=3)
+
+
+# Adding strains data ####
+
+
+strain_diam_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_4_network_growth_with_fragmentation/mean_diameter_values_3oct2025.csv", header=TRUE)
+colnames(strain_diam_df)
+
+exponential_df=data.frame(strain="Exponential",
+                          num_nodes=num_cells,
+                          mean_diameter=diameter)
+
+temp_strain_df=rbind(data.frame(strain=c("Grande", "Petite w/o Delay", "Petite"),
+                                num_nodes=c(2, 2, 2),
+                                mean_diameter=c(1,1,1)),
+                     strain_diam_df[strain_diam_df$num_nodes<=512 & strain_diam_df$num_nodes>1, c("strain", "num_nodes", "mean_diameter")])
+
+network_df=rbind(exponential_df, temp_strain_df)
+network_df$strain=factor(network_df$strain, levels=c("Exponential", "Grande", "Petite w/o Delay", "Petite"))
+
+p1_strain=ggplot(network_df, aes(x = num_nodes, y = mean_diameter, color=strain))+
+  geom_line()+
+  geom_point(data=network_df[network_df$strain=='Exponential',],
+             aes(x=num_nodes, y=mean_diameter))+
+  scale_color_manual(values=c("cornflowerblue", "#AE93BEFF", "#B4DAE5FF", "#F0D77BFF"))+
+  labs(x = "Number of cells", y = "Network diameter")+
+  theme_classic(base_size = 10)+
+  guides(col='none')+
+  NULL
+p1_strain
+
+p2_strain <- ggplot(network_df, aes(x = num_nodes, y = mean_diameter, color=strain))+
+  geom_line()+
+  geom_point(data=network_df[network_df$strain=='Exponential',],
+             aes(x=num_nodes, y=mean_diameter))+
+  geom_line(data=network_df[network_df$strain=='Exponential',],
+            aes(y = p[1] + p[2] * log10(num_nodes)), linetype = "dashed", color = "black")+
+  scale_x_log10()+
+  labs(x = "Number of cells", y = "Network diameter")+
+  scale_color_manual(values=c("cornflowerblue", "#AE93BEFF", "#B4DAE5FF", "#F0D77BFF"))+
+  theme_classic(base_size = 10)+
+  guides(col='none')+
+  NULL
+p2_strain
+
+network_df$norm_diameter=network_df$mean_diameter/ (p[2] * log10(network_df$num_nodes) + p[1])
+
+p3_strain <- ggplot(network_df, aes(x = num_nodes, y = norm_diameter, color=strain))+
+  geom_line()+
+  ylim(0.5, 1.5)+
+  labs(x = "Number of cells", y = "Normalized network diameter") +
+  scale_color_manual(values=c("cornflowerblue", "#AE93BEFF", "#B4DAE5FF", "#F0D77BFF"))+
+  theme_classic(base_size = 10)+
+  guides(col='none')+
+  NULL
+p3_strain
+
+
+# temporary plot to extract the legend from
+temp_plot <- ggplot(network_df, aes(x = num_nodes, y = norm_diameter, color=strain))+
+  geom_line()+
+  ylim(0.5, 1.5)+
+  labs(x = "Number of cells", y = "Normalized network diameter") +
+  scale_color_manual(values=c("cornflowerblue", "#AE93BEFF", "#B4DAE5FF", "#F0D77BFF"))+
+  theme_classic(base_size = 10)+
+  theme(legend.position = "bottom",           # Position at bottom
+        legend.direction = "horizontal")+      # Make it horizontal
+  labs(color='Strain')+
+  NULL
+
+# Extract the legend
+shared_legend <- ggpubr::get_legend(temp_plot)
+
+
+# Create the plot grid without legend
+plots_grid <- plot_grid(p1_strain, p2_strain, p3_strain, ncol = 3)
+
+# Combine the plots with the shared legend
+final_plot <- plot_grid(plots_grid, shared_legend, ncol = 1, rel_heights = c(1, 0.1))
+final_plot
+
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_normalized_net_diam_method_2oct2025.png',
+#        plot=final_plot, dpi='retina', width=9, height=3)
+

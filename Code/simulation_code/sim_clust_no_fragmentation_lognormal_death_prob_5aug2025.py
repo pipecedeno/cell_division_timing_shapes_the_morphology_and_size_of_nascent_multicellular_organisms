@@ -35,6 +35,9 @@ Modified to use log-normal distribution parameters instead of empirical data fil
 Added cell death probability parameter and safety feature to restart simulations that don't reach target size.
 Removed diff_doub_t.csv output file.
 
+10Sep2025:
+Added the flag alive to know if the cells are dead or alive when making the network images
+
 '''
 
 import os
@@ -156,12 +159,15 @@ def divide_cells(cluster_population, cells_to_divide, first_div_params, second_d
 
 		# Create daughter cell
 		daughter_id = cont_ids
-		cluster_population.add_node(daughter_id, number_divisions=0)
+		cluster_population.add_node(daughter_id, number_divisions=0, alive=True)
 		cluster_population.add_edge(mother_id, daughter_id)
 		temp_daughter_time = sample_doub_t(first_div_params, second_div_params, 0, curr_time)
 		
 		# Check if daughter cell survives (cell death probability check)
 		daughter_survives = random.random() >= death_prob
+
+		# updating if the daughter cell is alive or dead
+		cluster_population.nodes[daughter_id]["alive"]=daughter_survives
 		
 		# Only add daughter's next division time if it survives and we haven't reached max size
 		if daughter_survives and cluster_population.number_of_nodes() < max_size:
@@ -175,6 +181,9 @@ def divide_cells(cluster_population, cells_to_divide, first_div_params, second_d
 		
 		# Check if mother cell survives (cell death probability check)
 		mother_survives = random.random() >= death_prob
+
+		# updating if the mother cell is alive or dead
+		cluster_population.nodes[mother_id]["alive"]=mother_survives
 		
 		# Only add mother's next division time if it survives and we haven't reached max size
 		if mother_survives and cluster_population.number_of_nodes() < max_size:
@@ -275,7 +284,7 @@ def simulate_one_cluster_growth(input_variables, first_div_params, second_div_pa
 	# Initialize cluster with first cell
 	cont_ids = 1
 	snowflake = nx.Graph()
-	snowflake.add_node(cont_ids, number_divisions=0)
+	snowflake.add_node(cont_ids, number_divisions=0, alive=True)
 	
 	# Save initial network parameters (1 node) to memory
 	save_network_parameters(snowflake, sim_number, results_table)

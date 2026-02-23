@@ -23,6 +23,7 @@ library(png)
 library(grid)
 
 library(slider)
+library(effectsize)
 
 
 theme_set(theme_classic(base_size = 16))
@@ -55,7 +56,7 @@ summary(sim_df)
 
 
 
-#### Network Diameter
+# Network Diameter ####
 
 # Raw data
 ggplot(sim_df, aes(x=num_nodes, y=diameter, col=strain, fill=strain))+
@@ -83,7 +84,8 @@ ggplot(summ_diameter, aes(x=num_nodes, y=mean_diameter, col=strain, fill=strain)
   petite_t200_colors+
   NULL
 
-
+# Saving data for supplementary figure 5 of network normalization
+# write.csv(summ_diameter, "~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_4_network_growth_with_fragmentation/mean_diameter_values_3oct2025.csv", row.names = FALSE)
 
 
 # Undivided Daughters ####
@@ -150,6 +152,8 @@ ggplot(summ_max_edge, aes(x=num_nodes, y=mean_max_edge, col=strain, fill=strain)
 
 
 
+
+### Functional ANOVA
 
 
 # Paper Figure ####
@@ -250,6 +254,34 @@ p_diam
 # Grande, mean: 13.33, observed: 13
 # Petite, mean: 12.22667, observed: 12
 
+# Petite vs Petite w/o Delay
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$diameter ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$strain)
+# p-value < 2.2e-16
+
+cliff.delta(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$diameter ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$strain)
+# delta estimate: -0.6945111 (large)
+
+# Petite w/o Delay vs Grande
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite',]$diameter ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite',]$strain)
+# p-value = 0.09466
+
+sub_df <- droplevels(sim_df[sim_df$num_nodes == 100 & sim_df$strain != 'Petite', ])
+cliff.delta(sub_df$diameter ~ sub_df$strain)
+# delta estimate: 0.07146667 (negligible)
+
+# Petite vs Grande
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite w/o Delay',]$diameter ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite w/o Delay',]$strain)
+# p-value < 2.2e-16
+
+sub_df <- droplevels(sim_df[sim_df$num_nodes == 100 & sim_df$strain != 'Petite w/o Delay', ])
+cliff.delta(sub_df$diameter ~ sub_df$strain)
+# delta estimate: -0.6767111 (large)
+
+
 p_undivided=ggplot(summ_undivided, aes(x=num_nodes, y=mean_undivided, col=strain, fill=strain))+
   geom_ribbon(aes(ymin=ci_lower, ymax=ci_upper), alpha=0.5, color=NA)+
   geom_line()+
@@ -274,6 +306,34 @@ p_undivided
 # Grande, mean: 3.106667, observed: 3
 # Petite, mean 8.806667, observed: 12
 
+
+# Petite vs Petite w/o Delay
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$cases_mother_with_undivided_cells ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$strain)
+# p-value < 2.2e-16
+
+cliff.delta(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$cases_mother_with_undivided_cells ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$strain)
+# delta estimate: 0.7811778 (large)
+
+# Petite w/o Delay vs Grande
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite',]$cases_mother_with_undivided_cells ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite',]$strain)
+# p-value < 2.2e-16
+
+sub_df <- droplevels(sim_df[sim_df$num_nodes == 100 & sim_df$strain != 'Petite', ])
+cliff.delta(sub_df$cases_mother_with_undivided_cells ~ sub_df$strain)
+# delta estimate: 0.4687222 (medium)
+
+# Petite vs Grande
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite w/o Delay',]$cases_mother_with_undivided_cells ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite w/o Delay',]$strain)
+# p-value < 2.2e-16
+
+sub_df <- droplevels(sim_df[sim_df$num_nodes == 100 & sim_df$strain != 'Petite w/o Delay', ])
+cliff.delta(sub_df$cases_mother_with_undivided_cells ~ sub_df$strain)
+# delta estimate: 0.9339778 (large)
+
 p_edge_degree=ggplot(summ_max_edge, aes(x=num_nodes, y=mean_max_edge, col=strain, fill=strain))+
   geom_ribbon(aes(ymin=ci_lower, ymax=ci_upper), alpha=0.5, color=NA)+
   geom_line()+
@@ -296,6 +356,34 @@ p_edge_degree=ggplot(summ_max_edge, aes(x=num_nodes, y=mean_max_edge, col=strain
 p_edge_degree
 # Grande, mean: 12.38, observed: 12
 # Petite, mean: 13.51667, observed: 14
+
+
+# Petite vs Petite w/o Delay
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$max_edge_degree ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$strain)
+# p-value < 2.2e-16
+
+cliff.delta(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$max_edge_degree ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Grande',]$strain)
+# delta estimate: 0.6696 (large)
+
+# Petite w/o Delay vs Grande
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite',]$max_edge_degree ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite',]$strain)
+# p-value = 0.2401
+
+sub_df <- droplevels(sim_df[sim_df$num_nodes == 100 & sim_df$strain != 'Petite', ])
+cliff.delta(sub_df$max_edge_degree ~ sub_df$strain)
+# delta estimate: -0.04982222 (negligible)
+
+# Petite vs Grande
+wilcox.test(sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite w/o Delay',]$max_edge_degree ~ 
+              sim_df[sim_df$num_nodes==100 & sim_df$strain!='Petite w/o Delay',]$strain)
+# p-value < 2.2e-16
+
+sub_df <- droplevels(sim_df[sim_df$num_nodes == 100 & sim_df$strain != 'Petite w/o Delay', ])
+cliff.delta(sub_df$max_edge_degree ~ sub_df$strain)
+# delta estimate: 0.6709778 (large)
 
 fig=plot_grid(dt_distributions_v2, p_undivided, p_diam, p_edge_degree,
               labels=c('A', 'B', 'C', 'D'), ncol=2, label_size=12)

@@ -75,6 +75,10 @@ Date: 26Apr2024
 of cells that are going to be transfered to the next growth phase
 -Added 2 options for settling selection
 
+Date: 30Jan2026
+-Corrected how the diameter of the clusters is calculated, now the gyration radius of the clusters is calculated and 
+then converted in the radius of a sphere to calculate the diameter of the clusters assuming that they have spherical shapes
+
 %}
 
 %% Inputs:
@@ -233,8 +237,11 @@ for i = 1:length(unique_cluster_ids)
     %diameter 
     % temp_diameter=((6*V/pi)^(1/3))*10^-6; % It is multiplied to the 10^-6 to make it be in meters
 
-    %Calculating cluster diameter using the gyration radius
-    temp_diameter=gyration_diameter(cell_list);
+    %Calculating the gyration radius
+    temp_gyr_rad=gyration_radius(cell_list);
+
+    % Transforming the gyration radius to a spherical radius, and obtaining the diameter
+    temp_diameter=2*(sqrt(5*(temp_gyr_rad^2)/3));
 
     list_cluster_ids(i)=temp_clust_id;
     list_diameters(i)=temp_diameter;
@@ -544,9 +551,8 @@ end
 % end
 
 
-% Function to obtain the gyration diameter of a cluster, it calculates the radius, converts it to meters and then
-%multiplies by two to get the diameter
-function [diameter]=gyration_diameter(cell_list)
+% Function to obtain the gyration radius of a cluster, it calculates the radius, converts it to meters
+function [diameter]=gyration_radius(cell_list)
     % Number of points (cells)
     num_points = length(cell_list);
     
@@ -564,7 +570,7 @@ function [diameter]=gyration_diameter(cell_list)
     
     % Gyration radius
     Rg = sqrt(sum(distances.^2) / num_points)*10^-6;
-    diameter=Rg*2;
+    diameter=Rg;
 end
 
 
