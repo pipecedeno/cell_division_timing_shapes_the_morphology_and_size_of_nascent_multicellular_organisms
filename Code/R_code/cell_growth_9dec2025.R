@@ -7,6 +7,8 @@ library(stringr)
 library(cowplot)
 library(effsize)
 
+# Cell properties over time ####
+
 ancestor_spots=read.csv("~/work_dir/timelapses/cell_growth_data_ancestors_9dec2025.csv", header=TRUE)
 
 
@@ -105,9 +107,18 @@ p_cell_props=plot_grid(p_dt_diam, p_cell_cycle_diam, p_dt_asp_r, p_cell_cycle_as
                        ncol=2, labels=LETTERS[1:6], label_size=10)
 p_cell_props
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_cell_growth_properties_9dec2025.png',
-       plot=p_cell_props, dpi='retina', width=6, height=6, bg='white')
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_cell_growth_properties_9dec2025.png',
+#        plot=p_cell_props, dpi='retina', width=6, height=6, bg='white')
 
+
+#### version 2 paper figure ####
+
+p_cell_props_v2=plot_grid(p_dt_asp_r, p_dt_diam,
+                       ncol=2, labels=LETTERS[1:6], label_size=10)
+p_cell_props_v2
+
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_cell_growth_properties_24feb2026.png',
+#        plot=p_cell_props_v2, dpi='retina', width=6.5, height=3, bg='white')
 
 ancestor_spots[ancestor_spots$division_number==2 &
                  ancestor_spots$ELLIPSE_ASPECTRATIO!=1,] %>%
@@ -124,83 +135,9 @@ ancestor_spots[ancestor_spots$division_number==2 &
 
 
 
-p_dt_diam=ggplot(ancestor_spots[ancestor_spots$division_number<=2,], 
-                 aes(x=dt_minutes, y=ELLIPSE_MINOR*2, col=division_id, group=division_id))+
-  geom_line(alpha=0.5, linewidth=0.25)+
-  geom_smooth(aes(group=1), method="loess", color="black", linewidth=0.75, se=FALSE)+
-  theme_classic(base_size = 8)+
-  facet_grid(Strain~division_number)+
-  labs(x="Doubling Time (min)", y=expression("Cell Diameter"~(µ*m)))+
-  guides(col='none')+
-  NULL
-
-p_cell_cycle_diam=ggplot(ancestor_spots[ancestor_spots$division_number<=2,], 
-                         aes(x=percentage_cell_cycle, y=ELLIPSE_MINOR*2, col=division_id, group=division_id))+
-  geom_line(alpha=0.5, linewidth=0.25)+
-  geom_smooth(aes(group=1), method="loess", color="black", linewidth=0.75, se=FALSE)+
-  theme_classic(base_size = 8)+
-  facet_grid(Strain~division_number)+
-  labs(x="Proportion of Cell Cycle", y=expression("Cell Diameter"~(µ*m)))+
-  scale_x_continuous(labels = function(x) ifelse(x %in% c(0, 1), as.character(x), sprintf("%.2f", x)))+
-  guides(col='none')+
-  NULL
-
-p_dt_asp_r=ggplot(ancestor_spots[ancestor_spots$division_number<=2,], 
-                  aes(x=dt_minutes, y=ELLIPSE_ASPECTRATIO, col=division_id, group=division_id))+
-  geom_line(alpha=0.5, linewidth=0.25)+
-  geom_smooth(aes(group=1), method="loess", color="black", linewidth=0.75, se=FALSE)+
-  theme_classic(base_size = 8)+
-  facet_grid(Strain~division_number)+
-  labs(x="Doubling Time (min)", y="Cell Aspect Ratio")+
-  guides(col='none')+
-  NULL
-
-p_cell_cycle_asp_r=ggplot(ancestor_spots[ancestor_spots$division_number<=2,], 
-                          aes(x=percentage_cell_cycle, y=ELLIPSE_ASPECTRATIO, col=division_id, group=division_id))+
-  geom_line(alpha=0.5, linewidth=0.25)+
-  geom_smooth(aes(group=1), method="loess", color="black", linewidth=0.75, se=FALSE)+
-  theme_classic(base_size = 8)+
-  facet_grid(Strain~division_number)+
-  labs(x="Proportion of Cell Cycle", y="Cell Aspect Ratio")+
-  scale_x_continuous(labels = function(x) ifelse(x %in% c(0, 1), as.character(x), sprintf("%.2f", x)))+
-  guides(col='none')+
-  NULL
-
-p_dt_area=ggplot(ancestor_spots[ancestor_spots$division_number<=2,], 
-                 aes(x=dt_minutes, y=AREA, col=division_id, group=division_id))+
-  geom_line(alpha=0.5, linewidth=0.25)+
-  geom_smooth(aes(group=1), method="loess", color="black", linewidth=0.75, se=FALSE)+
-  theme_classic(base_size = 8)+
-  facet_grid(Strain~division_number)+
-  labs(x="Doubling Time (min)", y=expression("Cell Area"~(µ*m^2)))+
-  guides(col='none')+
-  NULL
-
-p_cell_cycle_area=ggplot(ancestor_spots[ancestor_spots$division_number<=2,], 
-                         aes(x=percentage_cell_cycle, y=AREA, col=division_id, group=division_id))+
-  geom_line(alpha=0.5, linewidth=0.25)+
-  geom_smooth(aes(group=1), method="loess", color="black", linewidth=0.75, se=FALSE)+
-  theme_classic(base_size = 8)+
-  facet_grid(Strain~division_number)+
-  labs(x="Proportion of Cell Cycle", y=expression("Cell Area"~(µ*m^2)))+
-  scale_x_continuous(labels = function(x) ifelse(x %in% c(0, 1), as.character(x), sprintf("%.2f", x)))+
-  guides(col='none')+
-  NULL
-
-# p_cell_props=plot_grid(p_dt_diam, p_dt_asp_r, p_dt_area, p_cell_cycle_diam, p_cell_cycle_asp_r, p_cell_cycle_area,
-#           ncol=3, labels=LETTERS[1:6], label_size=10)
-# p_cell_props
-
-p_cell_props=plot_grid(p_dt_diam, p_cell_cycle_diam, p_dt_asp_r, p_cell_cycle_asp_r, p_dt_area, p_cell_cycle_area,
-                       ncol=2, labels=LETTERS[1:6], label_size=10)
-p_cell_props
-
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_cell_growth_properties_9dec2025.png',
-#        plot=p_cell_props, dpi='retina', width=6, height=6, bg='white')
 
 
-
-# Cell properties ####
+#### Cell properties statistics ####
 
 colnames(ancestor_spots)
 

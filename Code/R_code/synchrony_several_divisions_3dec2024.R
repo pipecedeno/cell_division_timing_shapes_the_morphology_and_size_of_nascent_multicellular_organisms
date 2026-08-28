@@ -116,3 +116,76 @@ div_num_t600
 # ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_3oct2025.png',
 #        plot=div_num_t600, dpi='retina', width=6, height=4, bg='white')
 
+
+doubled_filtered <- doubled %>%
+  group_by(strain_timepoint, division_number) %>%
+  filter(n() >= 20) %>%
+  ungroup()
+
+
+div_num_all=ggplot(doubled_filtered[doubled_filtered$timepoint!="t0",], 
+       aes(x=division_number, y=hours, fill=division_number)) +
+  geom_violin(adjust=2)+
+  # geom_boxplot()+
+  facet_grid(strain~timepoint)+
+  xlab('Division Number')+ylab('Doubling Time (Hours)')+
+  guides(fill='none')+
+  theme_classic(base_size=10)+
+  stat_summary(fun='mean', geom='crossbar', linewidth=0.25)+
+  scale_fill_manual(values=c("#EAD890FF", "#E48C2AFF", "#CD4F38FF", "#44A57CFF"))+
+  NULL
+div_num_all
+
+
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_24feb2026.png',
+#        plot=div_num_all, dpi='retina', width=6.5, height=5.5, bg='white')
+
+
+#### version 26 mar 2026 ####
+
+doubled_few_data_points <- doubled %>%
+  group_by(strain_timepoint, division_number) %>%
+  filter(n() < 20) %>%
+  ungroup()
+
+
+div_num_ancestors=ggplot(doubled_filtered[doubled_filtered$timepoint=="t0",], 
+                      aes(x=division_number, y=hours, fill=division_number)) +
+  geom_violin(adjust=2)+
+  geom_beeswarm(data=doubled_few_data_points[doubled_few_data_points$timepoint=="t0",], 
+                aes(x=division_number, y=hours), size=1, alpha=0.5, color='black')+
+  facet_grid(timepoint~strain, labeller = labeller(strain = c("petite" = "Petite", "grande" = "Grande")))+
+  xlab('Division Number')+ylab('Doubling Time\n(Hours)')+
+  guides(fill='none')+
+  theme_classic(base_size=10)+
+  stat_summary(fun='mean', geom='crossbar', linewidth=0.25)+
+  scale_fill_manual(values=c("#EAD890FF", "#E48C2AFF", "#CD4F38FF", "#44A57CFF", "#3B7BC8FF", "#8E44ADFF", "#2ECC71FF"))+
+  # The last 3 colors are not needed but just added so that scale fill manual doesn't give an error
+  NULL
+div_num_ancestors
+
+
+div_num_all_v2=ggplot(doubled_filtered[doubled_filtered$timepoint!="t0",], 
+                   aes(x=division_number, y=hours, fill=division_number)) +
+  geom_violin(adjust=2)+
+  geom_beeswarm(data=doubled_few_data_points[doubled_few_data_points$timepoint!="t0",], 
+                aes(x=division_number, y=hours), size=1, alpha=0.5, color='black')+
+  facet_grid(timepoint~strain)+
+  xlab('Division Number')+ylab('Doubling Time (Hours)')+
+  guides(fill='none')+
+  theme_classic(base_size=10)+
+  stat_summary(fun='mean', geom='crossbar', linewidth=0.25)+
+  scale_fill_manual(values=c("#EAD890FF", "#E48C2AFF", "#CD4F38FF", "#44A57CFF", "#3B7BC8FF", "#8E44ADFF", "#2ECC71FF"))+
+  # The last 3 colors are not needed but just added so that scale fill manual doesn't give an error
+  NULL
+div_num_all_v2
+
+row_1=plot_grid(div_num_ancestors, ggplot(), ncol=2, rel_widths = c(2,2.5))
+
+division_numbers_all=plot_grid(row_1, div_num_all_v2, 
+                               labels=c('A', 'B'), ncol=1, label_size=11, rel_heights=c(1,4))
+
+
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_26mar2026.png',
+       plot=division_numbers_all, dpi='retina', width=6.5, height=7, bg='white')
+

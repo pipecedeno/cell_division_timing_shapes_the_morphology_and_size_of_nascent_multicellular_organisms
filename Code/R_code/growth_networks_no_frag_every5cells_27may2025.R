@@ -24,6 +24,8 @@ library(grid)
 
 library(slider)
 library(effectsize)
+library(ggbeeswarm)
+library(colorspace)
 
 
 theme_set(theme_classic(base_size = 16))
@@ -218,14 +220,22 @@ names(facet.labs)=c('Ancestor', 'Ancestor w/o Delay', 't200')
 
 
 
+
+your_colors <- c("#F0D77B", "#B4DAE5", "#AE93BE")
+darker_colors <- darken(your_colors, amount = 0.3)
+
 dt_distributions_v2=ggplot(doub_t_data, aes(x=division_number, y=hours, fill=name))+
   facet_wrap(~name)+
   geom_violin(adjust=2)+
-  stat_summary(fun='mean', geom='crossbar')+
+  # geom_beeswarm(cex=0.5)+
+  # geom_jitter(alpha=0.5, size=0.25)+
+  stat_summary(fun='median', geom='crossbar')+
+  geom_quasirandom(aes(col=name), method="tukeyDense", size=0.1)+
   xlab('Division Number')+
   ylab('Hours')+
-  guides(fill='none')+
+  guides(fill='none', color='none')+
   petite_t200_colors+
+  scale_color_manual(values=darker_colors)+
   theme_classic(base_size = 10)+
   NULL
 dt_distributions_v2
@@ -389,7 +399,7 @@ fig=plot_grid(dt_distributions_v2, p_undivided, p_diam, p_edge_degree,
               labels=c('A', 'B', 'C', 'D'), ncol=2, label_size=12)
 fig
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_3_growth_no_frag_28may2025_every5cells.svg',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_3_growth_no_frag_1apr2025_every5cells_jitter.svg',
        plot=fig, dpi='retina', width=6.5, height=4.5, bg='white')
 
 

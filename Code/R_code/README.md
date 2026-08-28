@@ -1,8 +1,11 @@
 ## List of codes used to create each figure in the article
 
 synchrony_mother_daughter_31jan2024.R:  
--Figure 1  
+-Figure 2  
 -Figure 7
+
+cell_growth_9dec2025.R
+-supplementary Figure 0
 
 synchrony_several_divisions_3dec2024.R:  
 -Supplementary Figure 1
@@ -30,8 +33,10 @@ frag_syn_data_4_steps_16oct2024.R:
 -Figure 5  
 -Supplementary Figure 6
 
+equal_growth_rates_29_june2024.R:
+-Figure 7
+
 set_sim_test_carr_cap_15apr2024.R:  
--Figure 6  
 -Supplementary Figure 7  
 -Supplementary Figure 9
 

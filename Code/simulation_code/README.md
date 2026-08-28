@@ -131,6 +131,11 @@ snowflake_synchrony_volume_prediction.m
 ```
 With this data a linear regression was fitted to the data, and a the difference from the predictions was obtained by using the actual parameter for each of the strains.
 
+The following code was executed to obtain the result of all variabled tested combined:
+```
+snowflake_synchrony_volume_prediction_combined_effect.m
+```
+
 ### Supplementary figure 3: Validation of the network model with biophysical simulations
 
 First some networks need to be created for the matlab code to be executed:

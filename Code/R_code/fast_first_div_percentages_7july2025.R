@@ -644,6 +644,7 @@ p_doub_times=ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', 
   facet_wrap(~percentage_diff, nrow = 1) +
   theme_classic() +
   scale_color_manual(values=c("#BBA78CFF", "#333544FF"))+
+  scale_x_discrete(breaks = c(1, 2), labels = c("1", "2+"))+
   labs(x = "Number of Divisions", y = "Doubling Time (min)") +
   guides(col = 'none') +
   NULL
@@ -730,5 +731,5 @@ figure_first_div_net=plot_grid(p_doub_times, p_diameter,
                                align='hv', label_size=12)
 figure_first_div_net
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_9_first_div_3oct2025.png',
-       plot=figure_first_div_net, dpi='retina', height=12, width=10, bg='white')
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_9_first_div_1apr2026.png',
+#        plot=figure_first_div_net, dpi='retina', height=12, width=10, bg='white')

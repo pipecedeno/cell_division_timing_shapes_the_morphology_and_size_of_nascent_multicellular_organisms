@@ -427,8 +427,6 @@ p1_temp=ggplot(mean_frag_sim, aes(x=strain, y=mean_clust_size, fill=strain))+
   petite_t200_colors+
   theme_classic(base_size = 10)+
   guides(fill='none')+
-  scale_x_discrete(labels=c("Ancestor"="Ancestor", "Ancestor w/o Delay"="Ancestor w/o Delay",
-                            "PA2_t200"='Evolved'))+
   NULL
 p1_temp
 
@@ -440,8 +438,6 @@ p2_temp=ggplot(mean_frag_sim, aes(x=strain, y=mean_propagule_prop, fill=strain))
   petite_t200_colors+
   theme_classic(base_size = 10)+
   guides(fill='none')+
-  scale_x_discrete(labels=c("Ancestor"="Ancestor", "Ancestor w/o Delay"="Ancestor w/o Delay",
-                            "PA2_t200"='Evolved'))+
   NULL
 p2_temp
 
@@ -497,13 +493,11 @@ pairwise.wilcox.test(mean_diam_sim$mean_norm_diam, mean_diam_sim$strain, p.adjus
 
 p3_temp=ggplot(mean_diam_sim, aes(x=strain, y=mean_norm_diam, fill=strain))+
   geom_violin()+
-  xlab('')+ylab('Mean\nDiameter')+
+  xlab('')+ylab('Mean Normalized\nDiameter')+
   stat_summary(fun='mean', geom='crossbar')+
   petite_t200_colors+
   theme_classic(base_size = 10)+
   guides(fill='none')+
-  scale_x_discrete(labels=c("Ancestor"="Ancestor", "Ancestor w/o Delay"="Ancestor w/o Delay",
-                            "PA2_t200"='Evolved'))+
   NULL
 p3_temp
 
@@ -511,9 +505,9 @@ p3_temp
 
 
 
-fig_restructured_updated=plot_grid(p1_temp, p2_temp, p3_temp,
+fig_restructured_updated=plot_grid(p1_temp, p3_temp, p2_temp,
                                labels=c('A', 'B', 'C'), ncol=1, label_size=11)
 fig_restructured_updated
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_5_network_properties_all-clusters_3oct2025_ancestors.png',
-#        plot=fig_restructured_updated, dpi='retina', width=3.5, height=6.3, bg='white')
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_5_network_properties_all-clusters_3apr2026_ancestors.png',
+       plot=fig_restructured_updated, dpi='retina', width=3.5, height=6.3, bg='white')

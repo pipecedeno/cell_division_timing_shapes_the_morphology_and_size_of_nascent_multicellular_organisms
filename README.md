@@ -1,4 +1,4 @@
-# Emergence of coordinated cell division during the evolution of multicellularity
+# Cell division timing shapes the morphology and size of nascent multicellular organisms
 
 
 ## Conda environment creation:
@@ -81,10 +81,6 @@ emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/
 
 In the Code folder the simulation_code includes all the python, bash, and matlab scripts required to generate all the data of the results. The folder R_code includes all the R scripts that were used to analyze the data from the simulations and generate all the plots of the article. And the timelapse_analysis folder contain the python scripts needed to generate the dataset of doubling time distribution and cell synchrony. Each of these folders has their own README.md file with instructions of which codes were used for each figure and the commands used in the simulations.  
 
-Data folder:
 
-Paper figures:
-
-Supplementary videos:
 
 

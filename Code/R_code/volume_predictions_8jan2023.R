@@ -442,3 +442,23 @@ aggregate(num_cells ~ strain, data = sync_df, FUN = mean)
 
 
 
+# Combined size difference prediction ####
+
+
+sync_grande_diff=read.csv('grande_volume_pred_synchrony_2025june12.csv', header=TRUE)
+sync_petite_diff=read.csv('petite_combined_effect_volume_pred_synchrony_2025june12.csv', header=TRUE)
+combined_effect_df=rbind(sync_grande_diff, sync_petite_diff)
+
+
+ggplot(combined_effect_df, aes(x=strain, y=volume_clust, fill=strain))+
+  geom_violin()+
+  theme_bw()+
+  xlab('Strain')+ylab('Cluster Volume')+
+  NULL
+
+
+aggregate(volume_clust ~ strain, data = combined_effect_df, FUN = mean)
+# grande    105066.66
+# petite     85934.39
+# Difference: 19132.27
+

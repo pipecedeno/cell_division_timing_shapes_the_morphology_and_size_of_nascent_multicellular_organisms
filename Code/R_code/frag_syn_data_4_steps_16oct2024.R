@@ -346,20 +346,28 @@ diam_var
 
 
 
-#### Supplementary Figure 5 ####
+#### Figure 5 ####
 
-supp_net_prop_v3=plot_grid(clust_delay,clust_var, prop_delay,prop_var, 
-                           diam_delay,diam_var,
+# supp_net_prop_v3=plot_grid(clust_delay,clust_var, prop_delay,prop_var, 
+#                            diam_delay,diam_var,
+#                            labels=c('A', 'B', 'C', 'D', 'E', 'F'), ncol=2, 
+#                            align='hv', label_size=12)
+# supp_net_prop_v3
+# 
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_effects_delay_variation_25sep2025.png',
+#        plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
+
+
+supp_net_prop_v4=plot_grid(clust_delay,clust_var, diam_delay,diam_var, prop_delay,prop_var,
                            labels=c('A', 'B', 'C', 'D', 'E', 'F'), ncol=2, 
-                           align='hv', label_size=12)
-supp_net_prop_v3
+                           align='hv', label_size=11)
+supp_net_prop_v4
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_effects_delay_variation_25sep2025.png',
-       plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_effects_delay_variation_29mar2026.png',
+       plot=supp_net_prop_v4, dpi='retina', width=6.5, height=5.6, bg='white')
 
 
-
-# Figure 5 ####
+# OLD Figure 5 ####
 
 mean_mean_clust_size$var_cat=NA
 mean_mean_clust_size$var_cat=ifelse(mean_mean_clust_size$variation==0, '0',
@@ -517,8 +525,8 @@ plot_summary_effects_temp <- plot_grid(clust_p1, clust_p2, diameter_p1, diameter
 plot_summary_effects_temp
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_syn_summ_doub_t_effects_30july2025.png',
-       plot=plot_summary_effects_temp, dpi='retina', width=6, height=6, bg='white')
+# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_syn_summ_doub_t_effects_30july2025.png',
+#        plot=plot_summary_effects_temp, dpi='retina', width=6, height=6, bg='white')
 
 
 
