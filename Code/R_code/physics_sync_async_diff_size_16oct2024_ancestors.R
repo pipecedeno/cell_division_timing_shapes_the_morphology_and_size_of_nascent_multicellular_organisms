@@ -27,7 +27,7 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
-setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/supp_fig3_physics_sim')
+# setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/supp_fig3_physics_sim')
 
 
 # Cluster size difference ####
@@ -50,7 +50,7 @@ setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/resu
 # 
 # write.csv(clust_size, file="physics_sim_frag_size_sync_vs_async_10june2025.csv", row.names=FALSE)
 
-clust_size=read.csv("physics_sim_frag_size_sync_vs_async_10june2025.csv", header = TRUE)
+clust_size=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/physics_sim_frag_size_sync_vs_async_10june2025.csv", header = TRUE)
 clust_size$strain=factor(clust_size$strain, levels=c('Petite', 'Grande'))
 
 
@@ -115,16 +115,16 @@ summ_clust_size %>%
 #   }
 # }
 
-petite_overlap=read.csv("overlap_accumulation_2dec2024/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
-petite_overlap$strain="Petite"
-grande_overlap=read.csv("overlap_accumulation_2dec2024/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
-grande_overlap$strain="Grande"
-overlap_size_df=rbind(grande_overlap, petite_overlap)
+# petite_overlap=read.csv("overlap_accumulation_2dec2024/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+# petite_overlap$strain="Petite"
+# grande_overlap=read.csv("overlap_accumulation_2dec2024/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+# grande_overlap$strain="Grande"
+# overlap_size_df=rbind(grande_overlap, petite_overlap)
 
 # Test sampling budding sites from time lapse distributions budding distributions
-petite_overlap=read.csv("/Users/pipe/Desktop/results_edge_degree_15/supp_fig3_physics_sim/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+petite_overlap=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 petite_overlap$strain="Petite"
-grande_overlap=read.csv("/Users/pipe/Desktop/results_edge_degree_15/supp_fig3_physics_sim/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
+grande_overlap=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 grande_overlap$strain="Grande"
 overlap_size_df=rbind(grande_overlap, petite_overlap)
 
@@ -174,7 +174,7 @@ mean_summ_overlap_size[mean_summ_overlap_size$cluster_size==330,]
 
 # process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap.csv -o stats_overlap_pos_10jun2025.csv
 
-overlap_pos_df=read.csv("stats_overlap_pos_10jun2025.csv", header=TRUE)
+overlap_pos_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/stats_overlap_pos_10jun2025.csv", header=TRUE)
 
 overlap_pos_df$strain=factor(overlap_pos_df$strain, levels=c("Petite", "Grande"))
 summary(overlap_pos_df)
@@ -222,10 +222,10 @@ summary(anova_mean_dist)
 #### Paper Figure ####
 
 
-img_petite <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/matlab_plots/petite_overlap_302cells_cropped.png")
+img_petite <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/matlab_plots/petite_overlap_302cells_cropped.png")
 img_plot_petite <- rasterGrob(img_petite, interpolate = TRUE)
 
-img_grande <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/matlab_plots/grande_overlap_329cells_cropped.png")
+img_grande <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/matlab_plots/grande_overlap_329cells_cropped.png")
 img_plot_grande <- rasterGrob(img_grande, interpolate = TRUE)
 
 
@@ -298,7 +298,7 @@ fig_physics_sim_mean_dist=plot_grid(p_petite, p_grande, p_overlap, p_frac_size, 
 fig_physics_sim_mean_dist
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig3_physics_sims_10juune2025_ancestors.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_4_physics_sims_28aug2026.png',
        plot=fig_physics_sim_mean_dist, dpi='retina', width=10, height=12, bg='white')
 
 

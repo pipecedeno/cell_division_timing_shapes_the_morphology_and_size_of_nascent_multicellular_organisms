@@ -22,7 +22,7 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
-cell_sync=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/cell_sync_mother_daughter_2025may5.csv", header=TRUE)
+cell_sync=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/cell_sync_mother_daughter_2025may5.csv", header=TRUE)
 
 cell_sync$ordered_timepoint=cell_sync$timepoint
 cell_sync$ordered_timepoint=ifelse(cell_sync$strain=='petite', 'petite',
@@ -50,7 +50,7 @@ ggplot(cell_sync, aes(x=mother_minutes, y=daughter_minutes, col=timepoint))+
 
 # Branch synchrony ####
 
-df_all=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/timelapse_doubling_time_inf_2025may5.csv", header = TRUE)
+df_all=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/timelapse_doubling_time_inf_2025may5.csv", header = TRUE)
 
 unique(df_all[df_all$strain=='grande',]$id_file)
 # "2024nov5_gob8_4"   "2022nov22_gob8_6"  "2024oct31_gob8_2"  "2024oct30_gob8_11" "2022nov22_gob8_7"  "2024nov5_gob8_12" "2022nov23_gob8_7"  "2024oct30_gob8_6"
@@ -355,12 +355,12 @@ ggplot(df_grid_analysis, aes(x = delay*100/60, y = std, z = combined_sd)) +
 # Figure 2 ####
 
 
-# img_petite_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_2hr_5f_scale_masks_v2.png")
-img_petite_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_45min-step_50-86f_modified.png")
+# img_petite_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/petite_2hr_5f_scale_masks_v2.png")
+img_petite_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/petite_45min-step_50-86f_modified.png")
 img_plot_petite_v2 <- rasterGrob(img_petite_v2, interpolate = TRUE)
 
-# img_grande_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_49f_1hr_scale_1x_masks_complete.png")
-img_grande_v2 <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_30min-step_start-2hr_24-48f_modified.png")
+# img_grande_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/grande_49f_1hr_scale_1x_masks_complete.png")
+img_grande_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/grande_30min-step_start-2hr_24-48f_modified.png")
 img_plot_grande_v2 <- rasterGrob(img_grande_v2, interpolate = TRUE)
 
 
@@ -606,9 +606,9 @@ p4_ancestors_dt[p4_ancestors_dt$name=='Petite',] %>%
             sd_min=sd(hours*60)/(mean_min/123))
 
 table(p4_ancestors_dt$strain, p4_ancestors_dt$division_number_12)
-  #          1  2+
-  # grande 147  56
-  # petite 135  56
+#          1  2+
+# grande 147  56
+# petite 135  56
 
 
 p4_ancestors_dt %>%
@@ -658,7 +658,7 @@ figure_1_paper_ancestors_dt_v2 <- plot_grid(column1, row_v2,
 figure_1_paper_ancestors_dt_v2
 
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_synchronization_ancestors_dt_26sep2025.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_26sep2025.png',
 #        plot=figure_1_paper_ancestors_dt_v2, dpi='retina', width=10, height=12, bg='white')
 
 
@@ -735,7 +735,7 @@ figure_2_paper_ancestors_dt_v3 <- plot_grid(column1, row1,
 figure_2_paper_ancestors_dt_v3
 
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_synchronization_ancestors_dt_23feb2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_23feb2026.png',
 #        plot=figure_2_paper_ancestors_dt_v3, dpi='retina', width=6, height=7.2, bg='white')
 
 
@@ -802,7 +802,7 @@ figure_2_paper_ancestors_dt_v4 <- plot_grid(column1, row1,
 figure_2_paper_ancestors_dt_v4
 
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_synchronization_ancestors_dt_1apr2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_1apr2026.png',
 #        plot=figure_2_paper_ancestors_dt_v4, dpi='retina', width=6, height=7.2, bg='white')
 
 
@@ -866,8 +866,8 @@ figure_2_paper_ancestors_dt_v5 <- plot_grid(column1, row_cde_fg,
 figure_2_paper_ancestors_dt_v5
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_2_synchronization_ancestors_dt_29apr2026.png',
-       plot=figure_2_paper_ancestors_dt_v5, dpi='retina', width=6, height=7.2, bg='white')
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_28ug2026.png',
+#        plot=figure_2_paper_ancestors_dt_v5, dpi='retina', width=6, height=7.2, bg='white')
 
 
 # Figure 7 ####
@@ -918,7 +918,7 @@ figure_evol_sync=plot_grid(p3_paper, p4_doubling_times_violin,
                            labels=c('A', 'B'), ncol=1, label_size=16)
 figure_evol_sync
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_evolution_synchrony_PA_line_5may2025.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_7_evolution_synchrony_PA_line_5may2025.png',
 #        plot=figure_evol_sync, dpi='retina', width=10, height=6, bg='white')
 
 
@@ -991,7 +991,7 @@ for (temp_timepoint in unique(doubled_no_pa4_t200_outlier$timepoint)){
 # [1] "grande_t0: median=0 p=0.796906120057638  FALSE"
 
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_evolution_synchrony_PA_line_all_23feb2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_7_evolution_synchrony_PA_line_all_23feb2026.png',
 #        plot=p_all_timepoints, dpi='retina', width=6.5, height=3.5, bg='white')
 
 # not using timelapse 2022nov23_gob385_2 as it has higher doubling times that differ from the 2 other time lapses
@@ -1069,14 +1069,14 @@ ggplot(cell_sync[cell_sync$timepoint!='t0',],
 
 
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_evolution_synchrony_PA_line_all_no_outliers_27apr2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_7_evolution_synchrony_PA_line_all_no_outliers_28aug2026.png',
 #        plot=p_all_timepoints_no_outliers, dpi='retina', width=6.5, height=3, bg='white')
 
 # View(doubled %>%
 #   group_by(strain_timepoint) %>%
 #   summarise(mean_doubling_time=mean(minutes)))
 
-# Supplementary Figure ####
+# Supplementary Figure 9 ####
 
 p_mother_daughter=ggplot(cell_sync[cell_sync$timepoint!='t0' & cell_sync$id_file!='2022nov23_gob385_2',], 
                             aes(x=mother_minutes, y=daughter_minutes, col=timepoint))+
@@ -1267,6 +1267,6 @@ ggplot(cell_sync[cell_sync$timepoint=='t200' & cell_sync$strain=='PA5',],
   )+
   NULL
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_mother_daughter_synchrony_PA_line_all_27apr2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_9_mother_daughter_synchrony_PA_line_all_28aug2026.png',
 #               plot=p_mother_daughter, dpi='retina', width=6.5, height=5.5, bg='white')
 

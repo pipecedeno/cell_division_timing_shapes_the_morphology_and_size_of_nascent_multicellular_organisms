@@ -38,7 +38,7 @@ library(cowplot)
 
 theme_set(theme_classic(base_size = 16))
 
-setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/settling_selection_simulations_30jan2026/')
+# setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/settling_selection_simulations_30jan2026/')
 
 
 get_confidence_interval <- function(data) {
@@ -67,7 +67,7 @@ get_confidence_interval <- function(data) {
 # }
 # write.csv(growth_prop, file="set_sim_growth_registry_12mar2026.csv", row.names=FALSE)
 
-growth_prop=read.csv("set_sim_growth_registry_12mar2026.csv", header = TRUE)
+growth_prop=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_6_settling_simulations/set_sim_growth_registry_12mar2026.csv", header = TRUE)
 growth_prop$carr_cap=factor(growth_prop$carr_cap, levels=c("10k", "100k", "1mill", "10mill"))
 summary(growth_prop)
 
@@ -99,7 +99,7 @@ ggplot(growth_prop,
 # }
 # write.csv(settling_prop, file="set_sim_settling_registry_12mar2026.csv", row.names = FALSE)
 
-settling_prop=read.csv("set_sim_settling_registry_12mar2026.csv", header=TRUE)
+settling_prop=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_6_settling_simulations/set_sim_settling_registry_12mar2026.csv", header=TRUE)
 settling_prop$carr_cap=factor(settling_prop$carr_cap, levels=c("10k", "100k", "1mill", "10mill"))
 summary(settling_prop)
 
@@ -434,7 +434,7 @@ ggplot(mean_sim_sel_r, aes(x=phase, y=mean_sel_r, col=phase))+
 
 # Clusters per time ####
 
-time_top=read.csv('petite_second_10mill_50sim/time_registry_all_sim.csv', header=TRUE)
+time_top=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_6_settling_simulations/petite_second_10mill_50sim_time_registry_all_sim.csv', header=TRUE)
 time_top$total_time=time_top$time+((time_top$transfer-1)*24*60)
 time_top$total_hours=time_top$total_time/60
 summary(time_top)
@@ -478,7 +478,7 @@ ggplot(time_top[time_top$sim_number<=1,],
 # }
 # write.csv(settling_prop_boot, file='set_sim_bootstrap_settling_registry_12mar2026.csv', row.names = FALSE)
 
-settling_prop_boot=read.csv('set_sim_bootstrap_settling_registry_12mar2026.csv', header=TRUE)
+settling_prop_boot=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_6_settling_simulations/set_sim_bootstrap_settling_registry_12mar2026.csv', header=TRUE)
 settling_prop_boot$carr_cap=factor(settling_prop_boot$carr_cap, levels=c("10mill-boot", "100mill-boot", "1bill-boot"))
 summary(settling_prop_boot)
 
@@ -650,7 +650,7 @@ summary(anova_growth_random)
 # }
 # write.csv(growth_prop_top, file='set_sim_top_growth_registry_12mar2026.csv', row.names = FALSE)
 
-growth_prop_top=read.csv('set_sim_top_growth_registry_12mar2026.csv', header=TRUE)
+growth_prop_top=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_6_settling_simulations/set_sim_top_growth_registry_12mar2026.csv', header=TRUE)
 growth_prop_top$carr_cap=factor(growth_prop_top$carr_cap, levels=c("100k", "1mill", "10mill"))
 summary(growth_prop_top)
 
@@ -681,7 +681,7 @@ ggplot(growth_prop_top,
 # }
 # write.csv(settling_prop_top, file='set_sim_top_settling_registry_12mar2026.csv', row.names = FALSE)
 
-settling_prop_top=read.csv("set_sim_top_settling_registry_12mar2026.csv", header=TRUE)
+settling_prop_top=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_6_settling_simulations/set_sim_top_settling_registry_12mar2026.csv", header=TRUE)
 settling_prop_top$carr_cap=factor(settling_prop_top$carr_cap, levels=c("100k", "1mill", "10mill"))
 summary(settling_prop_top)
 
@@ -901,7 +901,7 @@ mean_filt_sel_r_top[mean_filt_sel_r_top$phase=='Settling',] %>%
 # }
 # write.csv(settling_prop_boot_top,file="set_sim_bootstrap_top_settling_registry_12mar2026.csv", row.names = FALSE)
 
-settling_prop_boot_top=read.csv("set_sim_bootstrap_top_settling_registry_12mar2026.csv", header=TRUE)
+settling_prop_boot_top=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_6_settling_simulations/set_sim_bootstrap_top_settling_registry_12mar2026.csv", header=TRUE)
 settling_prop_boot_top$carr_cap=factor(settling_prop_boot_top$carr_cap, levels=c("10mill-boot", "100mill-boot", "1bill-boot"))
 summary(settling_prop_boot_top)
 
@@ -1061,7 +1061,7 @@ pairwise.t.test(mean_comp_sett_carr_cap_top$mean_sel_r, mean_comp_sett_carr_cap_
 
 
 
-# Supplementary Figure 8 ####
+# Supplementary Figure 7 ####
 
 
 supp_mean_growth=ggplot(mean_filt_sel_r[mean_filt_sel_r$phase=='Growth' & mean_filt_sel_r$carr_cap!='10k',], 
@@ -1185,20 +1185,20 @@ pairwise.wilcox.test(mean_comp_sett_carr_cap_top$mean_sel_r, mean_comp_sett_carr
 #                         labels=c('A', 'B', 'C', 'D'), ncol=2, align='hv')
 # supp_carr_cap
 # 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig8_carrying_capacity_test_23apr2025.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig8_carrying_capacity_test_23apr2025.png',
 #        plot=supp_carr_cap, dpi='retina', width=9, height=7)
 
 supp_carr_cap=plot_grid(supp_mean_settling, supp_mean_settling_top, 
                         labels=c('A', 'B'), ncol=2, align='hv', label_size = 11)
 supp_carr_cap
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig9_carrying_capacity_test_12mar2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_7_carrying_capacity_test_28aug2026.png',
 #        plot=supp_carr_cap, dpi='retina', width=6.5, height=2.5)
 
 
 
 
-# Supplementary Figure 6 ####
+# Supplementary Figure 8 ####
 
 growth_s_rate=ggplot(growth_prop[growth_prop$carr_cap=='10mill',],
                      aes(x=transfer, y=cell_sel_r, group=sim_number,))+
@@ -1252,7 +1252,7 @@ supp_s_rate=plot_grid(growth_s_rate,settling_s_rate, p_num_gen,
                       labels=c('A', 'B', 'C'), ncol=1, label_size = 11)
 supp_s_rate
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig7_selection_rate_per_transfer_12mar2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_8_selection_rate_per_transfer_28aug2026.png',
 #        plot=supp_s_rate, dpi='retina', width=5.5, height=7)
 
 

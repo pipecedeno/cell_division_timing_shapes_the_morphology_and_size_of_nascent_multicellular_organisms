@@ -9,7 +9,8 @@ library(effsize)
 
 # Cell properties over time ####
 
-ancestor_spots=read.csv("~/work_dir/timelapses/cell_growth_data_ancestors_9dec2025.csv", header=TRUE)
+ancestor_spots=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_1_cell_growth/cell_growth_data_ancestors_9dec2025.csv", 
+                        header=TRUE)
 
 
 summary(ancestor_spots)
@@ -107,17 +108,17 @@ p_cell_props=plot_grid(p_dt_diam, p_cell_cycle_diam, p_dt_asp_r, p_cell_cycle_as
                        ncol=2, labels=LETTERS[1:6], label_size=10)
 p_cell_props
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_cell_growth_properties_9dec2025.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_cell_growth_properties_9dec2025.png',
 #        plot=p_cell_props, dpi='retina', width=6, height=6, bg='white')
 
 
-#### version 2 paper figure ####
+#### Supplementary Figure 1 ####
 
 p_cell_props_v2=plot_grid(p_dt_asp_r, p_dt_diam,
                        ncol=2, labels=LETTERS[1:6], label_size=10)
 p_cell_props_v2
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_cell_growth_properties_24feb2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_1_cell_growth_properties_28aug2026.png',
 #        plot=p_cell_props_v2, dpi='retina', width=6.5, height=3, bg='white')
 
 ancestor_spots[ancestor_spots$division_number==2 &
@@ -201,7 +202,8 @@ cliff.delta(median_cell_properties$median_ar~median_cell_properties$strain)
 # Budding angle ####
 
 
-new_cell_position=read.csv("~/work_dir/timelapses/cell_budding_angles_all_divisions_30july2025.csv", header = TRUE)
+new_cell_position=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_1_cell_growth/cell_budding_angles_all_divisions_30july2025.csv", 
+                           header = TRUE)
 
 
 

@@ -18,7 +18,7 @@ mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
 #loading data set
-doubled=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/first_second_div_doubling_data_2024dec2.csv", header = TRUE)
+doubled=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/first_second_div_doubling_data_2024dec2.csv", header = TRUE)
 doubled$timepoint=factor(doubled$timepoint, levels=c('t0','t200','t400','t600','t800','t1000'))
 doubled$division_number=factor(doubled$division_number)
 
@@ -42,7 +42,7 @@ dt_by_div_num=doubled %>%
     names_prefix = "Division_"
   )
 
-# write.csv(dt_by_div_num, "~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/summary_doubling_time_per_division_number.csv")
+# write.csv(dt_by_div_num, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/summary_doubling_time_per_division_number.csv")
 
 
 
@@ -113,7 +113,7 @@ div_num_t600=ggplot(t600_doubled,
   NULL
 div_num_t600
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_3oct2025.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig1_similar_mean_several_div_3oct2025.png',
 #        plot=div_num_t600, dpi='retina', width=6, height=4, bg='white')
 
 
@@ -137,7 +137,7 @@ div_num_all=ggplot(doubled_filtered[doubled_filtered$timepoint!="t0",],
 div_num_all
 
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_24feb2026.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig1_similar_mean_several_div_24feb2026.png',
 #        plot=div_num_all, dpi='retina', width=6.5, height=5.5, bg='white')
 
 
@@ -186,6 +186,8 @@ division_numbers_all=plot_grid(row_1, div_num_all_v2,
                                labels=c('A', 'B'), ncol=1, label_size=11, rel_heights=c(1,4))
 
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig1_similar_mean_several_div_26mar2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_2_similar_mean_several_div_28aug2026.png',
        plot=division_numbers_all, dpi='retina', width=6.5, height=7, bg='white')
+
+
 

@@ -170,14 +170,14 @@ p3
 supp_fig_4=plot_grid(p1, p2, p3, labels=c('A', 'B', 'C'), ncol=3, align='hv')
 supp_fig_4
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_normalized_net_diam_method_29apr2025.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig4_normalized_net_diam_method_29apr2025.png',
 #        plot=supp_fig_4, dpi='retina', width=9, height=3)
 
 
 # Adding strains data ####
 
 
-strain_diam_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_4_network_growth_with_fragmentation/mean_diameter_values_3oct2025.csv", header=TRUE)
+strain_diam_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_4_network_growth_with_fragmentation/mean_diameter_values_3oct2025.csv", header=TRUE)
 colnames(strain_diam_df)
 
 exponential_df=data.frame(strain="Exponential",
@@ -253,6 +253,6 @@ plots_grid <- plot_grid(p1_strain, p2_strain, p3_strain, ncol = 3)
 final_plot <- plot_grid(plots_grid, shared_legend, ncol = 1, rel_heights = c(1, 0.1))
 final_plot
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig4_normalized_net_diam_method_2oct2025.png',
-#        plot=final_plot, dpi='retina', width=9, height=3)
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_5_normalized_net_diam_method_28aug2026.png',
+       plot=final_plot, dpi='retina', width=9, height=3)
 

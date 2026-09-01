@@ -28,7 +28,7 @@ syn_data_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli
 #                                            breaks = std_vector, limits = c(min(std_vector), max(std_vector))))
 
 
-setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig9_fast_first_div_7jul2025/")
+# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig9_fast_first_div_7jul2025/")
 
 
 # # Function for Direct Parameter Conversion
@@ -282,7 +282,7 @@ ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', '-25', '0', '
 # # write.csv(sim_df, file="growth_no_frag_inf_15_var_pencentages_7july2025.csv", row.names = FALSE)
 
 
-sim_df=read.csv("growth_no_frag_inf_15_var_pencentages_7july2025.csv", header = TRUE)
+sim_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/growth_no_frag_inf_15_var_pencentages_7july2025.csv", header = TRUE)
 
 summary(sim_df)
 
@@ -537,7 +537,7 @@ ggplot(summ_motif_diff,
 # 
 # # write.csv(frag_df, file="edge_degree_sim_frag_15_var_percentages_7july2025.csv", row.names=FALSE)
 
-frag_df=read.csv("edge_degree_sim_frag_15_var_percentages_7july2025.csv", header=TRUE)
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/edge_degree_sim_frag_15_var_percentages_7july2025.csv", header=TRUE)
 
 
 summary(frag_df)
@@ -601,10 +601,10 @@ ggplot(mean_mean_clust_size, aes(x = edge_degree, y = percentage_diff, z = mean)
 # Paper Figures ####
 
 
-img_sync <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/synchronous_div_combined_viz_delay_0min_9july2025.png")
+img_sync <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/synchronous_div_combined_viz_delay_0min_9july2025.png")
 img_plot_sync_net <- rasterGrob(img_sync, interpolate = TRUE)
 
-img_fast_first <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/fast_first_div_combined_viz_delay_-30min_9july2025.png")
+img_fast_first <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/fast_first_div_combined_viz_delay_-30min_9july2025.png")
 img_plot_fast_first_net <- rasterGrob(img_fast_first, interpolate = TRUE)
 
 # Create text annotations
@@ -731,5 +731,5 @@ figure_first_div_net=plot_grid(p_doub_times, p_diameter,
                                align='hv', label_size=12)
 figure_first_div_net
 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_9_first_div_1apr2026.png',
-#        plot=figure_first_div_net, dpi='retina', height=12, width=10, bg='white')
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_8_fast_first_div_28aug2026.png',
+       plot=figure_first_div_net, dpi='retina', height=12, width=10, bg='white')

@@ -23,7 +23,7 @@ mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
 
-setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/supp_fig5_frag_clusters_random/')
+# setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/supp_fig5_frag_clusters_random/')
 
 # Fragmentation summary ####
 
@@ -45,7 +45,8 @@ setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/resu
 # write.csv(frag_df, file="growth_frag_random_frag_df_25june2025.csv", row.names = FALSE)
 
 
-frag_df=read.csv("growth_frag_random_frag_df_25june2025.csv", header=TRUE)
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_6_random_fragmentation/growth_frag_random_frag_df_25june2025.csv", 
+                 header=TRUE)
 
 frag_df$strain=factor(frag_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
 summary(frag_df)
@@ -177,7 +178,7 @@ pairwise.t.test(frag_df$proportion_propagule, frag_df$strain)
 # write.csv(diameter_df, file='growth_frag_random_diameter_df_26june2025.csv', row.names = FALSE)
 
 
-diameter_df=read.csv("growth_frag_random_diameter_df_26june2025.csv", header=TRUE)
+diameter_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_6_random_fragmentation/growth_frag_random_diameter_df_26june2025.csv", header=TRUE)
 
 diameter_df$strain=factor(diameter_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
 summary(diameter_df)
@@ -338,7 +339,7 @@ figure_supp_v2
 figure_supp_v2_with_legend <- plot_grid(figure_supp_v2, common_legend, ncol = 1, rel_heights = c(1, 0.05), label_size=11)
 figure_supp_v2_with_legend
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig5_network_trajectories_random_23apr2025.png',
+ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_6_network_trajectories_random_28aug2026.png',
        plot=figure_supp_v2_with_legend, dpi='retina', width=10, height=11, bg = 'white')
 
 

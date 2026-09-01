@@ -58,19 +58,22 @@ load_one_csv_cluster_size <- function(file) {
 # Loading cluster size data ####
 #Directory where the images are located
 
-# in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cluster_measurements"
-
-in_dir="~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cluster_measurements"
-
-data_clust <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
-                    .fun = load_one_csv_cluster_size)
-data_clust$volume=(4/3)*pi*((data_clust$Major/2)^3)
-data_clust$strain=factor(data_clust$strain, levels=c('grande', 'petite'))
-summary(data_clust)
-
+# in_dir="~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cluster_measurements"
+# 
+# data_clust <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
+#                     .fun = load_one_csv_cluster_size)
+# data_clust$volume=(4/3)*pi*((data_clust$Major/2)^3)
+# data_clust$strain=factor(data_clust$strain, levels=c('grande', 'petite'))
+# summary(data_clust)
+# 
+# write.csv(data_clust, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/ancestor_cluster_measurements_23may2024.csv",
+#           row.names=FALSE)
 
 # Grande and petite volume measurements ####
 
+data_clust=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/ancestor_cluster_measurements_23may2024.csv",
+                    header=TRUE)
+data_clust$strain=factor(data_clust$strain, levels=c('grande', 'petite'))
 summary(data_clust)
 
 
@@ -171,13 +174,18 @@ load_one_csv_cell_measurements <- function(file) {
 }
 
 #Directory where the images are located
-# in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cell_properties"
-in_dir="~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cell_properties"
+# in_dir='~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cell_properties'
+# 
+# 
+# cell_data <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
+#                    .fun = load_one_csv_cell_measurements)
+# 
+# cell_data$strain=factor(cell_data$strain, levels=c('grande', 'petite'))
+# write.csv(cell_data, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/ancestor_cell_phenotype_measurements_23may2024.csv",
+#           row.names=FALSE)
 
-
-cell_data <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
-                   .fun = load_one_csv_cell_measurements)
-
+cell_data=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/ancestor_cell_phenotype_measurements_23may2024.csv",
+                   header=TRUE)
 cell_data$strain=factor(cell_data$strain, levels=c('grande', 'petite'))
 summary(cell_data)
 
@@ -332,11 +340,18 @@ load_one_csv_cell_distribution <- function(file) {
 
 
 #Directory where the images are located
-in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cell_distribution/cell_counts_results"
+# in_dir="~/work_dir/observed_synchrony/data/Microscopy/2025may19_ancestors_measurements/cell_distribution/cell_counts_results"
+# 
+# cell_dist <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
+#                    .fun = load_one_csv_cell_distribution)
+# 
+# cell_dist$strain=factor(cell_dist$strain, levels=c('grande', 'petite'))
+# 
+# write.csv(cell_dist, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/ancestor_cluster_cell_counts_23may2024.csv",
+#           row.names=FALSE)
 
-cell_dist <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
-                   .fun = load_one_csv_cell_distribution)
-
+cell_dist=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/ancestor_cluster_cell_counts_23may2024.csv",
+                   header=TRUE)
 cell_dist$strain=factor(cell_dist$strain, levels=c('grande', 'petite'))
 summary(cell_dist)
 
@@ -466,7 +481,7 @@ quantile(cell_dist$num_cells, c(0.75, 0.90, 0.95, 0.97))
 quantile(sqrt(data_clust$Area/pi), c(0.75, 0.9, 0.95, 0.97))
 
 
-# Paper Figure ####
+# Paper Figure 1 ####
 
 
 #### version 2 ####
@@ -578,17 +593,17 @@ cliff.delta(cell_data$Major~cell_data$strain)
 # delta estimate: 0.3329875 (medium)
 
 
-img_petite_clust <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/gob21-2_day2_001_620x620_100um-scale.png")
+img_petite_clust <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob21-2_day2_001_620x620_100um-scale.png")
 img_plot_petite_clust <- rasterGrob(img_petite_clust, interpolate = TRUE)
 
-img_grande_clust <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/gob8-1_day2_001_620x620_100um-scale.png")
+img_grande_clust <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob8-1_day2_001_620x620_100um-scale.png")
 img_plot_grande_clust <- rasterGrob(img_grande_clust, interpolate = TRUE)
 
 
-img_petite_ar <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/gob21-1_day2_003_no_masks_10um-scale.png")
+img_petite_ar <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob21-1_day2_003_no_masks_10um-scale.png")
 img_plot_petite_ar <- rasterGrob(img_petite_ar, interpolate = TRUE)
 
-img_grande_ar <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/gob8-1_day2_006_no_masks_10um-scale.png")
+img_grande_ar <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob8-1_day2_006_no_masks_10um-scale.png")
 img_plot_grande_ar <- rasterGrob(img_grande_ar, interpolate = TRUE)
 
 
@@ -608,6 +623,6 @@ fig_1_v2=plot_grid(col_clust_vol, p_cluster_vol, col_ar, plot_c_ar_diam,
                    labels=c('A', 'B','C',''), nrow=2, label_size=16, rel_widths=c(0.35, 1), rel_heights=c(1,1))
 fig_1_v2
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_1_clust_size_ancestors_27may2025_v3.svg',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_1_clust_size_ancestors_28aug2026.svg',
        plot=fig_1_v2, dpi='retina', width=8, height=6, bg='white')
 # note: image is saved as an svg to later add the strain labels for the images

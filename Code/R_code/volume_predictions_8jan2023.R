@@ -13,7 +13,7 @@ library(ggpubr)
 library(tidyverse)
 library(igraph)
 
-setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/')
+# setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/')
 
 
 # PA ancestors measurements ####
@@ -54,11 +54,14 @@ load_one_csv_cluster_size <- function(file) {
 # Loading cluster size data ####
 #Directory where the images are located
 
-in_dir="~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cluster_measurements"
+# in_dir="~/work_dir/observed_synchrony/data/Microscopy/all_ancestor_measurements/cluster_measurements"
+# 
+# data_clust <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
+#                     .fun = load_one_csv_cluster_size)
+# data_clust$volume=(4/3)*pi*((data_clust$Major/2)^3)
 
-data_clust <- ldply(.data = list.files(path = in_dir, pattern = "*.csv", full.names = TRUE),
-                    .fun = load_one_csv_cluster_size)
-data_clust$volume=(4/3)*pi*((data_clust$Major/2)^3)
+data_clust=read.csv("/Users/pipe/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/ancestor_cluster_measurements_23may2024.csv",
+                    header=TRUE)
 data_clust$strain=factor(data_clust$strain, levels=c('grande', 'petite'))
 summary(data_clust)
 
@@ -108,7 +111,7 @@ grande_mean_volume-petite_mean_volume
 # Aspect ratio ####
 #### Threshold prediction ####
 
-aspr_volume_df=read.csv("exponential_clust_volume_1.197aspr.csv", header=TRUE)
+aspr_volume_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/exponential_clust_volume_1.197aspr.csv", header=TRUE)
 
 summary(aspr_volume_df)
 
@@ -165,7 +168,7 @@ b1 <- fit_volume$coefficients[2]
 
 #### Size difference AR ####
 
-aspr_df=read.csv("constant_threshold_changing_aspr_2025june12.csv", header=TRUE)
+aspr_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/constant_threshold_changing_aspr_2025june12.csv", header=TRUE)
 
 summary(aspr_df)
 
@@ -233,7 +236,7 @@ cell_coeffs[1]+(cell_coeffs[2]*grande_asp_r)+(cell_coeffs[3]*(grande_asp_r^2))
 # Cell Diameter ####
 #### Threshold prediction ####
 
-diam_volume_df=read.csv("exponential_clust_volume_5.085cell_diam.csv", header=TRUE)
+diam_volume_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/exponential_clust_volume_5.085cell_diam.csv", header=TRUE)
 
 summary(diam_volume_df)
 
@@ -288,7 +291,7 @@ b1_diam <- fit_volume_diam$coefficients[2]
 
 #### Size Difference DIAM ####
 
-diam_df=read.csv("constant_threshold_changing_cell_diam_2025june12.csv", header=TRUE)
+diam_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/constant_threshold_changing_cell_diam_2025june12.csv", header=TRUE)
 
 summary(diam_df)
 
@@ -366,7 +369,7 @@ grande_diam_cell_pred
 # Cell synchrony ####
 
 
-sync_volume_df=read.csv('grande_clust_volume_sync_aprox_2025june12.csv', header=TRUE)
+sync_volume_df=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/grande_clust_volume_sync_aprox_2025june12.csv', header=TRUE)
 
 summary(sync_volume_df)
 
@@ -415,7 +418,7 @@ b1_sync <- fit_synchrony$coefficients[2]
 # 
 # write.csv(sync_df, file='synchrony_volume_pred_2025june12.csv', row.names=FALSE)
 
-sync_df=read.csv('synchrony_volume_pred_2025june12.csv', header=TRUE)
+sync_df=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/synchrony_volume_pred_2025june12.csv', header=TRUE)
 summary(sync_df)
 
 ggplot(sync_df, aes(x=strain, y=volume_clust, fill=strain))+
@@ -445,8 +448,8 @@ aggregate(num_cells ~ strain, data = sync_df, FUN = mean)
 # Combined size difference prediction ####
 
 
-sync_grande_diff=read.csv('grande_volume_pred_synchrony_2025june12.csv', header=TRUE)
-sync_petite_diff=read.csv('petite_combined_effect_volume_pred_synchrony_2025june12.csv', header=TRUE)
+sync_grande_diff=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/grande_volume_pred_synchrony_2025june12.csv', header=TRUE)
+sync_petite_diff=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_table_3_volume_predictions/petite_combined_effect_volume_pred_synchrony_2025june12.csv', header=TRUE)
 combined_effect_df=rbind(sync_grande_diff, sync_petite_diff)
 
 

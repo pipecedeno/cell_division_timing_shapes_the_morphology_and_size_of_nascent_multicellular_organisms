@@ -32,7 +32,7 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
-setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig4_growth_no_frag_18june2025/")
+# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig4_growth_no_frag_18june2025/")
 
 # Loading the data ####
 
@@ -51,7 +51,7 @@ setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/resu
 # 
 # write.csv(sim_df, file="growth_no_frag_diameter_27may2025.csv", row.names = FALSE)
 
-sim_df=read.csv("growth_no_frag_diameter_27may2025.csv", header = TRUE)
+sim_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_3_network_growth_no_fragmentation/growth_no_frag_diameter_27may2025.csv", header = TRUE)
 sim_df$strain=factor(sim_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
 summary(sim_df)
 
@@ -87,7 +87,7 @@ ggplot(summ_diameter, aes(x=num_nodes, y=mean_diameter, col=strain, fill=strain)
   NULL
 
 # Saving data for supplementary figure 5 of network normalization
-# write.csv(summ_diameter, "~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_4_network_growth_with_fragmentation/mean_diameter_values_3oct2025.csv", row.names = FALSE)
+# write.csv(summ_diameter, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_4_network_growth_with_fragmentation/mean_diameter_values_3oct2025.csv", row.names = FALSE)
 
 
 # Undivided Daughters ####
@@ -154,17 +154,13 @@ ggplot(summ_max_edge, aes(x=num_nodes, y=mean_max_edge, col=strain, fill=strain)
 
 
 
-
-### Functional ANOVA
-
-
 # Paper Figure ####
 
 
-# img_petite <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/petite_diameter_undivided_23apr2025.png")
+# img_petite <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/petite_diameter_undivided_23apr2025.png")
 # img_plot_petite_net <- rasterGrob(img_petite, interpolate = TRUE)
 # 
-# img_grande <- readPNG("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/Images/grande_diameter_undivided_23apr2025.png")
+# img_grande <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/grande_diameter_undivided_23apr2025.png")
 # img_plot_grande_net <- rasterGrob(img_grande, interpolate = TRUE)
 # 
 # # Create text annotations
@@ -188,7 +184,7 @@ ggplot(summ_max_edge, aes(x=num_nodes, y=mean_max_edge, col=strain, fill=strain)
 
 
 
-doubled=read.csv('~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/first_second_div_doubling_data_2024dec2.csv', header=TRUE)
+doubled=read.csv('~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/first_second_div_doubling_data_2024dec2.csv', header=TRUE)
 doubled$division_number=factor(doubled$division_number)
 doubled$timepoint=factor(doubled$timepoint, levels=c('t0','t200','t400','t600','t800','t1000'))
 
@@ -399,7 +395,7 @@ fig=plot_grid(dt_distributions_v2, p_undivided, p_diam, p_edge_degree,
               labels=c('A', 'B', 'C', 'D'), ncol=2, label_size=12)
 fig
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_3_growth_no_frag_1apr2025_every5cells_jitter.svg',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_3_growth_no_frag_28aug2026.svg',
        plot=fig, dpi='retina', width=6.5, height=4.5, bg='white')
 
 

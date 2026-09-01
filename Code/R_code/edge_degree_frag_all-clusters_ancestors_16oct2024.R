@@ -27,7 +27,7 @@ mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
 
-setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig5_frag_all-clusters_edge_degree")
+# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig5_frag_all-clusters_edge_degree")
 
 
 # Fragmentation summary ####
@@ -49,8 +49,8 @@ setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/resu
 # 
 # write.csv(frag_df, "growth_frag_all_frag_df_29may2025.csv", row.names=FALSE)
 
-# frag_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_4_network_growth_with_fragmentation/growth_frag_all_frag_df_3de2024.csv", header = TRUE)
-frag_df=read.csv("growth_frag_all_frag_df_29may2025.csv", header = TRUE)
+
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_4_network_growth_with_fragmentation/growth_frag_all_frag_df_29may2025.csv", header = TRUE)
 frag_df$strain=factor(frag_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
 summary(frag_df)
 
@@ -244,8 +244,7 @@ frag_df %>%
 # 
 # write.csv(diameter_df, "growth_frag_all_diameter_df_29may2025.csv", row.names=FALSE)
 
-# diameter_df=read.csv("~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/fig_4_network_growth_with_fragmentation/growth_frag_all_diameter_df_3de2024.csv", header = TRUE)
-diameter_df=read.csv("growth_frag_all_diameter_df_29may2025.csv", header = TRUE)
+diameter_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_4_network_growth_with_fragmentation/growth_frag_all_diameter_df_29may2025.csv", header = TRUE)
 
 diameter_df$strain=factor(diameter_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
 summary(diameter_df)
@@ -316,7 +315,7 @@ ggplot(summ_diam)+
 
 
 
-# Paper Figures ####
+# Paper Figure 4 ####
 
 
 # Mean of means
@@ -509,5 +508,5 @@ fig_restructured_updated=plot_grid(p1_temp, p3_temp, p2_temp,
                                labels=c('A', 'B', 'C'), ncol=1, label_size=11)
 fig_restructured_updated
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_5_network_properties_all-clusters_3apr2026_ancestors.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_4_network_properties_all-clusters_28aug2026.png',
        plot=fig_restructured_updated, dpi='retina', width=3.5, height=6.3, bg='white')

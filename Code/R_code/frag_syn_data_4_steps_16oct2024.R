@@ -35,8 +35,7 @@ color_diff_mean_perc=list(scale_color_gradient(name = "Delay", low = "lightblue"
 color_variation=list(scale_color_gradient( name = "Variation", low = "pink", high = "darkred", 
                                            breaks = std_vector, limits = c(min(std_vector), max(std_vector))))
 
-# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig6_effects_delay_and_variation")
-setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig6_effects_delay_and_variation_more_variation")
+# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig6_effects_delay_and_variation_more_variation")
 
 
 # Fragmentation summary ####
@@ -56,8 +55,8 @@ setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/resu
 # 
 # write.csv(frag_df, "frag_syn_frag_df_24sep2025.csv", row.names = FALSE)
 
-# frag_df=read.csv("frag_syn_frag_df_2june2025.csv", header=TRUE)
-frag_df=read.csv("frag_syn_frag_df_24sep2025.csv", header=TRUE)
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_5_delay_variation_in_cluster_properties/frag_syn_frag_df_24sep2025.csv", 
+                 header=TRUE)
 
 summary(frag_df)
 
@@ -193,8 +192,7 @@ ggplot(mean_mean_frag_prop, aes(x=variation, y=mean_prop, col=diff_mean, group=d
 # write.csv(diameter_df, "frag_syn_diameter_df_24sep2025.csv", row.names = FALSE)
 
 
-# diameter_df=read.csv("frag_syn_diameter_df_2june2025.csv", header=TRUE)
-diameter_df=read.csv("frag_syn_diameter_df_24sep2025.csv", header=TRUE)
+diameter_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_5_delay_variation_in_cluster_properties/frag_syn_diameter_df_24sep2025.csv", header=TRUE)
 
 summary(diameter_df)
 
@@ -354,7 +352,7 @@ diam_var
 #                            align='hv', label_size=12)
 # supp_net_prop_v3
 # 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_effects_delay_variation_25sep2025.png',
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_6_effects_delay_variation_25sep2025.png',
 #        plot=supp_net_prop_v3, dpi='retina', width=7, height=6, bg='white')
 
 
@@ -363,170 +361,7 @@ supp_net_prop_v4=plot_grid(clust_delay,clust_var, diam_delay,diam_var, prop_dela
                            align='hv', label_size=11)
 supp_net_prop_v4
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_effects_delay_variation_29mar2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_5_effects_delay_variation_28aug2026.png',
        plot=supp_net_prop_v4, dpi='retina', width=6.5, height=5.6, bg='white')
-
-
-# OLD Figure 5 ####
-
-mean_mean_clust_size$var_cat=NA
-mean_mean_clust_size$var_cat=ifelse(mean_mean_clust_size$variation==0, '0',
-                                    ifelse(mean_mean_clust_size$variation==5, 'l',
-                                           ifelse(mean_mean_clust_size$variation==10, 'm', 'h')))
-mean_mean_clust_size$var_cat=factor(mean_mean_clust_size$var_cat, levels=c('0', 'l', 'm', 'h'))
-
-mean_mean_clust_size$diff_cat=NA
-mean_mean_clust_size$diff_cat=ifelse(mean_mean_clust_size$diff_mean==0, '0',
-                                     ifelse(mean_mean_clust_size$diff_mean==20, 'l',
-                                            ifelse(mean_mean_clust_size$diff_mean==40, 'm', 'h')))
-mean_mean_clust_size$diff_cat=factor(mean_mean_clust_size$diff_cat, levels=c('0', 'l', 'm', 'h'))
-
-
-clust_size_diff=mean_mean_clust_size[mean_mean_clust_size$var_cat=='l',]
-clust_size_diff$category=clust_size_diff$diff_cat
-clust_size_diff$Variable='Delay'
-
-clust_size_var=mean_mean_clust_size[mean_mean_clust_size$diff_cat=='l',]
-clust_size_var$category=clust_size_var$var_cat
-clust_size_var$Variable='Variation'
-
-clust_size_min=min(c(clust_size_var$mean, clust_size_diff$mean))-10
-clust_size_max=max(c(clust_size_var$mean, clust_size_diff$mean))+10
-
-clust_p2=ggplot(clust_size_var, aes(x=variation, y=mean))+
-  geom_line(col='#DCCA2CFF')+
-  # geom_point(col='#DCCA2CFF')+
-  geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
-  ylim(c(clust_size_min, clust_size_max))+
-  theme_classic(base_size = 10)+
-  labs(y='Mean Fracture\nSize', x='Variation')+
-  NULL
-clust_p2
-
-clust_p1=ggplot(clust_size_diff, aes(x=diff_mean/60*100, y=mean))+
-  geom_line(col='#92BBD9FF')+
-  # geom_point(col='#92BBD9FF')+
-  geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
-  ylim(c(clust_size_min, clust_size_max))+
-  theme_classic(base_size = 10)+
-  labs(y='Mean Fracture\nSize', x='Delay (% Second Division)')+
-  NULL
-clust_p1
-
-
-mean_mean_frag_prop$var_cat=NA
-mean_mean_frag_prop$var_cat=ifelse(mean_mean_frag_prop$variation==0, '0',
-                                   ifelse(mean_mean_frag_prop$variation==5, 'l',
-                                          ifelse(mean_mean_frag_prop$variation==10, 'm', 'h')))
-mean_mean_frag_prop$var_cat=factor(mean_mean_frag_prop$var_cat, levels=c('0', 'l', 'm', 'h'))
-
-mean_mean_frag_prop$diff_cat=NA
-mean_mean_frag_prop$diff_cat=ifelse(mean_mean_frag_prop$diff_mean==0, '0',
-                                    ifelse(mean_mean_frag_prop$diff_mean==20, 'l',
-                                           ifelse(mean_mean_frag_prop$diff_mean==40, 'm', 'h')))
-mean_mean_frag_prop$diff_cat=factor(mean_mean_frag_prop$diff_cat, levels=c('0', 'l', 'm', 'h'))
-
-
-propag_prop_diff=mean_mean_frag_prop[mean_mean_frag_prop$var_cat=='l',]
-propag_prop_diff$category=propag_prop_diff$diff_cat
-propag_prop_diff$Variable='Delay'
-
-propag_prop_var=mean_mean_frag_prop[mean_mean_frag_prop$diff_cat=='l',]
-propag_prop_var$category=propag_prop_var$var_cat
-propag_prop_var$Variable='Variation'
-
-prop_propag_min=min(c(propag_prop_var$mean_prop, propag_prop_diff$mean_prop))-0.005
-prop_propag_max=max(c(propag_prop_var$mean_prop, propag_prop_diff$mean_prop))+0.005
-
-propagule_p2=ggplot(propag_prop_var, aes(x=variation, y=mean_prop))+
-  geom_line(col='#DCCA2CFF')+
-  # geom_point(col='#DCCA2CFF')+
-  geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
-  ylim(c(prop_propag_min, prop_propag_max))+
-  theme_classic(base_size = 10)+
-  labs(y='Mean Propagule\nProportion', x='Variation')+
-  NULL
-propagule_p2
-
-propagule_p1=ggplot(propag_prop_diff, aes(x=diff_mean/60*100, y=mean_prop))+
-  geom_line(col='#92BBD9FF')+
-  # geom_point(col='#92BBD9FF')+
-  geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
-  ylim(c(prop_propag_min, prop_propag_max))+
-  theme_classic(base_size = 10)+
-  labs(y='Mean Propagule\nProportion', x='Delay (% Second Division)')+
-  NULL
-propagule_p1
-
-
-mean_summ_diam$var_cat=NA
-mean_summ_diam$var_cat=ifelse(mean_summ_diam$variation==0, '0', 
-                              ifelse(mean_summ_diam$variation==5, 'l',
-                                     ifelse(mean_summ_diam$variation==10, 'm', 'h')))
-mean_summ_diam$var_cat=factor(mean_summ_diam$var_cat, levels=c('0', 'l', 'm', 'h'))
-
-mean_summ_diam$diff_cat=NA
-mean_summ_diam$diff_cat=ifelse(mean_summ_diam$diff_mean==0, '0', 
-                               ifelse(mean_summ_diam$diff_mean==20, 'l',
-                                      ifelse(mean_summ_diam$diff_mean==40, 'm', 'h')))
-mean_summ_diam$diff_cat=factor(mean_summ_diam$diff_cat, levels=c('0', 'l', 'm', 'h'))
-
-
-net_diam_diff=mean_summ_diam[mean_summ_diam$var_cat=='l',]
-net_diam_diff$category=net_diam_diff$diff_cat
-net_diam_diff$Variable='Delay'
-
-net_diam_var=mean_summ_diam[mean_summ_diam$diff_cat=='l',]
-net_diam_var$category=net_diam_var$var_cat
-net_diam_var$Variable='Variation'
-
-net_diam_min=min(c(net_diam_var$mean_d, net_diam_diff$mean_d))-0.02
-net_diam_max=max(c(net_diam_var$mean_d, net_diam_diff$mean_d))+0.02
-
-diameter_p2=ggplot(net_diam_var, aes(x=variation, y=mean_d))+
-  geom_line(col='#DCCA2CFF')+
-  # geom_point(col='#DCCA2CFF')+
-  geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
-  ylim(c(net_diam_min, net_diam_max))+
-  theme_classic(base_size = 10)+
-  labs(y='Mean Diameter', x='Variation')+
-  NULL
-diameter_p2
-
-diameter_p1=ggplot(net_diam_diff, aes(x=diff_mean/60*100, y=mean_d))+
-  geom_line(col='#92BBD9FF')+
-  # geom_point(col='#92BBD9FF')+
-  geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1, col='black')+
-  ylim(c(net_diam_min, net_diam_max))+
-  theme_classic(base_size = 10)+
-  labs(y='Mean Diameter', x='Delay (% Second Division)')+
-  NULL
-diameter_p1
-
-
-legend <- get_legend(
-  ggplot() + 
-    geom_line(data = data.frame(x = 1, y = 1, group = factor(c("Delay", "Variation"))),
-              aes(x = x, y = y, color = group)) +
-    guides(color = guide_legend(title = "")) +
-    scale_color_manual(values = c('#92BBD9FF', '#DCCA2CFF'), labels = c("Delay", "Variation")) +
-    theme(legend.position = "bottom",
-          legend.box.just = "center",
-          legend.justification = "center",
-          legend.text = element_text(size = 8))
-)
-
-plot_summary_effects_temp <- plot_grid(clust_p1, clust_p2, diameter_p1, diameter_p2,
-                                       propagule_p1, propagule_p2,
-                                  labels = c("A", "B", "C", "D", "E", "F"), 
-                                  ncol = 2, align = 'v', axis = 'l',
-                                  rel_heights = c(1, 1, 1),
-                                  rel_widths = c(1, 1),label_size=12)
-plot_summary_effects_temp
-
-
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_6_syn_summ_doub_t_effects_30july2025.png',
-#        plot=plot_summary_effects_temp, dpi='retina', width=6, height=6, bg='white')
-
 
 
