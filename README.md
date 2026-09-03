@@ -58,28 +58,38 @@ Now the bash scripts should be capable of executing the matlab commands.
 The github has the following structure:
 
 ```
-emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/
+cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/
 ├── Code
 │   ├── R_code
-│   ├── timelapse_analysis
-│   └── simulation_code
-│       ├── table_1
-│       └── visualization_codes
+│   ├── simulation_code
+│   │   ├── table_1
+│   │   └── visualization_codes
+│   └── timelapse_analysis
 ├── Data
 │   ├── fig_3_network_growth_no_fragmentation
 │   ├── fig_4_network_growth_with_fragmentation
 │   ├── fig_5_delay_variation_in_cluster_properties
+│   ├── fig_6_settling_simulations
 │   ├── fig_8_fast_first_division
 │   ├── Images
+│   │   └── old_images
+│   ├── matlab_plots
 │   ├── network_files
+│   │   └── old_files
 │   ├── settling_simulation_data
-│   ├── supp_fig_3_size_difference_physics_sim
-│   └── supp_fig_4_growth_with_fragmentation_all
+│   ├── supp_fig_1_cell_growth
+│   ├── supp_fig_10-11_cell_death_simulations
+│   ├── supp_fig_3_edge_degree_selection
+│   ├── supp_fig_4_growth_with_fragmentation_all
+│   ├── supp_fig_5_size_difference_physics_sim
+│   ├── supp_fig_6_random_fragmentation
+│   └── supp_table_3_volume_predictions
 ├── Paper_figures
+│   └── old_figures
 └── Supplementary_videos
 ```
 
-In the Code folder the simulation_code includes all the python, bash, and matlab scripts required to generate all the data of the results. The folder R_code includes all the R scripts that were used to analyze the data from the simulations and generate all the plots of the article. And the timelapse_analysis folder contain the python scripts needed to generate the dataset of doubling time distribution and cell synchrony. Each of these folders has their own README.md file with instructions of which codes were used for each figure and the commands used in the simulations.  
+In the ```Code``` folder the ```simulation_code``` includes all the python, bash, and matlab scripts required to generate all the data of the results. The folder ```R_code``` includes all the R scripts that were used to analyze the data from the simulations and generate all the plots of the article. And the ```timelapse_analysis``` folder contain the python scripts needed to generate the dataset of doubling time distribution and cell synchrony. Each of these folders has their own README.md file with instructions of which codes were used for each figure and the commands used in the simulations.  
 
 
 
