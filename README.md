@@ -1,16 +1,18 @@
 # Cell division timing shapes the morphology and size of nascent multicellular organisms
 
+Data and code used in the manuscript: [Cell division timing shapes the morphology and size of nascent multicellular organisms](https://doi.org/10.1101/2025.04.23.650085)  
+DOI: https://doi.org/10.1101/2025.04.23.650085
 
 ## Conda environment creation:
 
--Environment:
-    -Python 3.10.12
-    -matplotlib=3.8.2
-    -Networkx=3.2.1
-    -pyvis=0.3.2
-    -pandas=2.2.0
-    -numpy=1.26.4
-    -parallel=20240122
+- Environment:  
+    - Python 3.10.12  
+    - matplotlib=3.8.2  
+    - Networkx=3.2.1  
+    - pyvis=0.3.2  
+    - pandas=2.2.0  
+    - numpy=1.26.4  
+    - parallel=20240122  
 
 Commands to create the conda environment: 
 ```
