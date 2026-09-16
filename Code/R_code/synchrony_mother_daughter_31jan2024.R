@@ -134,9 +134,9 @@ normal_to_lognormal_direct <- function(mean, sd) {
 
 
 # Parameters
-default_mean <- 60
-delays <- seq(default_mean, default_mean + 60, 3)
-std_devs <- seq(0, 30, length.out = 21)
+default_mean <- 105
+delays <- seq(default_mean, default_mean + 105, 5)
+std_devs <- seq(0, 52, 1)
 n_samples <- 10000
 
 # DATASET 1: Fixed variation at 0, iterate through delays
@@ -170,12 +170,14 @@ for (delay_j in delays) {
   
   # Calculate standard deviation of combined distribution
   combined_sd <- sd(combined_times)
+  combined_cv=sd(combined_times)/mean(combined_times)
   
   # Store results
   df_temp <- data.frame(
     delay = delay_j - default_mean,
     variation = fixed_variation,
     combined_sd = combined_sd,
+    combined_cv = combined_cv,
     first_div_mean = mean(first_div_times),
     second_div_mean = mean(second_div_times),
     dataset = "delay_effect"
@@ -208,12 +210,14 @@ for (std_i in std_devs) {
   
   # Calculate standard deviation of combined distribution
   combined_sd <- sd(combined_times)
+  combined_cv = sd(combined_times)/mean(combined_times)
   
   # Store results
   df_temp <- data.frame(
     delay = fixed_delay - default_mean,
     variation = std_i,
     combined_sd = combined_sd,
+    combined_cv = combined_cv,
     first_div_mean = mean(first_div_times),
     second_div_mean = mean(second_div_times),
     dataset = "variation_effect"
@@ -229,7 +233,7 @@ df_combined_analysis <- rbind(df_delay_effect, df_variation_effect)
 
 
 # Combined plot for comparison
-ggplot(df_combined_analysis, aes(x = ifelse(dataset == "delay_effect", delay*100/60, variation), 
+ggplot(df_combined_analysis, aes(x = ifelse(dataset == "delay_effect", delay*100/default_mean, variation), 
                                  y = combined_sd, 
                                  color = dataset)) +
   geom_line() +
@@ -242,7 +246,7 @@ ggplot(df_combined_analysis, aes(x = ifelse(dataset == "delay_effect", delay*100
   NULL
 
 
-ggplot(df_combined_analysis, aes(x = ifelse(dataset == "delay_effect", delay*100/60, variation*(10/3)), 
+ggplot(df_combined_analysis, aes(x = ifelse(dataset == "delay_effect", delay*100/default_mean, variation*2.02), # *(10/3) 
                                  y = combined_sd, 
                                  color = dataset)) +
   geom_line() +
@@ -255,16 +259,16 @@ ggplot(df_combined_analysis, aes(x = ifelse(dataset == "delay_effect", delay*100
   NULL
 
 
-relationship_df=data.frame(sd_variation=df_combined_analysis[df_combined_analysis$dataset=='variation_effect',]$variation,
-                           sd_delay=df_combined_analysis[df_combined_analysis$dataset=='delay_effect',]$combined_sd)
-
-ggplot(relationship_df, aes(x=sd_delay, y=sd_variation))+
-  geom_line(color='lightblue')+
-  geom_point(color='blue')+
-  theme_classic()+
-  labs(x='Combined Standard Deviation Effect by Delay',
-       y='Doubling Time Distribution Standard Deviation')+
-  NULL
+# relationship_df=data.frame(sd_variation=df_combined_analysis[df_combined_analysis$dataset=='variation_effect',]$variation,
+#                            sd_delay=df_combined_analysis[df_combined_analysis$dataset=='delay_effect',]$combined_sd)
+# 
+# ggplot(relationship_df, aes(x=sd_delay, y=sd_variation))+
+#   geom_line(color='lightblue')+
+#   geom_point(color='blue')+
+#   theme_classic()+
+#   labs(x='Combined Standard Deviation Effect by Delay',
+#        y='Doubling Time Distribution Standard Deviation')+
+#   NULL
 
 
 
@@ -273,8 +277,8 @@ ggplot(relationship_df, aes(x=sd_delay, y=sd_variation))+
 
 df_grid_analysis <- data.frame()
 
-delays_grid <- seq(0, 60, 3)  # 0 to 60 minutes delay
-std_devs_grid <- seq(0, 30, length.out = 31)  # 0 to 30 SD units
+delays_grid <- seq(0, 105, 5)  # 0 to 60 minutes delay
+std_devs_grid <- seq(0, 52, length.out = 53)  # 0 to 30 SD units
 
 # Create grid of all combinations
 for (delay_i in delays_grid) {
@@ -306,6 +310,7 @@ for (delay_i in delays_grid) {
     
     # Calculate standard deviation of combined distribution
     combined_sd <- sd(combined_times)
+    combined_coefficient_of_variation = (sd(combined_times) / mean(combined_times))
     
     # Difference in doubling times
     # Resampling division times to avoid an issue of different sample sizes
@@ -323,6 +328,7 @@ for (delay_i in delays_grid) {
       delay = delay_i,
       std = std_j,
       combined_sd = combined_sd,
+      combined_cv=combined_coefficient_of_variation,
       first_div_mean = mean(first_div_times),
       second_div_mean = mean(second_div_times),
       median_diff=median_difference,
@@ -339,9 +345,8 @@ for (delay_i in delays_grid) {
 }
 
 # Create the contour plot
-ggplot(df_grid_analysis, aes(x = delay*100/60, y = std, z = combined_sd)) +
-  geom_contour_filled(breaks=seq(0, 45, 5)) +  # You can adjust bins or use breaks = seq(min, max, by = step)
-  # scale_fill_viridis_d(name = "Combined\nStandard\nDeviation") +  # Using viridis, but you can change to scale_fill_brewer()
+ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z = combined_sd)) +
+  geom_contour_filled(binwidth=10) + # breaks=seq(0, 45, 5)
   scale_fill_brewer(palette = "Purples", name = "Combined\nStandard\nDeviation")+
   labs(x = "Delay (% Second Division)", 
        y = "Doubling Time Standard Deviation") +
@@ -351,6 +356,18 @@ ggplot(df_grid_analysis, aes(x = delay*100/60, y = std, z = combined_sd)) +
   NULL
 
 
+
+
+ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z = combined_cv)) +
+  geom_contour_filled() +  
+  # scale_fill_viridis_d(name = "Combined\nStandard\nDeviation") +  # Using viridis, but you can change to scale_fill_brewer()
+  scale_fill_brewer(palette = "Purples", name = "Combined\nStandard\nDeviation")+
+  labs(x = "Delay (% Second Division)", 
+       y = "Doubling Time Standard Deviation") +
+  theme_classic() +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  NULL
 
 # Figure 2 ####
 
@@ -658,10 +675,6 @@ figure_1_paper_ancestors_dt_v2 <- plot_grid(column1, row_v2,
 figure_1_paper_ancestors_dt_v2
 
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_26sep2025.png',
-#        plot=figure_1_paper_ancestors_dt_v2, dpi='retina', width=10, height=12, bg='white')
-
-
 
 #### version 2 - 9dec2025
 
@@ -675,14 +688,14 @@ figure_1_paper_ancestors_dt_v2
 # Petite color, "#F0D77BFF"
 
 
-contour_sd=ggplot(df_grid_analysis, aes(x = delay*100/60, y = std, z = combined_sd)) +
-  geom_contour_filled(breaks=seq(0, 45, 5)) +  # You can adjust bins or use breaks = seq(min, max, by = step)
+contour_sd=ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z = combined_sd)) +
+  geom_contour_filled() +  #breaks=seq(0, 45, 5)
   # scale_fill_viridis_d(name = "Combined\nStandard\nDeviation") +  # Using viridis, but you can change to scale_fill_brewer()
   scale_fill_brewer(palette = "Purples", name = "Asynchrony\n(Combined\nStandard\nDeviation)")+
-  geom_point(data = data.frame(x = 0.9, y = 15.15), 
+  geom_point(data = data.frame(x = 0.9, y = 15.32), # x = 0.9, y = 15.15
              aes(x = x, y = y, z = NULL), 
              shape = 8, size = 1, color = "#AE93BEFF", stroke = 1) +  # Grande
-  geom_point(data = data.frame(x = 24.3, y = 28.4), 
+  geom_point(data = data.frame(x = 31.45, y = 32.65), # x = 24.3, y = 28.4
              aes(x = x, y = y, z = NULL), 
              shape = 8, size = 1, color = "#F0D77BFF", stroke = 1) +  # Petite
   labs(x = "Delay (% Second Division)", 
@@ -701,42 +714,28 @@ contour_sd=ggplot(df_grid_analysis, aes(x = delay*100/60, y = std, z = combined_
   NULL
 contour_sd
 
+sd(p4_ancestors_dt[p4_ancestors_dt$strain=="grande",]$minutes)
+# [1] 15.32588
 
-# Create the first column with two plots
-column1 <- plot_grid(img_plot_grande_v2, img_plot_petite_v2, 
-                     labels = c('A', 'B'), 
-                     ncol = 1, 
-                     label_size = 11, 
-                     rel_heights = c(1, 0.8))
-
-column2=plot_grid(p3_ancestors, contour_sd,
-                  labels=c('D', 'F'),
-                  ncol=1,
-                  label_size = 11,
-                  rel_heights = c(1,1))
-
-column3=plot_grid(p2_ancestors_v2, p4_doubling_times_violin_ancestors,
-                  labels = c('C', 'E'),
-                  ncol = 1,
-                  label_size = 11,
-                  rel_widths = c(1.4, 1.4))
+mean(p4_ancestors_dt[p4_ancestors_dt$strain=="grande" & p4_ancestors_dt$division_number_12=='1',]$minutes)-mean(p4_ancestors_dt[p4_ancestors_dt$strain=="grande" & p4_ancestors_dt$division_number_12=='2+',]$minutes)
+# [1] 0.8971088
 
 
-row1=plot_grid(column3, column2,
-                 labels = c('C', ''),
-                 ncol = 2,
-                 label_size = 11,
-                 rel_widths = c(1.4, 1.4))
+mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='1',]$minutes)-mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes)
+# [1] 31.45172
 
+mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='1',]$minutes)/mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes)
+# [1] 1.258444
 
-figure_2_paper_ancestors_dt_v3 <- plot_grid(column1, row1, 
-                                            ncol = 1, 
-                                            rel_heights = c(0.7, 1))
-figure_2_paper_ancestors_dt_v3
+sd(c(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='1',]$minutes/1.258444, p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes))
+# [1] 32.65674
 
+sd(p4_ancestors_dt[p4_ancestors_dt$strain=="grande",]$minutes)/mean(p4_ancestors_dt[p4_ancestors_dt$strain=="grande",]$minutes)
+# [1] 0.1439683
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_23feb2026.png',
-#        plot=figure_2_paper_ancestors_dt_v3, dpi='retina', width=6, height=7.2, bg='white')
+sd(p4_ancestors_dt[p4_ancestors_dt$strain=="petite",]$minutes)/mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite",]$minutes)
+# [1] 0.2862308
+
 
 
 # Updated version April 1st 2026
@@ -768,42 +767,6 @@ fligner.test(hours ~ name, data = p4_ancestors_dt)
 
 table(p4_ancestors_dt$name)
 
-
-# Create the first column with two plots
-column1 <- plot_grid(img_plot_grande_v2, img_plot_petite_v2, 
-                     labels = c('A', 'B'), 
-                     ncol = 1, 
-                     label_size = 11, 
-                     rel_heights = c(1, 0.8))
-
-column2=plot_grid(p4_doubling_times_violin_ancestors_v2, contour_sd,
-                  labels=c('D', 'F'),
-                  ncol=1,
-                  label_size = 11,
-                  rel_heights = c(1,1))
-
-column3=plot_grid(p2_ancestors_v2, p3_ancestors,
-                  labels = c('C', 'E'),
-                  ncol = 1,
-                  label_size = 11,
-                  rel_widths = c(1.4, 1.4))
-
-
-row1=plot_grid(column3, column2,
-               labels = c('C', ''),
-               ncol = 2,
-               label_size = 11,
-               rel_widths = c(1.4, 1.4))
-
-
-figure_2_paper_ancestors_dt_v4 <- plot_grid(column1, row1, 
-                                            ncol = 1, 
-                                            rel_heights = c(0.7, 1))
-figure_2_paper_ancestors_dt_v4
-
-
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_1apr2026.png',
-#        plot=figure_2_paper_ancestors_dt_v4, dpi='retina', width=6, height=7.2, bg='white')
 
 
 
@@ -866,8 +829,10 @@ figure_2_paper_ancestors_dt_v5 <- plot_grid(column1, row_cde_fg,
 figure_2_paper_ancestors_dt_v5
 
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_28ug2026.png',
-#        plot=figure_2_paper_ancestors_dt_v5, dpi='retina', width=6, height=7.2, bg='white')
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_14sep2026.png',
+       plot=figure_2_paper_ancestors_dt_v5, dpi='retina', width=6, height=7.2, bg='white')
+
+
 
 
 # Figure 7 ####

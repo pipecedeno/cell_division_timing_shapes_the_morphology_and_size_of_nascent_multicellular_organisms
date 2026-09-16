@@ -312,7 +312,7 @@ ggplot(summ_norm_max_edge[summ_norm_max_edge$num_nodes %in% network_sizes & summ
   NULL
 
 
-# Supplementary plot synchronous strain ####
+# Supplementary Figure 10 ####
 
 # using not normalized
 summ_diameter_not_norm <- net_sim_df %>%
@@ -397,16 +397,6 @@ temp_plot <- ggplot(summ_diameter[summ_diameter$num_nodes %in% network_sizes & s
 # Extract the legend
 shared_legend <- ggpubr::get_legend(temp_plot)
 
-# # Create the plot grid without legend
-# plots_grid <- plot_grid(p_diam, p_max_edge, p_undivided, p_filament, nrow = 2)
-# 
-# # Combine the plots with the shared legend
-# final_plot <- plot_grid(plots_grid, shared_legend, ncol = 1, rel_heights = c(1, 0.1))
-# final_plot
-
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig11_cell_death_18sep2025.svg',
-#        plot=final_plot, dpi='retina', height=6, width=8, bg='white')
-
 
 # Create the plot grid without legend
 plots_grid <- plot_grid(p_diam_not_norm, p_max_edge, ncol = 2)
@@ -418,7 +408,7 @@ final_plot
 ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig10_cell_death_28aug2026.svg',
        plot=final_plot, dpi='retina', height=4, width=8, bg='white')
 
-#### Supplementary plot combined effect ####
+#### Supplementary Figure 11 ####
 
 contour_diam=ggplot(summ_diameter[summ_diameter$num_nodes==1300,],
        aes(x = death_percentage, y = percentage_diff, z = mean_diameter)) +
@@ -448,13 +438,7 @@ contour_edge=ggplot(summ_max_edge[summ_max_edge$num_nodes==1300,],
   NULL
 contour_edge
 
-## Normalized diameter
-# countour_plots_supp=plot_grid(contour_diam, contour_edge, 
-#                               labels=c('A', 'B'), ncol=2, label_size=11)
-# countour_plots_supp
-# 
-# ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig12_death_prob_and_delay_18sep2025.png',
-#        plot=countour_plots_supp, dpi='retina', width=9, height=3.5, bg='white')
+
 
 ## Not normalized diameter
 countour_plots_supp=plot_grid(contour_diam_not_norm, contour_edge,

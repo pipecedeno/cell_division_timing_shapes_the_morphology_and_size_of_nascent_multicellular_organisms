@@ -53,11 +53,11 @@ print(results)
 # Create table of parameter ####
 
 
-default_mean=60
+default_mean=105
 
 #to create only 4 levels
-delays=seq(default_mean, default_mean+60, 20)
-std_devs=seq(0,30,10)
+delays=seq(default_mean, default_mean*2, length.out = 4)
+std_devs=seq(0,52, length.out=4)
 
 
 table_parameters=data.frame()
@@ -96,7 +96,7 @@ for (std_i in std_devs){
 summary(table_parameters)
 
 # This files are used for simulations using this synthetic data distributions
-# write.csv(table_parameters, file="~/work_dir/observed_synchrony/evolution_results/syn_diff_mean_var_24apr2024/4_diffs_4_stds_17oct2024/params_4diffs_4stds_17oct2024.csv", row.names=FALSE)
+# write.csv(table_parameters, file="~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/params_4diffs_4stds_105basemean_14sep2025.csv", row.names=FALSE)
 
 
 

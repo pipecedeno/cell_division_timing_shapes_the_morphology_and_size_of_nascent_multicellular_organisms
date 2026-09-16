@@ -16,11 +16,14 @@ only after all cells at a given timepoint have divided.
 
 
 Inputs:
-	-e: edge degree threshold of when fragmentation should happen
-	-d: doubling time distributions, csv file that has the doubling times to be sampled from
+	-i: lognormal parameters of first cell division. Format is log_mean,log_std
+	-j: lognormal parameters of subsequent cell divisions (2+). Format is log_mean,log_std
 	-n: number of the simulation/network, is to name the files differently when saving them.
 	-o: output directory
 	-g: number of generations to end the simulation
+	-e: edge degree threshold of when fragmentation should happen
+	-c: cluster to keep after fragmentation to keep growing in the simulation. Options are: 'parent', 'propagule', 'random', 
+			parent being the biggest network after fragmentation.
 
 Outputs:
 	-degree distribution file (saved as probabilities)

@@ -43,8 +43,9 @@ setwd("/Users/pipe/Desktop/edge_degree_selection_28may2025")
 # write.csv(frag_df, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig3_edge_degree_selection/edge_selection_grande_frag_28may2026.csv",
 #           row.names = FALSE)
 
-frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig3_edge_degree_selection/edge_selection_grande_frag_28may2026.csv",
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_3_edge_degree_selection/edge_selection_grande_frag_28may2026.csv",
                  header=TRUE)
+
 summary(frag_df)
 
 ggplot(frag_df, aes(x=edge_degree_threshold, y=cluster_size, fill=factor(edge_degree_threshold)))+

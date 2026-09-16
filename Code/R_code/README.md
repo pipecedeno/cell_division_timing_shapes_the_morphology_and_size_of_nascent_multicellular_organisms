@@ -26,7 +26,7 @@ growth_frag_all_frag_df_29may2025.csv
 ### frag_syn_data_4_steps_16oct2024.R:  
 -Figure 5  
 frag_syn_frag_df_24sep2025.csv  
-Note: code causes_of_asynchrony_1oct2024.R was used to create the table params_4diffs_4stds_23sep2025.csv which is needed to run the simulation for this results.
+Note: code causes_of_asynchrony_1oct2024.R was used to create the table params_4diffs_4stds_105basemean_14sep2025.csv which is needed to run the simulation for this results.
 
 ### equal_growth_rates_29_june2024.R:  
 -Figure 6  

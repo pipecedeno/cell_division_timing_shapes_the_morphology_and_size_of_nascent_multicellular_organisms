@@ -27,79 +27,78 @@ syn_data_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli
 # color_variation=list(scale_color_gradient( name = "Variation", low = "pink", high = "darkred", 
 #                                            breaks = std_vector, limits = c(min(std_vector), max(std_vector))))
 
+setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/fig8_fast_first_div_14sep2026/")
 
-# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/fig9_fast_first_div_7jul2025/")
+
+# Function for Direct Parameter Conversion
+#This formulas are in the wikipedia page of Log-normal distribution
+normal_to_lognormal_direct <- function(mean, sd) {
+  variance <- sd^2
+  meanlog <- log(mean^2 / sqrt(variance + mean^2))
+  sdlog <- sqrt(log(1 + variance / mean^2))
+
+  return(list(meanlog = meanlog, sdlog = sdlog))
+}
+
+# Create table of parameter ####
 
 
-# # Function for Direct Parameter Conversion
-# #This formulas are in the wikipedia page of Log-normal distribution
-# normal_to_lognormal_direct <- function(mean, sd) {
-#   variance <- sd^2
-#   meanlog <- log(mean^2 / sqrt(variance + mean^2))
-#   sdlog <- sqrt(log(1 + variance / mean^2))
-#   
-#   return(list(meanlog = meanlog, sdlog = sdlog))
-# }
-# 
-# # Create table of parameter ####
-# 
-# 
-# default_mean=90
-# default_std=15
-# 
-# # Create delays as percentages: -50% to +50% in steps of 5%
-# delay_percentages=seq(-50, 50, 5)
-# delays=default_mean * (1 + delay_percentages/100)
-# 
-# # for creating the plot of the distributions
-# n_times=1000
-# 
-# df_doub_times=data.frame()
-# table_parameters=data.frame()
-# 
-# for (i_cont in seq(length(delays))){
-#   
-#   delay_j=delays[i_cont]
-#   temp_percentages=delay_percentages[i_cont]
-#   
-#   #calculating parameters of the first division
-#   first_div_params=normal_to_lognormal_direct(delay_j, delay_j/default_mean*default_std)
-#   
-#   second_div_params=normal_to_lognormal_direct(default_mean, default_std)
-#   
-#   df_temp=data.frame(delay=delay_j-default_mean, std=default_std,
-#                      first_div_mean=delay_j, first_div_scaled_std=delay_j/default_mean*default_std,
-#                      first_div_log_mean=first_div_params$meanlog, first_div_log_sd=first_div_params$sdlog,
-#                      second_div_mean=default_mean, second_div_scaled_std=default_std,
-#                      second_div_log_mean=second_div_params$meanlog, second_div_log_sd=second_div_params$sdlog)
-#   
-#   table_parameters=rbind(table_parameters, df_temp)
-#   
-#   first_div_times=rlnorm(n_times, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
-#   second_div_times=rlnorm(n_times, meanlog = second_div_params$meanlog, sdlog = second_div_params$sdlog)
-#   
-#   temp_df=data.frame(delay=as.character(delay_j-default_mean), std=as.character(default_std), div_num=c(rep("1", n_times), rep("2", n_times)), 
-#                      doub_t=c(first_div_times, second_div_times), percentage_diff=temp_percentages)
-#   
-#   df_doub_times=rbind(df_doub_times, temp_df)
-#   
-# }
-# summary(table_parameters)
-# 
-# 
-# # This files are used for simulations using this synthetic data distributions
-# # write.csv(table_parameters, file="params_distributions_50percent_15var_7july2025.csv", row.names=FALSE)
-# 
-# 
-# df_doub_times$percentage_diff=factor(df_doub_times$percentage_diff, levels=unique(df_doub_times$percentage_diff))
-# ggplot(df_doub_times, aes(x=div_num, y=doub_t, fill=div_num))+
-#   geom_violin()+
-#   facet_wrap(~percentage_diff, nrow=1)+
-#   # stat_summary(fun='mean', geom='crossbar')+
-#   theme_classic()+
-#   labs(x="Number of Divisions", y="Doubling Time (min)")+
-#   guides(fill='none')+
-#   NULL
+default_mean=105
+default_std=15
+
+# Create delays as percentages: -50% to +50% in steps of 5%
+delay_percentages=seq(-50, 50, 5)
+delays=default_mean * (1 + delay_percentages/100)
+
+# for creating the plot of the distributions
+n_times=1000
+
+df_doub_times=data.frame()
+table_parameters=data.frame()
+
+for (i_cont in seq(length(delays))){
+
+  delay_j=delays[i_cont]
+  temp_percentages=delay_percentages[i_cont]
+
+  #calculating parameters of the first division
+  first_div_params=normal_to_lognormal_direct(delay_j, delay_j/default_mean*default_std)
+
+  second_div_params=normal_to_lognormal_direct(default_mean, default_std)
+
+  df_temp=data.frame(delay=delay_j-default_mean, std=default_std,
+                     first_div_mean=delay_j, first_div_scaled_std=delay_j/default_mean*default_std,
+                     first_div_log_mean=first_div_params$meanlog, first_div_log_sd=first_div_params$sdlog,
+                     second_div_mean=default_mean, second_div_scaled_std=default_std,
+                     second_div_log_mean=second_div_params$meanlog, second_div_log_sd=second_div_params$sdlog)
+
+  table_parameters=rbind(table_parameters, df_temp)
+
+  first_div_times=rlnorm(n_times, meanlog = first_div_params$meanlog, sdlog = first_div_params$sdlog)
+  second_div_times=rlnorm(n_times, meanlog = second_div_params$meanlog, sdlog = second_div_params$sdlog)
+
+  temp_df=data.frame(delay=as.character(delay_j-default_mean), std=as.character(default_std), div_num=c(rep("1", n_times), rep("2", n_times)),
+                     doub_t=c(first_div_times, second_div_times), percentage_diff=temp_percentages)
+
+  df_doub_times=rbind(df_doub_times, temp_df)
+
+}
+summary(table_parameters)
+
+
+# This files are used for simulations using this synthetic data distributions
+# write.csv(table_parameters, file="~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/params_distributions_50percent_15var_14sep2026.csv", row.names=FALSE)
+
+
+df_doub_times$percentage_diff=factor(df_doub_times$percentage_diff, levels=unique(df_doub_times$percentage_diff))
+ggplot(df_doub_times, aes(x=div_num, y=doub_t, fill=div_num))+
+  geom_violin()+
+  facet_wrap(~percentage_diff, nrow=1)+
+  # stat_summary(fun='mean', geom='crossbar')+
+  theme_classic()+
+  labs(x="Number of Divisions", y="Doubling Time (min)")+
+  guides(fill='none')+
+  NULL
 
 
 # Function for Direct Parameter Conversion
@@ -113,7 +112,7 @@ normal_to_lognormal_direct <- function(mean, sd) {
 }
 
 # Create table of parameter ####
-default_mean <- 90
+default_mean <- 105
 default_std <- 15
 # Create delays as percentages: -50% to +50% in steps of 5%
 delay_percentages <- seq(-50, 50, 5)
@@ -150,7 +149,7 @@ find_pdf_limits <- function(meanlog, sdlog, threshold = 0.0001) {
 # pdf_threshold <- 0.000001  # Threshold for PDF cutoff
 n_points <- 500  # Number of points to evaluate PDF
 y_min=25
-y_max=225
+y_max=250
 
 df_pdf_data <- data.frame()
 table_parameters <- data.frame()
@@ -262,15 +261,15 @@ ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', '-25', '0', '
 
 # No fragmentation sim data ####
 
-# delay_values=as.character(round(delays,digits=1)-90)
+# delay_values=as.character(round(delays,digits=2)-default_mean)
 # 
 # sim_df=data.frame()
 # 
 # for (i_cont in seq(length(delay_values))){
 #   temp_delay=delay_values[i_cont]
 #   temp_percentages=delay_percentages[i_cont]
-#   temp_df=read.csv(paste("no_frag_growth_50percent_15_var/test_15_var_", temp_delay, "_diff/network_information.csv", sep=""), header=TRUE)
-#   
+#   temp_df=read.csv(paste("no_frag_growth/test_15_var_", temp_delay, "_diff/network_information.csv", sep=""), header=TRUE)
+# 
 #   temp_df$variation=15
 #   temp_df$diff_mean=temp_delay
 #   temp_df$percentage_diff=temp_percentages
@@ -279,10 +278,10 @@ ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', '-25', '0', '
 # summary(sim_df)
 # 
 # 
-# # write.csv(sim_df, file="growth_no_frag_inf_15_var_pencentages_7july2025.csv", row.names = FALSE)
+# write.csv(sim_df, file="growth_no_frag_inf_15_var_pencentages_15sep2026.csv", row.names = FALSE)
 
 
-sim_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/growth_no_frag_inf_15_var_pencentages_7july2025.csv", header = TRUE)
+sim_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/growth_no_frag_inf_15_var_pencentages_15sep2026.csv", header = TRUE)
 
 summary(sim_df)
 
@@ -523,8 +522,8 @@ ggplot(summ_motif_diff,
 #   temp_delay=delay_values[i_cont]
 #   temp_percentages=delay_percentages[i_cont]
 #   for (temp_degree in as.character(seq(5, 15))){
-#     temp_df=read.csv(paste("edge_degree_sim_50percent_15_var/test_15_var_", temp_delay,"_diff_", temp_degree,"_deg/fragmentation_inf.csv", sep=""), header=TRUE)
-#     
+#     temp_df=read.csv(paste("edge_degree_sim_50percent/test_15_var_", temp_delay,"_diff_", temp_degree,"_deg/fragmentation_inf.csv", sep=""), header=TRUE)
+# 
 #     temp_df$variation=15
 #     temp_df$diff_mean=temp_delay
 #     temp_df$percentage_diff=temp_percentages
@@ -535,9 +534,9 @@ ggplot(summ_motif_diff,
 # 
 # summary(frag_df)
 # 
-# # write.csv(frag_df, file="edge_degree_sim_frag_15_var_percentages_7july2025.csv", row.names=FALSE)
+# write.csv(frag_df, file="edge_degree_sim_frag_15_var_percentages_15sep2026.csv", row.names=FALSE)
 
-frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/edge_degree_sim_frag_15_var_percentages_7july2025.csv", header=TRUE)
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/edge_degree_sim_frag_15_var_percentages_15sep2026.csv", header=TRUE)
 
 
 summary(frag_df)
@@ -601,15 +600,19 @@ ggplot(mean_mean_clust_size, aes(x = edge_degree, y = percentage_diff, z = mean)
 # Paper Figures ####
 
 
-img_sync <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/synchronous_div_combined_viz_delay_0min_9july2025.png")
+img_sync <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/synchronous_div_combined_viz_delay_0perc_15sep2026.png")
 img_plot_sync_net <- rasterGrob(img_sync, interpolate = TRUE)
 
-img_fast_first <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/fast_first_div_combined_viz_delay_-30min_9july2025.png")
+img_fast_first <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/fast_first_div_combined_viz_delay_-30perc_15sep2026.png")
 img_plot_fast_first_net <- rasterGrob(img_fast_first, interpolate = TRUE)
+
+img_delayed_first <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/delayed_first_combined_viz_delay_+30perc_15sep2026.png")
+img_plot_delayed_net <- rasterGrob(img_delayed_first, interpolate = TRUE)
 
 # Create text annotations
 text_sync <- textGrob("Synchronous (0% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col="black"))
 text_fast_first <- textGrob("Fast First Division (-30% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col='blue'))
+text_delayed = textGrob("Delayed First Division (+30% Delay)", gp = gpar(fontsize = 10, fontface = "bold", col='red'))
 
 # Create ggplot objects for the images with annotations
 p_sync_net <- ggplot() + 
@@ -625,6 +628,14 @@ p_fast_first <- ggplot() +
   theme_void() +
   theme(plot.margin = unit(c(0, 0, 0, 0), "cm"))
 p_fast_first
+
+
+p_delayed_network <- ggplot() + 
+  annotation_custom(img_plot_delayed_net, xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) +
+  annotation_custom(text_delayed, xmin = 0.5, xmax = 0.5, ymin = 1, ymax = 1) +
+  theme_void() +
+  theme(plot.margin = unit(c(0, 0, 0, 0), "cm"))
+p_delayed_network
 
 
 # p_doub_times=ggplot(df_doub_times[df_doub_times$percentage_diff %in% c("-50", "-25", "0", "25", "50"),], 
@@ -671,22 +682,22 @@ p_edge_degree=ggplot(summ_max_edge[summ_max_edge$num_nodes>=5,],
   NULL
 p_edge_degree
 
-p_delayed=ggplot(summ_undivided, aes(x = num_nodes, y = percentage_diff, z = mean_undivided)) +
+p_delayed_plot=ggplot(summ_undivided, aes(x = num_nodes, y = percentage_diff, z = mean_undivided)) +
   # geom_contour_filled(bins = 8) +
   # geom_contour_filled(breaks=seq(0, 135, 15)) +
   geom_contour_filled(breaks = c(0, 1, 2, 4, 8, 16, 32, 64, 128, 256)) +
   scale_fill_brewer(palette = "Purples", name = "Delayed\nDaughter\nCells")+
   labs(x = "Network Size", y = "Delay (% Second Division)") +
   scale_y_continuous(breaks = seq(-50, 50, 10)) +
-  geom_point(data = data.frame(x = c(200, 200), y = c(0, -30)), 
+  geom_point(data = data.frame(x = c(200, 200, 200), y = c(0, -30, 30)), 
              aes(x = x, y = y), 
-             color = c("black", "blue"), 
+             color = c("black", "blue", "red"), 
              shape = 15,  # cross shape
              size = 2,   # adjust size as needed
              inherit.aes = FALSE) +  # don't inherit the z aesthetic
   theme_classic()+
   NULL
-p_delayed
+p_delayed_plot
 
 p_filament=ggplot(summ_filamentous, aes(x = num_nodes, y = percentage_diff, z = mean_filament)) +
   # geom_contour_filled(bins = 8) +
@@ -694,9 +705,9 @@ p_filament=ggplot(summ_filamentous, aes(x = num_nodes, y = percentage_diff, z = 
   scale_fill_brewer(palette = "Purples", name = "Filament\nBranches")+
   labs(x = "Network Size", y = "Delay (% Second Division)") +
   scale_y_continuous(breaks = seq(-50, 50, 10)) +
-  geom_point(data = data.frame(x = c(200, 200), y = c(0, -30)), 
+  geom_point(data = data.frame(x = c(200, 200, 200), y = c(0, -30, 30)), 
              aes(x = x, y = y), 
-             color = c("black", "blue"), 
+             color = c("black", "blue", "red"), 
              shape = 15,  # cross shape
              size = 2,   # adjust size as needed
              inherit.aes = FALSE) +  # don't inherit the z aesthetic
@@ -714,22 +725,23 @@ p_fragmentation=ggplot(mean_mean_clust_size, aes(x = edge_degree, y = percentage
   NULL
 p_fragmentation
 
-# figure_first_div_net=plot_grid(p_doub_times, p_diameter, 
-#                                p_edge_degree, p_delayed, 
-#                                p_filament, p_sync_net,
-#                                p_fast_first,
-#                                p_fragmentation,
-#                                labels=c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'), ncol=2, 
-#                                align='hv', label_size=12)
-# figure_first_div_net
 
-figure_first_div_net=plot_grid(p_doub_times, p_diameter,
+
+# Updated figure with 3 networks
+
+data_panels=plot_grid(p_doub_times, p_diameter,
                                p_edge_degree, p_fragmentation,
-                               p_filament, p_delayed,
-                               p_fast_first, p_sync_net,
-                               labels=c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'), ncol=2, 
-                               align='hv', label_size=12)
-figure_first_div_net
+                               p_filament, p_delayed_plot,
+                               labels=c('A', 'B', 'C', 'D', 'E', 'F'), ncol=2, 
+                               label_size=12)
+data_panels
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_8_fast_first_div_28aug2026.png',
-       plot=figure_first_div_net, dpi='retina', height=12, width=10, bg='white')
+images_row=plot_grid(p_fast_first, p_sync_net, p_delayed_network, 
+                     nrow=1, label_size = 12, labels=c('G', 'H', 'I'))
+images_row
+
+figure_8_3_networks=plot_grid(data_panels, images_row, nrow=2, rel_heights = c(3, 1))
+figure_8_3_networks
+
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_8_fast_first_div_15sep2026.png',
+       plot=figure_8_3_networks, dpi='retina', height=12, width=10, bg='white')
