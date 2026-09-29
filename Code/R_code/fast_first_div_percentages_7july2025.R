@@ -596,6 +596,16 @@ ggplot(mean_mean_clust_size, aes(x = edge_degree, y = percentage_diff, z = mean)
   theme_classic()+
   NULL
 
+table(mean_mean_clust_size$percentage_diff)
+
+mean_mean_clust_size[mean_mean_clust_size$percentage_diff==30 & mean_mean_clust_size$edge_degree==15,]$mean
+# 184.4269
+
+mean_mean_clust_size[mean_mean_clust_size$percentage_diff==0 & mean_mean_clust_size$edge_degree==15,]$mean
+# 337.3545
+
+mean_mean_clust_size[mean_mean_clust_size$percentage_diff==-30 & mean_mean_clust_size$edge_degree==15,]$mean
+# 829.3231
 
 # Paper Figures ####
 
@@ -661,6 +671,8 @@ p_doub_times=ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', 
   NULL
 p_doub_times
 
+
+
 p_diameter=ggplot(summ_norm_diameter[summ_norm_diameter$num_nodes>=10,], 
                   aes(x = num_nodes, y = percentage_diff, z = mean_diameter)) +
   # geom_contour_filled(bins = 7) +
@@ -718,6 +730,12 @@ p_filament
 p_fragmentation=ggplot(mean_mean_clust_size, aes(x = edge_degree, y = percentage_diff, z = mean)) +
   geom_contour_filled(breaks = c(2**seq(3, 12, 1)))+
   # scale_fill_viridis_d(name = "Fracture\nSize") +  # Use discrete scale
+  geom_point(data = data.frame(x = c(15, 15, 15), y = c(0, -30, 30)), 
+             aes(x = x, y = y), 
+             color = c("black", "blue", "red"), 
+             shape = 15,  # cross shape
+             size = 2,   # adjust size as needed
+             inherit.aes = FALSE) +  # don't inherit the z aesthetic
   scale_fill_brewer(palette = "Purples", name = "Fracture\nSize")+
   labs(x = "Edge Degree", y = "Delay (% Second Division)") +
   scale_y_continuous(breaks = seq(-50, 50, 10)) +
@@ -725,6 +743,37 @@ p_fragmentation=ggplot(mean_mean_clust_size, aes(x = edge_degree, y = percentage
   NULL
 p_fragmentation
 
+
+
+# Your main plot
+main_plot <- ggplot(df_violin_data[df_violin_data$percentage_diff %in% c('-50', '-25', '0', '25', '50'),], 
+                    aes(x = div_num, y = doub_t, col = div_num)) +
+  geom_violinhalf(trim = FALSE) +
+  facet_wrap(~percentage_diff, nrow = 1) +
+  theme_classic() +
+  scale_color_manual(values = c("#BBA78CFF", "#333544FF")) +
+  scale_x_discrete(breaks = c(1, 2), labels = c("1", "2+")) +
+  labs(x = "Number of Divisions", y = "Doubling Time (min)") +
+  guides(col = 'none') +
+  NULL
+
+# Annotation strip: two arrows pointing outward from the middle
+arrow_strip <- ggplot() +
+  geom_segment(aes(x = 0.45, xend = 0.25, y = 0, yend = 0),
+               arrow = arrow(length = unit(0.12, "inches"), type = "closed"),
+               color = "blue", linewidth = 1) +
+  geom_segment(aes(x = 0.55, xend = 0.75, y = 0, yend = 0),
+               arrow = arrow(length = unit(0.12, "inches"), type = "closed"),
+               color = "red", linewidth = 1) +
+  geom_point(aes(x = 0.5, y = 0), shape = 15, size = 3, color = "black") +  # <-- square dot
+  annotate("text", x = 0.02, y = 0, label = "Accelerated", hjust = 0, size = 3.2, fontface = "bold") +
+  annotate("text", x = 0.98, y = 0, label = "Delayed", hjust = 1, size = 3.2, fontface = "bold") +
+  xlim(0, 1) + ylim(-1, 1) +
+  theme_void()
+
+# Combine: annotation strip above the main plot
+p_doub_times=arrow_strip / main_plot + plot_layout(heights = c(0.15, 1))
+p_doub_times
 
 
 # Updated figure with 3 networks
@@ -736,12 +785,13 @@ data_panels=plot_grid(p_doub_times, p_diameter,
                                label_size=12)
 data_panels
 
-images_row=plot_grid(p_fast_first, p_sync_net, p_delayed_network, 
+images_row=plot_grid(p_fast_first, p_sync_net, p_delayed_network,
                      nrow=1, label_size = 12, labels=c('G', 'H', 'I'))
 images_row
 
 figure_8_3_networks=plot_grid(data_panels, images_row, nrow=2, rel_heights = c(3, 1))
 figure_8_3_networks
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_8_fast_first_div_15sep2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_8_fast_first_div_28sep2026.png',
        plot=figure_8_3_networks, dpi='retina', height=12, width=10, bg='white')
+

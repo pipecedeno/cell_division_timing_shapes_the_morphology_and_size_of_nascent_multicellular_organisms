@@ -20,6 +20,7 @@ library(cowplot)
 library(png)
 library(grid)
 library(effsize)
+library(scales)
 
 
 theme_set(theme_classic(base_size = 16))
@@ -321,20 +322,6 @@ ggplot(summ_diam)+
 # Mean of means
 
 
-frag_df %>% 
-  group_by(strain) %>%
-  summarise(mean_frac=mean(cluster_size),
-            mean_prop=mean(proportion_propagule))
-# edge degree: 14
-# strain                 mean_frac mean_prop
-# 1 Petite                158.7926     0.395
-# 2 Petite w/o delay      248.3067     0.392
-# 3 Grande                224.1929     0.453
-# edge degree: 15
-#   strain           mean_frac mean_prop
-# 1 Petite                218.     0.393
-# 2 Petite w/o Delay      354.     0.394
-# 3 Grande                340.     0.454
 
 mean_frag_sim=frag_df %>% 
   group_by(strain, sim_number) %>%
@@ -344,19 +331,14 @@ summary(mean_frag_sim)
 
 mean_frag_sim %>% 
   group_by(strain) %>%
-  summarise(mean_frac=mean(mean_clust_size),
-            mean_prop=mean(mean_propagule_prop))
-# edge degree: 14
-# strain                mean_frac mean_prop
-# 1 Petite            158.7926    0.395
-# 2 Petite w/o delay  248.3067    0.392
-# 3 Grande            224.1929    0.453
+  summarise(median_frac=median(mean_clust_size),
+            median_prop=median(mean_propagule_prop))
 # The means are the same as if all the data was used at the same time
 # edge degree: 15
-#   strain              mean_frac  mean_prop
-# 1 Petite                218.1666     0.393
-# 2 Petite w/o Delay      353.9265     0.394
-# 3 Grande                340.0217     0.454
+#   strain              median_frac  median_prop
+# 1 Petite                 218.3708     0.393
+# 2 Petite w/o Delay       354.0881     0.394
+# 3 Grande                 339.4521     0.454
 
 anova_frac_sim=aov(mean_clust_size~strain, data=mean_frag_sim)
 summary(anova_frac_sim)
@@ -422,16 +404,17 @@ pairwise.wilcox.test(mean_frag_sim$mean_propagule_prop, mean_frag_sim$strain, p.
 p1_temp=ggplot(mean_frag_sim, aes(x=strain, y=mean_clust_size, fill=strain))+
   geom_violin()+
   stat_summary(fun='mean', geom='crossbar')+
-  xlab('')+ylab('Mean Fracture\nSize')+
+  xlab('')+ylab('Mean Fracture\nSize (# nodes)')+
   petite_t200_colors+
   theme_classic(base_size = 10)+
   guides(fill='none')+
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
   NULL
 p1_temp
 
 p2_temp=ggplot(mean_frag_sim, aes(x=strain, y=mean_propagule_prop, fill=strain))+
   geom_violin()+
-  xlab('')+
+  xlab('Genotype')+
   ylab('Mean Propagule\nProportion')+
   stat_summary(fun='mean', geom='crossbar')+
   petite_t200_colors+
@@ -448,17 +431,11 @@ summary(mean_diam_sim)
 
 mean_diam_sim %>% 
   group_by(strain) %>%
-  summarise(mean_diam=mean(mean_norm_diam))
-# edge degree 14
-# strain             mean_diam
-# 1 Ancestor               0.910
-# 2 Ancestor w/o delay     0.995
-# 3 PA2_t200               0.988
-# edge degree 15
-# strain           mean_diam
-# 1 Petite               0.913
-# 2 Petite w/o Delay     0.997
-# 3 Grande               0.990
+  summarise(median_diam=median(mean_norm_diam))
+#   strain           median_diam
+# 1 Petite                 0.912
+# 2 Petite w/o Delay       0.997
+# 3 Grande                 0.990
 
 anova_diam_sim=aov(mean_norm_diam~strain, data=mean_diam_sim)
 summary(anova_diam_sim)
@@ -492,11 +469,13 @@ pairwise.wilcox.test(mean_diam_sim$mean_norm_diam, mean_diam_sim$strain, p.adjus
 
 p3_temp=ggplot(mean_diam_sim, aes(x=strain, y=mean_norm_diam, fill=strain))+
   geom_violin()+
-  xlab('')+ylab('Mean Normalized\nDiameter')+
+  xlab('Genotype')+ylab('Mean Normalized\nNetwork Diameter')+
   stat_summary(fun='mean', geom='crossbar')+
   petite_t200_colors+
   theme_classic(base_size = 10)+
   guides(fill='none')+
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
+  scale_y_continuous(labels = label_number(accuracy = 0.01))+
   NULL
 p3_temp
 
@@ -508,5 +487,5 @@ fig_restructured_updated=plot_grid(p1_temp, p3_temp, p2_temp,
                                labels=c('A', 'B', 'C'), ncol=1, label_size=11)
 fig_restructured_updated
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_4_network_properties_all-clusters_28aug2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_4_network_properties_all-clusters_22sep2026.png',
        plot=fig_restructured_updated, dpi='retina', width=3.5, height=6.3, bg='white')

@@ -132,21 +132,20 @@ Note: this code executes the python script ```sim_frag_clust_edge_degree_after_a
 
 First some networks need to be created for the matlab code to be executed:
 ```
-sim_edges_network_null_1nov2023.py -d grande_doubling_time_dist_2024dec2.csv -m 1000 -n 500 -o test_grande_1000m_500n
+sim_edges_network_null_1nov2023.py -d grande_doubling_time_dist_2024dec2.csv -m 1000 -n 100 -o test_grande_1000m_100n
 
-sim_edges_network_null_1nov2023.py -d petite_doubling_time_dist_2023may30.csv -m 1000 -n 500 -o test_petite_1000m_500n
+sim_edges_network_null_1nov2023.py -d petite_doubling_time_dist_2023may30.csv -m 1000 -n 100 -o test_petite_1000m_100n
 ```
 
 Then the matlab code ``` size_diff_sync_vs_async_2024sep26_v3.m ``` is executed to calculate the size at fragmentation and also the overlaps between the cells. This code uses the file ```cell_budding_angles_grande_ancestor_30july2025.csv``` to load the cell budding angles measured from the grande ancestor.
 
 To generate the statistics of the overlap data the following python code was used:
 ```
-process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap.csv -o stats_overlap_pos_10jun2025.csv
+process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_100n.csv -o stats_overlap_pos.csv
 ```
 
 Finally, the code matlab code ``` size_diff_overlap_acumulation_2024dec2.m ``` is executed to calculate how the overlap changes as a cell gets added.
 
-Notes: both matlab codes need have their input parameters in the first lines of the code. For the overlap acumulation code only 100 networks were created instead of 500.
 
 
 
@@ -191,9 +190,9 @@ sim_clust_no_fragmentation_lognormal_death_prob_5aug2025.py
 For simulations with fragmentation:  
 
 ```
-lognormal_parameter_csv="~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/params_distributions_50percent_15var_14sep2026.csv"
+lognormal_parameter_csv="/Users/pipe/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/params_distributions_50percent_15var_14sep2026.csv"
 
-exec_death_prob_frag_parallel_delays.sh -n 100 -g 30 -e 4 -c random -i ${lognormal_parameter_csv} -p 0.0 -P 0.3 -s 0.05 -t 4
+exec_death_prob_frag_parallel_delays.sh -n 30 -g 50 -e 15 -c random -i ${lognormal_parameter_csv} -p 0.0 -P 0.3 -s 0.05 -t 4
 ```
 
 This bash script runs the python script: ```sim_frag_clust_death_prob_16sep2026.py```  

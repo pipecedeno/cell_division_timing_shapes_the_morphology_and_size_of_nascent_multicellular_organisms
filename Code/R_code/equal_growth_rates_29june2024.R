@@ -546,9 +546,10 @@ fig_a=ggplot(mean_sim_sel_r[mean_sim_sel_r$experiment=='Normal',],
   coord_cartesian(ylim = c(0, 7)) +
   scale_x_discrete(labels=c('Growth'='Growth',
                             'Settling'='Settling'))+
-  theme_classic(base_size = 10)+
+  annotate("text", x = 1.5, y = Inf, label="Standard Growth Rates\nRandom Starting Position", 
+           hjust = 0.5, vjust = 1.2, fontface = "bold", size=2.5)+
+  theme_classic(base_size = 9)+
   theme(
-    plot.title = element_text(hjust = 0.5, size=10),
     axis.text.x = element_blank(),
     axis.title.x = element_blank()
   )+
@@ -575,9 +576,10 @@ fig_b=ggplot(mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates',],
   coord_cartesian(ylim = c(0, 7)) +
   scale_x_discrete(labels=c('Growth'='Growth',
                             'Settling'='Settling'))+
-  theme_classic(base_size = 10)+
+  annotate("text", x = 1.5, y = Inf, label="Equal Growth Rates\nRandom Starting Position", 
+           hjust = 0.5, vjust = 1.2, fontface = "bold", size=2.5)+
+  theme_classic(base_size = 9)+
   theme(
-    plot.title = element_text(hjust = 0.5, size=10),
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
     axis.title.x = element_blank(),
@@ -616,8 +618,10 @@ fig_c=ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Normal',],
   coord_cartesian(ylim = c(0, 7)) +
   scale_x_discrete(labels=c('Growth'='Growth',
                             'Settling'='Settling'))+
-  theme_classic(base_size = 10)+
-  theme(plot.title = element_text(hjust = 0.5, size=10))+
+  annotate("text", x = 1.5, y = Inf, label="Standard Growth Rates\nTop Starting Position", 
+           hjust = 0.5, vjust = 1.2, fontface = "bold", size=2.5)+
+  theme_classic(base_size = 9)+
+  theme()+
   NULL
 fig_c
 
@@ -642,9 +646,10 @@ fig_d=ggplot(mean_filt_sel_r_top[mean_filt_sel_r_top$experiment=='Equal Growth R
   coord_cartesian(ylim = c(0, 7)) +
   scale_x_discrete(labels=c('Growth'='Growth',
                             'Settling'='Settling'))+
-  theme_classic(base_size = 10)+
+  annotate("text", x = 1.5, y = Inf, label="Equal Growth Rates\nTop Starting Position", 
+           hjust = 0.5, vjust = 1.2, fontface = "bold", size=2.5)+
+  theme_classic(base_size = 9)+
   theme(
-    plot.title = element_text(hjust = 0.5, size=10),
     axis.text.y = element_blank(),
     axis.title.y = element_blank()
   )+
@@ -672,8 +677,11 @@ cliff.delta(mean_sim_sel_r[mean_sim_sel_r$experiment=='Equal Growth Rates' & mea
 # delta estimate: 0.1544 (small) 
 
 
-figure_7=plot_grid(fig_a, fig_b, fig_c, fig_d, labels=c('A', 'B', 'C', 'D'), ncol=2, align='hv')
+figure_7=plot_grid(fig_a, fig_b, fig_c, fig_d, labels=c('A', 'B', 'C', 'D'), ncol=2, align='hv', label_size = 10)
 figure_7
+
+ggsave(filename="~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_6_selection_rates_10mill_22sep2026.png",
+       plot=figure_7, dpi='retina', width=5, height=4)
 
 
 # Add column labels at the top
@@ -712,7 +720,7 @@ figure_7_annotated <- ggdraw(
 figure_7_annotated
 
 
-ggsave(filename="~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/fig_7_selection_rates_10mill_12mar2026.png",
+ggsave(filename="~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_6_selection_rates_10mill_12mar2026.png",
        plot=figure_7_annotated, dpi='retina', width=6.5, height=5)
 
 

@@ -25,17 +25,17 @@ cd(folder);
 
 
 % Open output file
-output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/';
+output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/table_3_volume_prediction/';
 
-output_filename = fullfile(output_folder, 'exponential_clust_volume_1.197aspr.csv');
+output_filename = fullfile(output_folder, 'exponential_clust_volume_aspect_ratio.csv');
 write_to_output_file=1; % 1=YES, 0=NO # For size at fracture calculations
 
 
 N               = 250; % number of clusters to generate
 numGens         = 100; % number of generations of cell division in a group %# setting this value to be really high to that it won't be a limit
-diam            = 5.085; % smallest diameter of the cell
+diam            = 4.26; % smallest diameter of the cell
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
-AR              = 1.197;%:.1:2.8; % aspect ratio value
+AR              = 1.19;%:.1:2.8; % aspect ratio value
 err_AR          = 0; % standard deviation in aspect ratio from Shane's measurements
 pole_theta      = deg2rad(10); % buds nearest the pole will be chosen from between 0 and 10 degrees in polar angle
 THETA           = deg2rad(45); % polar angle average from SEM data
@@ -45,7 +45,7 @@ new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
 % overlap_vec  = 1.0e2; % threshold of total overlaps
 % overlap_vec = 1.0*10.^(1:0.05:2);
-overlap_vec = 50:1.0:150;
+overlap_vec = 100:1.0:200;
 
 % Force input parameters:
 include_forces  = 0; % do we include forces for rearrangements? 1 = Y, 0 = N

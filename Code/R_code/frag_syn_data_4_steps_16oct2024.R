@@ -271,11 +271,18 @@ clust_var=ggplot(mean_mean_clust_size, aes(x=variation, y=mean, col=floor(diff_m
   geom_line()+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
   xlab('Variation')+
-  ylab('Mean Fracture\nSize')+
+  ylab('Mean Fracture\nSize (# nodes)')+
   # guides(col = guide_legend(title = "Delay"))+
   guides(col='none')+
   color_diff_mean_perc+
   theme_classic(base_size = 10)+
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )+
+  theme(plot.margin = margin(t = 15, r = 5, b = 5, l = 15))+
   NULL
 clust_var
 
@@ -283,12 +290,17 @@ clust_delay=ggplot(mean_mean_clust_size, aes(x=diff_mean/default_mean*100, y=mea
   geom_point()+
   geom_line()+
   xlab('Delay (% Second Division)')+
-  ylab('Mean Fracture\nSize')+
+  ylab('Mean Fracture\nSize (# nodes)')+
   # guides(col = guide_legend(title = "Variation"))+
   guides(col='none')+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
   color_variation+
   theme_classic(base_size = 10)+
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
+  )+
+  theme(plot.margin = margin(t = 15, r = 5, b = 5, l = 15))+
   NULL
 clust_delay
 
@@ -304,19 +316,25 @@ prop_delay=ggplot(mean_mean_frag_prop, aes(x=diff_mean/default_mean*100, y=mean_
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
   color_variation+
   theme_classic(base_size = 10)+
+  theme(plot.margin = margin(t = 15, r = 5, b = 5, l = 15))+
   NULL
 prop_delay
 
 prop_var=ggplot(mean_mean_frag_prop, aes(x=variation, y=mean_prop, col=floor(diff_mean/default_mean*100), group=floor(diff_mean/default_mean*100)))+
   geom_point()+
   geom_line()+
-  xlab('Variation')+
+  xlab('Variation (SD)')+
   ylab('Mean propagule\nproportion')+
   # guides(col = guide_legend(title = "Delay"))+
   guides(col='none')+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
   color_diff_mean_perc+
   theme_classic(base_size = 10)+
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )+
+  theme(plot.margin = margin(t = 15, r = 5, b = 5, l = 15))+
   NULL
 prop_var
 
@@ -326,12 +344,17 @@ diam_delay=ggplot(mean_summ_diam, aes(x=diff_mean/default_mean*100, y=mean_d, co
   geom_point()+
   geom_line()+
   xlab('Delay (% Second Division)')+
-  ylab('Mean Network\nDiameter')+
+  ylab('Mean Normalized\nNetwork Diameter')+
   # guides(col = guide_legend(title = "Variation"))+
   guides(col='none')+
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
   color_variation+
   theme_classic(base_size = 10)+
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank()
+  )+
+  theme(plot.margin = margin(t = 15, r = 5, b = 5, l = 15))+
   NULL
 diam_delay
 
@@ -345,6 +368,13 @@ diam_var=ggplot(mean_summ_diam, aes(x=variation, y=mean_d, col=floor(diff_mean/d
   geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1)+
   color_diff_mean_perc+
   theme_classic(base_size = 10)+
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank()
+  )+
+  theme(plot.margin = margin(t = 15, r = 5, b = 5, l = 15))+
   NULL
 diam_var
 
@@ -389,10 +419,11 @@ supp_net_prop_v4=plot_grid(clust_delay, clust_var,
                            prop_delay, prop_var, 
                            common_legend_variation, common_legend_delay,
                            labels=c('A', 'B', 'C', 'D', 'E', 'F'), ncol=2, 
-                          label_size=10, rel_heights = c(1,1,1,0.1))
+                          label_size=10, rel_heights = c(1,1,1,0.1), rel_widths = c(1, 0.82))
 supp_net_prop_v4
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_5_effects_delay_variation_15sep2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_5_effects_delay_variation_22sep2026.png',
        plot=supp_net_prop_v4, dpi='retina', width=5.6, height=5.6, bg='white')
+
 
 

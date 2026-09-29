@@ -593,17 +593,17 @@ cliff.delta(cell_data$Major~cell_data$strain)
 # delta estimate: 0.3329875 (medium)
 
 
-img_petite_clust <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob21-2_day2_001_620x620_100um-scale.png")
+img_petite_clust <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob21-2_day2_001_22sep2026.png")
 img_plot_petite_clust <- rasterGrob(img_petite_clust, interpolate = TRUE)
 
-img_grande_clust <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob8-1_day2_001_620x620_100um-scale.png")
+img_grande_clust <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob8-1_day2_001_22sep2026.png")
 img_plot_grande_clust <- rasterGrob(img_grande_clust, interpolate = TRUE)
 
 
-img_petite_ar <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob21-1_day2_003_no_masks_10um-scale.png")
+img_petite_ar <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob21-1_day2_003_22sep2026.png")
 img_plot_petite_ar <- rasterGrob(img_petite_ar, interpolate = TRUE)
 
-img_grande_ar <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob8-1_day2_006_no_masks_10um-scale.png")
+img_grande_ar <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/gob8-1_day2_006_22sep2026.png")
 img_plot_grande_ar <- rasterGrob(img_grande_ar, interpolate = TRUE)
 
 
@@ -623,6 +623,6 @@ fig_1_v2=plot_grid(col_clust_vol, p_cluster_vol, col_ar, plot_c_ar_diam,
                    labels=c('A', 'B','C',''), nrow=2, label_size=16, rel_widths=c(0.35, 1), rel_heights=c(1,1))
 fig_1_v2
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_1_clust_size_ancestors_28aug2026.svg',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_1_clust_size_ancestors_22sep2026.svg',
        plot=fig_1_v2, dpi='retina', width=8, height=6, bg='white')
 # note: image is saved as an svg to later add the strain labels for the images

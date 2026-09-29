@@ -236,6 +236,16 @@ dt_distributions_v2=ggplot(doub_t_data, aes(x=division_number, y=hours, fill=nam
   NULL
 dt_distributions_v2
 
+sim_df[sim_df$num_nodes==100,] %>%
+  group_by(strain) %>%
+  summarise(median_edge_deg=median(max_edge_degree),
+            median_unbudded=median(cases_mother_with_undivided_cells),
+            median_diam=median(diameter))
+#   strain           median_edge_deg median_unbudded median_diam
+#   <fct>                      <dbl>           <dbl>       <dbl>
+# 1 Petite                        12             8.5          11
+# 2 Petite w/o Delay              11             5            12
+# 3 Grande                        11             3            12
 
 p_diam = ggplot(summ_diameter, aes(x=num_nodes, y=mean_diameter, col=strain, fill=strain))+
   geom_ribbon(aes(ymin=ci_lower, ymax=ci_upper), alpha=0.5, color=NA)+
@@ -253,7 +263,7 @@ p_diam = ggplot(summ_diameter, aes(x=num_nodes, y=mean_diameter, col=strain, fil
   petite_t200_colors+
   theme_classic(base_size = 10)+
   scale_x_continuous(breaks = seq(0, 1200, 200)) +
-  labs(y = "Mean Diameter", x = "Number of Nodes") +
+  labs(y = "Mean Network\nDiameter (# edges)", x = "Number of Nodes") +
   guides(col='none', fill='none')+
   NULL
 p_diam
@@ -391,11 +401,11 @@ sub_df <- droplevels(sim_df[sim_df$num_nodes == 100 & sim_df$strain != 'Petite w
 cliff.delta(sub_df$max_edge_degree ~ sub_df$strain)
 # delta estimate: 0.6709778 (large)
 
-fig=plot_grid(dt_distributions_v2, p_undivided, p_diam, p_edge_degree,
+fig=plot_grid(dt_distributions_v2, p_diam, p_edge_degree, p_undivided,
               labels=c('A', 'B', 'C', 'D'), ncol=2, label_size=12)
 fig
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_3_growth_no_frag_28aug2026.svg',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_3_growth_no_frag_22sep2026.svg',
        plot=fig, dpi='retina', width=6.5, height=4.5, bg='white')
 
 

@@ -29,21 +29,21 @@ cd(folder);
 
 
 % Open output file
-output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/table1_volume_predictions/';
+output_folder='/Users/pipe/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/table_3_volume_prediction/';
 % output_folder='/home/lprez3/work_dir/observed_synchrony/physics_model/overlap_volume_prediction_15dec2023';
 
-output_filename = fullfile(output_folder, 'constant_threshold_changing_cell_diam_2025june12.csv');
+output_filename = fullfile(output_folder, 'constant_threshold_changing_cell_diam.csv');
 write_to_output_file=1; % 1=YES, 0=NO # For size at fracture calculations
 
 
 N               = 500; % number of clusters to generatecell_list
 numGens         = 100; % number of generations of cell division in a group %# setting this value to be really high to that it won't be a limit
 % diam            = 4.58; % smallest diameter of the cell
-diam_vec        = 3.0:0.2:10; 
+diam_vec        = 3.0:0.2:7; 
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
 % AR              = 1.256;%:.1:2.8; % aspect ratio value
 % AR              = 1.0:0.05:2.8;
-aspRat          = 1.197; %Default aspect ratio value to be used
+aspRat          = 1.19; %Default aspect ratio value to be used
 err_AR          = 0; % standard deviation in aspect ratio from Shane's measurements
 pole_theta      = deg2rad(10); % buds nearest the pole will be chosen from between 0 and 10 degrees in polar angle
 THETA           = deg2rad(45); % polar angle average from SEM data
@@ -51,7 +51,7 @@ thetaVariance   = deg2rad(0); % variation in polar angle from SEM data
 distance_thresh = 1.1672; % minimum distance (um) separating bud scars
 new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
-overlap_thresh  = 67.06724; % threshold of total overlaps 
+overlap_thresh  = 185.5299; % threshold of total overlaps 
 
 
 % Force input parameters:

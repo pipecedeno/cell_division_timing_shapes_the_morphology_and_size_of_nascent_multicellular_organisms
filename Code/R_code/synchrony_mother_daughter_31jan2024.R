@@ -356,12 +356,23 @@ ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z = combined_s
   NULL
 
 
-
-
-ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z = combined_cv)) +
-  geom_contour_filled() +  
-  # scale_fill_viridis_d(name = "Combined\nStandard\nDeviation") +  # Using viridis, but you can change to scale_fill_brewer()
+# Transforming the y-values only
+ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std/105, z = combined_sd)) +
+  geom_contour_filled(binwidth=10) + # breaks=seq(0, 45, 5)
   scale_fill_brewer(palette = "Purples", name = "Combined\nStandard\nDeviation")+
+  labs(x = "Delay (% Second Division)", 
+       y = "Doubling Time Standard Deviation") +
+  theme_classic() +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  NULL
+
+
+
+ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std/105, z = combined_cv)) +
+  geom_contour_filled(bins=9) +  
+  # scale_fill_viridis_d(name = "Combined\nStandard\nDeviation") +  # Using viridis, but you can change to scale_fill_brewer()
+  scale_fill_brewer(palette = "Purples", name = "Combined\nCoefficient\nVariation")+
   labs(x = "Delay (% Second Division)", 
        y = "Doubling Time Standard Deviation") +
   theme_classic() +
@@ -372,11 +383,9 @@ ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z = combined_c
 # Figure 2 ####
 
 
-# img_petite_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/petite_2hr_5f_scale_masks_v2.png")
 img_petite_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/petite_45min-step_50-86f_modified.png")
 img_plot_petite_v2 <- rasterGrob(img_petite_v2, interpolate = TRUE)
 
-# img_grande_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/grande_49f_1hr_scale_1x_masks_complete.png")
 img_grande_v2 <- readPNG("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/Images/grande_30min-step_start-2hr_24-48f_modified.png")
 img_plot_grande_v2 <- rasterGrob(img_grande_v2, interpolate = TRUE)
 
@@ -692,14 +701,14 @@ contour_sd=ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z =
   geom_contour_filled() +  #breaks=seq(0, 45, 5)
   # scale_fill_viridis_d(name = "Combined\nStandard\nDeviation") +  # Using viridis, but you can change to scale_fill_brewer()
   scale_fill_brewer(palette = "Purples", name = "Asynchrony\n(Combined\nStandard\nDeviation)")+
-  geom_point(data = data.frame(x = 0.9, y = 15.32), # x = 0.9, y = 15.15
-             aes(x = x, y = y, z = NULL), 
+  geom_point(data = data.frame(x = 0.9, y = 15.3), # x = 0.9, y = 15.32)
+             aes(x = x, y = y, z = NULL),
              shape = 8, size = 1, color = "#AE93BEFF", stroke = 1) +  # Grande
-  geom_point(data = data.frame(x = 31.45, y = 32.65), # x = 24.3, y = 28.4
-             aes(x = x, y = y, z = NULL), 
+  geom_point(data = data.frame(x = 31.45, y = 29.5), # x = 31.45, y = 32.65
+             aes(x = x, y = y, z = NULL),
              shape = 8, size = 1, color = "#F0D77BFF", stroke = 1) +  # Petite
   labs(x = "Delay (% Second Division)", 
-       y = "Doubling Time\nStandard Deviation") +
+       y = "Doubling Time\nStandard Deviation") + 
   theme_classic(base_size=10) +
   theme(legend.key.size = unit(0.4, "cm"),
         legend.text = element_text(size = 7),
@@ -714,27 +723,22 @@ contour_sd=ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z =
   NULL
 contour_sd
 
-sd(p4_ancestors_dt[p4_ancestors_dt$strain=="grande",]$minutes)
-# [1] 15.32588
-
+# Delay grande
 mean(p4_ancestors_dt[p4_ancestors_dt$strain=="grande" & p4_ancestors_dt$division_number_12=='1',]$minutes)-mean(p4_ancestors_dt[p4_ancestors_dt$strain=="grande" & p4_ancestors_dt$division_number_12=='2+',]$minutes)
-# [1] 0.8971088
+#### [1] 0.8971088
 
+# SD grande
+sd(p4_ancestors_dt[p4_ancestors_dt$strain=="grande",]$minutes)
+### [1] 15.32588
 
+# Delay petite
 mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='1',]$minutes)-mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes)
-# [1] 31.45172
+### [1] 31.45172
 
-mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='1',]$minutes)/mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes)
-# [1] 1.258444
-
-sd(c(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='1',]$minutes/1.258444, p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes))
-# [1] 32.65674
-
-sd(p4_ancestors_dt[p4_ancestors_dt$strain=="grande",]$minutes)/mean(p4_ancestors_dt[p4_ancestors_dt$strain=="grande",]$minutes)
-# [1] 0.1439683
-
-sd(p4_ancestors_dt[p4_ancestors_dt$strain=="petite",]$minutes)/mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite",]$minutes)
-# [1] 0.2862308
+# SD petite (multiplying CV by 105 minutes of default mean to correctly map the petite SD in the matrix)
+sd(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes)/mean(p4_ancestors_dt[p4_ancestors_dt$strain=="petite" & p4_ancestors_dt$division_number_12=='2+',]$minutes)
+#### 0.2812098
+0.2812098*default_mean # 29.52703
 
 
 
@@ -761,6 +765,15 @@ p4_doubling_times_violin_ancestors_v2=ggplot(p4_ancestors_dt,
   )+
   NULL
 p4_doubling_times_violin_ancestors_v2
+
+p4_ancestors_dt %>%
+  group_by(name) %>%
+  summarise(sd_hours=sd(hours),
+            sd_minutes=sd(minutes))
+#   name   sd_hours sd_minutes
+#   <chr>     <dbl>      <dbl>
+# 1 Grande    0.255       15.3
+# 2 Petite    0.687       41.2
 
 fligner.test(hours ~ name, data = p4_ancestors_dt)
 # Fligner-Killeen:med chi-squared = 99.527, df = 1, p-value < 2.2e-16
@@ -829,7 +842,7 @@ figure_2_paper_ancestors_dt_v5 <- plot_grid(column1, row_cde_fg,
 figure_2_paper_ancestors_dt_v5
 
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_14sep2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_22sep2026.png',
        plot=figure_2_paper_ancestors_dt_v5, dpi='retina', width=6, height=7.2, bg='white')
 
 

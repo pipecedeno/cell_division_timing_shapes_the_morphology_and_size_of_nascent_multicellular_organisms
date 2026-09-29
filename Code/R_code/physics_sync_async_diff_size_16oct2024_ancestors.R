@@ -27,7 +27,9 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
-# setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/supp_fig3_physics_sim')
+
+# setwd('~/Desktop/version_supreme_corrected_results/supp_fig4_biophysics_sim/')
+setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/supp_fig4_biophysics_sim/')
 
 
 # Cluster size difference ####
@@ -35,8 +37,8 @@ petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghi
 # clust_size=data.frame()
 # 
 # for(j in c("petite", "grande")){
-#   temp_df=read.csv(paste(j, "_frac_size_30sim_500n_1.2aspr_10attempts_70overlap_v2.csv", sep=""), header=TRUE)
-#   
+#   temp_df=read.csv(paste(j, "_frac_size_30sim_100n_85overlap.csv", sep=""), header=TRUE)
+# 
 #   if(j=='petite'){
 #     temp_df$strain='Petite'
 #   } else {
@@ -46,11 +48,12 @@ petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghi
 # }
 # 
 # clust_size$strain=factor(clust_size$strain, levels=c('Petite', 'Grande'))
-# clust_size$gyration_diam=clust_size$gyration_diam*10**6
 # 
-# write.csv(clust_size, file="physics_sim_frag_size_sync_vs_async_10june2025.csv", row.names=FALSE)
+# write.csv(clust_size, file="physics_sim_frag_size_sync_vs_async_85overlap.csv", row.names=FALSE)
 
-clust_size=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/physics_sim_frag_size_sync_vs_async_10june2025.csv", header = TRUE)
+clust_size=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/physics_sim_frag_size_sync_vs_async_85overlap.csv", header = TRUE)
+
+# clust_size=read.csv("physics_sim_frag_size_sync_vs_async_85overlap.csv", header=TRUE)
 clust_size$strain=factor(clust_size$strain, levels=c('Petite', 'Grande'))
 
 
@@ -59,8 +62,14 @@ summary(clust_size)
 summ_clust_size=clust_size %>%
   group_by(strain, sim_number) %>%
   summarise(mean_size=mean(size_fracture),
-            mean_volume=mean(volume),
-            mean_diam=mean(gyration_diam))
+            mean_volume=mean(volume))
+
+summ_clust_size %>% group_by(strain) %>% summarise(mean_cluster_size=mean(mean_size))
+# target size is 339
+# 315 cells for 75 overlap
+# 327 cells for 80 overlap
+# 339 cells for 85 overlap <---
+# 351 cells for 90 overlap
 
 ggplot(summ_clust_size, aes(x=strain, y=mean_size, fill=strain))+
   geom_violin()+
@@ -78,55 +87,27 @@ ggplot(summ_clust_size, aes(x=strain, y=mean_volume, fill=strain))+
   labs(x='Strain', y='Volume (μm^3)')+
   NULL
 
-ggplot(summ_clust_size, aes(x=strain, y=mean_diam, fill=strain))+
-  geom_violin()+
-  stat_summary(fun='mean', geom='crossbar')+
-  petite_t200_colors+
-  guides(fill='none')+
-  labs(x='Strain', y='Cluster Diameter (μm)')+
-  NULL
 
-## All of the plots look the same
+
 
 summ_clust_size %>%
   group_by(strain) %>%
-  summarise(mean_fracture_size=mean(mean_size),
-            mean_cluster_volume=mean(mean_volume),
-            mean_gyration=mean(mean_diam))
-#overlap threshold 30
-#   strain     mean_fracture_size   mean_cluster_volume     mean_gyration
-# 1 Petite               312.4077              39293.82          30.7
-# 2 Grande               335.4728              46740.75          32.0
-# 23 cell difference between grande and petite
+  summarise(median_fracture_size=median(mean_size),
+            median_cluster_volume=median(mean_volume))
+#overlap threshold 85
+#   strain mean_fracture_size   mean_cluster_volume
+# 1 Petite               315.13              29228.
+# 2 Grande               340.50              36009.
+# 25 cell difference between grande and petite
 
 # Strain accumulation ####
 
-# overlap_size_df=data.frame()
-# 
-# for(j in c("petite", "grande")){
-#   for(i in seq(1,5)){
-#     temp_df=read.csv(paste("24oct2024_overlap_acum_100net_20n/", j, "_overlap_clust_size_1.2ar_10attempts_", i, ".csv", sep=""), header=TRUE)
-#     if(j=='petite'){
-#       temp_df$strain='Petite'
-#     } else {
-#       temp_df$strain='Grande'
-#     }
-#     overlap_size_df=rbind(overlap_size_df, temp_df)
-#   }
-# }
-
-# petite_overlap=read.csv("overlap_accumulation_2dec2024/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
-# petite_overlap$strain="Petite"
-# grande_overlap=read.csv("overlap_accumulation_2dec2024/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
-# grande_overlap$strain="Grande"
-# overlap_size_df=rbind(grande_overlap, petite_overlap)
-
-# Test sampling budding sites from time lapse distributions budding distributions
 petite_overlap=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/petite_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 petite_overlap$strain="Petite"
 grande_overlap=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/grande_overlap_clust_size_1.2ar_10attempts.csv", header=TRUE)
 grande_overlap$strain="Grande"
 overlap_size_df=rbind(grande_overlap, petite_overlap)
+
 
 overlap_size_df$strain=factor(overlap_size_df$strain, levels=c('Petite', 'Grande'))
 
@@ -172,9 +153,9 @@ mean_summ_overlap_size[mean_summ_overlap_size$cluster_size==330,]
 
 # Overlap Positions ####
 
-# process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap.csv -o stats_overlap_pos_10jun2025.csv
+# process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_100n.csv -o stats_overlap_pos.csv
 
-overlap_pos_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/stats_overlap_pos_10jun2025.csv", header=TRUE)
+overlap_pos_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_5_size_difference_physics_sim/stats_overlap_pos_85overlap.csv", header=TRUE)
 
 overlap_pos_df$strain=factor(overlap_pos_df$strain, levels=c("Petite", "Grande"))
 summary(overlap_pos_df)
@@ -196,24 +177,16 @@ ggplot(summ_overlap_pos, aes(x=strain, y=mean_dist, fill=strain))+
 tapply(summ_overlap_pos$mean_dist, summ_overlap_pos$strain, summary)
 # $Petite
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 13.92   14.84   15.12   15.13   15.42   16.85 
+# 12.70   13.11   13.26   13.33   13.57   14.28 
 # $Grande
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 14.56   15.38   15.62   15.62   15.88   16.71
+# 13.23   13.78   13.95   13.98   14.17   15.00
 
 t.test(summ_overlap_pos$mean_dist~summ_overlap_pos$strain)
-# t = -20.178, df = 971.8, p-value < 2.2e-16
+# t = -13.428, df = 197.87, p-value < 2.2e-16
 # 95 percent confidence interval:
-#   -0.5417887 -0.4457469
+#   -0.7538829 -0.5608051
 
-
-anova_mean_dist=aov(summ_overlap_pos$mean_dist~summ_overlap_pos$strain)
-summary(anova_mean_dist)
-#                          Df Sum Sq Mean Sq F value Pr(>F)    
-# summ_overlap_pos$strain   1  60.95   60.95   407.2 <2e-16 ***
-# Residuals               998 149.40    0.15 
-60.95/(60.95+149.40) #0.2897552
-#28% of the variance is explained by the strain variable
 
 
 
@@ -298,7 +271,7 @@ fig_physics_sim_mean_dist=plot_grid(p_petite, p_grande, p_overlap, p_frac_size, 
 fig_physics_sim_mean_dist
 
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_4_physics_sims_28aug2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_4_physics_sims_28sep2026.png',
        plot=fig_physics_sim_mean_dist, dpi='retina', width=10, height=12, bg='white')
 
 
