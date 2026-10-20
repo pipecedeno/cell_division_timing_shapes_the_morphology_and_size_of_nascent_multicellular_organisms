@@ -62,6 +62,7 @@ The github has the following structure:
 ```
 cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/
 ├── Code
+│   ├── image_analysis
 │   ├── R_code
 │   ├── simulation_code
 │   │   ├── table_1
@@ -74,20 +75,16 @@ cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_org
 │   ├── fig_6_settling_simulations
 │   ├── fig_8_fast_first_division
 │   ├── Images
-│   │   └── old_images
 │   ├── matlab_plots
 │   ├── network_files
-│   │   └── old_files
-│   ├── settling_simulation_data
 │   ├── supp_fig_1_cell_growth
-│   ├── supp_fig_10-11_cell_death_simulations
-│   ├── supp_fig_3_edge_degree_selection
-│   ├── supp_fig_4_growth_with_fragmentation_all
+│   ├── supp_fig_11-14_cell_death_simulations
+│   ├── supp_fig_3_acf_synchrony_index
+│   ├── supp_fig_4_edge_degree_selection
 │   ├── supp_fig_5_size_difference_physics_sim
-│   ├── supp_fig_6_random_fragmentation
+│   ├── supp_fig_7_random_fragmentation
 │   └── supp_table_3_volume_predictions
 ├── Paper_figures
-│   └── old_figures
 └── Supplementary_videos
 ```
 
