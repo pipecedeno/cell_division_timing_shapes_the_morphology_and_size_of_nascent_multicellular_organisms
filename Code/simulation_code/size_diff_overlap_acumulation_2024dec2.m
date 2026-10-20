@@ -42,7 +42,7 @@ cd(folder);
 strain="grande";
 
 %directory paths
-folder_path='~/work_dir/observed_synchrony/paper_results_2dec2024/physics_sim/overlap_accumulation_2dec2024/';
+folder_path='~/Desktop/version_supreme_corrected_results/supp_fig4_biophysics_sim/';
 
 
 % Network directory
@@ -52,7 +52,7 @@ directory_path = folder_path+"test_"+strain+"_1000m_100n/edges_sim_files/";
 
 % Open output file
 % output_folder=folder_path;
-output_folder='~/Desktop/results_edge_degree_15/supp_fig3_physics_sim';
+output_folder='~/Desktop/version_supreme_corrected_results/supp_fig4_biophysics_sim/';
 
 
 clust_filename = strain+"_clust_size_50sim_500n_1.2aspr.csv";
@@ -89,20 +89,20 @@ cell_overlap_size_filename=fullfile(output_folder, cell_overlap_size_file);
 % Cell budding angle information
 use_cell_angles = 1;
 
-cell_angle_path = '/Users/pipe/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/cell_budding_angles_grande_ancestor_30july2025.csv';
+cell_angle_path = '/Users/pipe/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/cell_budding_angles_grande_ancestor_30july2025.csv';
 cell_angle_data = readtable(cell_angle_path, 'Delimiter', ',', 'ReadVariableNames', true);
 cell_angles_degrees = cell_angle_data.angle_to_bud_scar;
 cell_angles_radians = deg2rad(cell_angles_degrees);  % Convert to radians
 
 
 max_network_size=500;
-add_cell_after_all_attempts=0; % 1 it always add the cell, 0 only adds it if there was space in the first 10 attempts
+add_cell_after_all_attempts=1; % 1 it always add the cell, 0 only adds it if there was space in the first 10 attempts
 
 N               = 30; % number of clusters to generate
 numGens         = 5; % number of generations of cell division in a group
-diam            = 4.58; % smallest diameter of the cell
+diam            = 4.26; % smallest diameter of the cell
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
-AR              = 1.2;%:.1:2.8; % aspect ratio value %# DEFAULT was 1.2
+AR              = 1.19;%:.1:2.8; % aspect ratio value %# DEFAULT was 1.2
 err_AR          = 0; % standard deviation in aspect ratio from Shane's measurements
 pole_theta      = deg2rad(10); % buds nearest the pole will be chosen from between 0 and 10 degrees in polar angle
 THETA           = deg2rad(45); % polar angle average from SEM data
@@ -620,6 +620,7 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
                     force_selection=0;
                     while cont_attempts<10 & newBud == 0 %if one of this conditions is met then it needs to stop
                         [newBud, newBudRel, newAxis] = getDaughterPos_measured_angles(cell_list(n), distance_thresh, cell_angles_radians, force_selection); % finds the new bud xyz position and relative position to the old cell
+                        cont_attempts=cont_attempts+1;
                     end
 
                     % If there wasn't space for the cell then it is just sampled randomly if add_cell_after_all_attempts is 1

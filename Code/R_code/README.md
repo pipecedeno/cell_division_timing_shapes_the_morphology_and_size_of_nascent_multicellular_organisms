@@ -11,7 +11,7 @@ ancestor_cluster_cell_counts_23may2024.csv
 ### synchrony_mother_daughter_31jan2024.R:  
 -Figure 2  
 -Figure 7 
--Supplementary Figure 9  
+-Supplementary Figure 10  
 cell_sync_mother_daughter_2025may5.csv  
 timelapse_doubling_time_inf_2025may5.csv  
 
@@ -50,31 +50,37 @@ Note: also includes the code for the plots of budding angles
 -Supplementary Figure 2  
 first_second_div_doubling_data_2024dec2.csv  
 
+### cell_division_freq_by_time_23sep2026.R:
+-Supplementary Figure 3  
+sim2_divisions.csv  
+sim3_divisions.csv  
+sim4_divisions.csv  
+
 ### grande_edge_degree_for_fragmentation_28may2025.R:  
--Supplementary figure 3  
+-Supplementary figure 4  
 edge_selection_grande_frag_28may2026.csv  
 
 ### physics_sync_async_diff_size_16oct2024_ancestors.R:  
--Supplementary Figure 4  
-grande_overlap_clust_size_1.2ar_10attempts.csv  
-physics_sim_frag_size_sync_vs_async_10june2025.csv  
-stats_overlap_pos_10jun2025.csv 
-petite_overlap_clust_size_1.2ar_10attempts.csv  
-physics_sim_frag_size_sync_vs_async_2024dec3.csv  
+-Supplementary Figure 5  
+physics_sim_frag_size_sync_vs_async_88overlap.csv  
+petite_overlap_clust_size_1.2ar_10attempts.csv
+grande_overlap_clust_size_1.2ar_10attempts.csv
+stats_overlap_pos_88overlap.csv
+
 
 ### normalized_net_diam_method_29apr2025.R:
--Supplementary Figure 5  
+-Supplementary Figure 6  
 mean_diameter_values_3oct2025.csv  
 
 ### edge_degree_frag_random_16oct2024_ancestors.R:  
--Supplementary Figure 6  
+-Supplementary Figure 7  
 growth_frag_random_diameter_df_26june2025.csv  
 growth_frag_random_frag_df_25june2025.csv  
 
 
 ### set_sim_test_carr_cap_15apr2024.R:  
--Supplementary Figure 7
 -Supplementary Figure 8
+-Supplementary Figure 9
 set_sim_growth_registry_12mar2026.csv  
 set_sim_settling_registry_12mar2026.csv  
 petite_second_10mill_50sim_time_registry_all_sim.csv  
@@ -87,9 +93,13 @@ set_sim_settling_registry_12mar2026.csv
 
 
 ### death_probability_alive_12sep2025.R:  
--Supplementary Figure 10
--Supplementary Figure 11
-growth_no_frag_more_parameters_12sep2025.csv
+-Supplementary Figure 11  
+-Supplementary Figure 12  
+-Supplementary Figure 13
+-Supplementary Figure 14
+fragmentation_data_death_prob_16sep2026.csv
+growth_no_frag_death_prob_0SD.csv
+spatial_constraints_sim_8oct2026.csv
 
 
 ### volume_predictions_8jan2023.R:  

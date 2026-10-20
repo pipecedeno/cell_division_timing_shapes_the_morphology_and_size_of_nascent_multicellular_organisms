@@ -45,7 +45,7 @@ petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghi
 # write.csv(frag_df, file="growth_frag_random_frag_df_25june2025.csv", row.names = FALSE)
 
 
-frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_6_random_fragmentation/growth_frag_random_frag_df_25june2025.csv", 
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_7_random_fragmentation/growth_frag_random_frag_df_25june2025.csv", 
                  header=TRUE)
 
 frag_df$strain=factor(frag_df$strain, levels=c('Petite', 'Petite w/o Delay', 'Grande'))
@@ -339,7 +339,7 @@ figure_supp_v2
 figure_supp_v2_with_legend <- plot_grid(figure_supp_v2, common_legend, ncol = 1, rel_heights = c(1, 0.05), label_size=11)
 figure_supp_v2_with_legend
 
-ggsave(filename='~/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Paper_figures/supp_fig_6_network_trajectories_random_28aug2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_7_network_trajectories_random_28aug2026.png',
        plot=figure_supp_v2_with_legend, dpi='retina', width=10, height=11, bg = 'white')
 
 

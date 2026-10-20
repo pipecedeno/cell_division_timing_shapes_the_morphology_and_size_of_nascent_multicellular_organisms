@@ -10,9 +10,10 @@ library(stringr)
 library(ggpubr)
 library(tidyverse)
 library(cowplot)
+library(ggridges)
+library(patchwork)
 
-
-setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/tom_burst_sim_supplementary/")
+# setwd("~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/tom_burst_sim_supplementary/")
 
 
 BINWIDTH <- 10
@@ -45,25 +46,29 @@ bin_counts <- function(df, time_col, group_vars = character(0)) {
 
 # Simulation 1: default sampling ####
 
-sim1_df=read.csv("sim1_divisions.csv", header = TRUE)
-summary(sim1_df)
 
-sim1_binned <- bin_counts(sim1_df, "divTime")
+
+sim4_df <- read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_3_acf_synchrony_index/sim4_divisions.csv", header=TRUE)
+sim1_binned <- bin_counts(sim4_df[sim4_df$run==1,], "divTime", group_vars = "condition")
 
 p_sim1=ggplot(sim1_binned[sim1_binned$n_plot!=0.01,], 
-              aes(x = bin_center, y = n_plot)) +
-  geom_col(fill = "#6699CC", width = BINWIDTH, color = NA) +
+              aes(x = bin_center, y = n_plot, fill=condition)) +
+  geom_col(width = BINWIDTH, position = "identity", alpha=0.75) +
   labs(x="Time (min)", y = "No. Cell Divisions")+
   coord_cartesian(xlim = c(0, 600)) +
   scale_y_log10() +
-  theme_classic(base_size = 8) +
+  theme_classic(base_size = 10) +
+  guides(fill=guide_legend(title = "Genotype"))+
+  scale_fill_manual(values = c(Grande = "#AE93BEFF", Petite = "#F0D77BFF"))+
   NULL
 p_sim1
 
 
+
+
 # Simualtion 2: Variance ####
 
-sim2_df <- read.csv("sim2_divisions.csv", header=TRUE)
+sim2_df <- read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_3_acf_synchrony_index/sim2_divisions.csv", header=TRUE)
 summary(sim2_df)
 
 sim2_binned <- bin_counts(sim2_df, "divTime", group_vars = "std_value")
@@ -74,19 +79,20 @@ p_sim2=ggplot(sim2_binned,
               aes(x = bin_center, y = n_plot,
                   color = factor(std_value, labels=sigma_labels))) +
   geom_line(linewidth = 1) +
-  scale_color_grey(start = 0.7, end = 0.1) +
+  # scale_color_grey(start = 0.7, end = 0.1) +
+  scale_color_manual(values = colorRampPalette(c("pink", "darkred"))(length(sigma_labels))) +
   labs(x="Time (min)", y = "No. Cell Divisions")+
   guides(col=guide_legend(title ="Standard\nDeviation"))+
   coord_cartesian(xlim = c(0, 600)) +
   scale_y_log10() +
-  theme_classic(base_size = 8) +
+  theme_classic(base_size = 10) +
   NULL
 p_sim2
 
 
 # Simulation 3: Delay ####
 
-sim3_df <- read.csv("sim3_divisions.csv", header=TRUE)
+sim3_df <- read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_3_acf_synchrony_index/sim3_divisions.csv", header=TRUE)
 sim3_binned <- bin_counts(sim3_df, "divTime", group_vars = "delay")
 sim3_binned$delay_percentage=sim3_binned$delay*100/105
 
@@ -94,19 +100,20 @@ p_sim3=ggplot(sim3_binned,
               aes(x = bin_center, y = n_plot,
                   color = factor(delay_percentage))) +
   geom_line(linewidth = 1) +
-  scale_color_brewer(palette = "Purples")+
+  # scale_color_brewer(palette = "Purples")+
+  scale_color_manual(values = colorRampPalette(c("lightblue", "darkblue"))(5)) +
   labs(x="Time (min)", y = "No. Cell Divisions")+
   guides(col=guide_legend(title ="Delay %"))+
   coord_cartesian(xlim = c(0, 600)) +
   scale_y_log10() +
-  theme_classic(base_size = 8) +
+  theme_classic(base_size = 10) +
   NULL
 p_sim3
 
 
 # Simulation 4: Combined effects ancestors ####
 
-sim4_df <- read.csv("sim4_divisions.csv", header=TRUE)
+sim4_df <- read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_3_acf_synchrony_index/sim4_divisions.csv", header=TRUE)
 sim4_binned <- bin_counts(sim4_df, "divTime", group_vars = "condition")
 
 p_sim4=ggplot(sim4_binned,
@@ -114,10 +121,10 @@ p_sim4=ggplot(sim4_binned,
   geom_line(linewidth = 1) +
   scale_color_manual(values = c(Grande = "#AE93BEFF", Petite = "#F0D77BFF")) +
   labs(x="Time (min)", y = "No. Cell Divisions")+
-  guides(col=guide_legend(title = ""))+
+  guides(col=guide_legend(title = "Genotype"))+
   coord_cartesian(xlim = c(0, 600)) +
   scale_y_log10() +
-  theme_classic(base_size = 8) +
+  theme_classic(base_size = 10) +
   NULL
 p_sim4
 
@@ -360,6 +367,9 @@ plot_run_rate(sim2_df, "std_value", 20, run_number = 3)
 
 plot_run_rate(sim3_df, "delay", 13.125, run_number = 1)
 
+
+sim4_mu_map <- c(Grande = MU_EXPECTED, Petite = 120)
+
 plot_run_rate(sim4_df, "condition", "Petite", run_number = 1,
              mu_expected = sim4_mu_map[["Petite"]])
 
@@ -375,8 +385,6 @@ plot_run_acf(sim2_df, "std_value", 20, run_number = 3)
 unique(sim3_df$delay)
 plot_run_acf(sim3_df, "delay", 13.125, run_number = 1)
 
-
-sim4_mu_map <- c(Grande = MU_EXPECTED, Petite = 120)
 
 plot_run_acf(sim4_df, "condition", "Petite", run_number = 1,
              mu_expected = sim4_mu_map[["Petite"]])
@@ -395,10 +403,32 @@ print(cor.test(sim2_sync$std_value, sim2_sync$sync_index, method = "spearman"))
 
 p_sim2_sync <- ggplot(sim2_sync, aes(x = factor(std_value), y = sync_index)) +
   geom_boxplot(fill = "grey85", outlier.shape = NA) +
-  geom_jitter(width = 0.1, color = "#6699CC", size = 1.5) +
+  # geom_jitter(width = 0.1, color = "#6699CC", size = 0.5) +
   labs(x = "Standard deviation (min)", y = "ACF synchrony index") +
-  theme_classic(base_size = 8)
+  theme_classic(base_size = 7)
 p_sim2_sync
+
+summ_sim2_sync=sim2_sync %>%
+  group_by(std_value) %>%
+  summarise(mean_sync_index = mean(sync_index),
+            sd_sync_index = sd(sync_index),
+            n = n(),
+            se_sync_index = sd_sync_index / sqrt(n),
+            ci_lower = mean_sync_index - qt(0.975, n-1) * se_sync_index,
+            ci_upper = mean_sync_index + qt(0.975, n-1) * se_sync_index,
+            .groups = 'drop')
+
+p_sim2_sync_mean=ggplot(summ_sim2_sync, aes(x = std_value, y = mean_sync_index)) +
+  geom_point()+
+  geom_line()+
+  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.4, color=NA)+
+  labs(x = "Standard deviation (min)", y = "ACF synchrony index") +
+  theme_classic(base_size = 8)+
+  NULL
+p_sim2_sync_mean
+
+p_sim2_inset=p_sim2 + inset_element(p_sim2_sync, left = 0.5, bottom = 0.05, right = 1, top = 0.6)
+p_sim2_inset
 
 #### Simulation 3: delays ####
 sim3_sync <- compute_synchrony_table(sim3_df, "divTime", "delay")
@@ -409,10 +439,32 @@ print(cor.test(sim3_sync$delay, sim3_sync$sync_index, method = "spearman"))
 
 p_sim3_sync <- ggplot(sim3_sync, aes(x = factor(delay*100/105), y = sync_index)) +
   geom_boxplot(fill = "grey85", outlier.shape = NA) +
-  geom_jitter(width = 0.1, color = "#9966CC", size = 1.5) +
+  # geom_jitter(width = 0.1, color = "#6699CC", size=0.5) +
   labs(x = "Delay %", y = "ACF synchrony index") +
-  theme_classic(base_size = 8)
+  theme_classic(base_size = 7)
 p_sim3_sync
+
+summ_sim3_sync=sim3_sync %>%
+  group_by(delay) %>%
+  summarise(mean_sync_index = mean(sync_index),
+            sd_sync_index = sd(sync_index),
+            n = n(),
+            se_sync_index = sd_sync_index / sqrt(n),
+            ci_lower = mean_sync_index - qt(0.975, n-1) * se_sync_index,
+            ci_upper = mean_sync_index + qt(0.975, n-1) * se_sync_index,
+            .groups = 'drop')
+
+p_sim3_sync_mean=ggplot(summ_sim3_sync, aes(x = delay, y = mean_sync_index)) +
+  geom_point()+
+  geom_line()+
+  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.4, color=NA)+
+  labs(x = "Delay %", y = "ACF synchrony index") +
+  theme_classic(base_size = 8)+
+  NULL
+p_sim3_sync_mean
+
+p_sim3_inset=p_sim3 + inset_element(p_sim3_sync, left = 0.5, bottom = 0.05, right = 1, top = 0.6)
+p_sim3_inset
 
 #### Simulation 4: grande vs. petite ####
 
@@ -429,31 +481,54 @@ sim4_sync %>%
 
 p_sim4_sync <- ggplot(sim4_sync, aes(x = condition, y = sync_index, color = condition)) +
   geom_boxplot(outlier.shape = NA) +
-  geom_jitter(width = 0.1, size = 1.5) +
+  # geom_jitter(width = 0.1, size = 0.5) +
   scale_color_manual(values = c(Grande = "#AE93BEFF", Petite = "#F0D77BFF")) +
   labs(x = "Genotype", y = "ACF synchrony index") +
-  theme_classic(base_size = 8) +
+  theme_classic(base_size = 7) +
   theme(legend.position = "none")
 p_sim4_sync
 
-## --- Combined synchrony-index summary plot ------------------------------
-supp_fig_sync <- plot_grid(p_sim2_sync, p_sim3_sync, p_sim4_sync,
-                           labels = LETTERS[1:3], label_size = 10, nrow = 1)
-supp_fig_sync
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_3-temp_sim_burstiness_18sep2026_ACF_dist.png',
-       plot=supp_fig_sync, dpi='retina', width=8, height=5.6, bg='white')
+summ_sim4_sync=sim4_sync %>%
+  group_by(condition) %>%
+  summarise(mean_sync_index = mean(sync_index),
+            sd_sync_index = sd(sync_index),
+            n = n(),
+            se_sync_index = sd_sync_index / sqrt(n),
+            ci_lower = mean_sync_index - qt(0.975, n-1) * se_sync_index,
+            ci_upper = mean_sync_index + qt(0.975, n-1) * se_sync_index,
+            .groups = 'drop')
+
+p_sim4_sync_mean=ggplot(summ_sim4_sync, aes(x = condition, y = mean_sync_index)) +
+  geom_point()+
+  geom_line()+
+  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.4, color=NA)+
+  labs(x = "Genotype", y = "ACF synchrony index") +
+  theme_classic(base_size = 8)+
+  NULL
+p_sim4_sync_mean
+
+p_sim4_inset=p_sim4 + inset_element(p_sim4_sync, left = 0.5, bottom = 0.05, right = 1, top = 0.6)
+p_sim4_inset
+
+## --- Combined synchrony-index summary plot ------------------------------
+# supp_fig_sync <- plot_grid(p_sim2_sync, p_sim3_sync, p_sim4_sync,
+#                            labels = LETTERS[1:3], label_size = 10, nrow = 1)
+# supp_fig_sync
+# 
+# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_3-temp_sim_burstiness_18sep2026_ACF_dist.png',
+#        plot=supp_fig_sync, dpi='retina', width=8, height=5.6, bg='white')
 
 
 
 # Supplementary Figure ####
 
-supp_fig=plot_grid(p_sim1, p_sim2, p_sim3, p_sim4,
+supp_fig=plot_grid(p_sim1, p_sim2_inset, p_sim3_inset, p_sim4_inset,
                    labels=LETTERS[1:4], label_size=10)
 supp_fig
 
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_3-temp_sim_burstiness_18sep2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_3-temp_sim_burstiness_29sep2026.png',
        plot=supp_fig, dpi='retina', width=8, height=5.6, bg='white')
 
 

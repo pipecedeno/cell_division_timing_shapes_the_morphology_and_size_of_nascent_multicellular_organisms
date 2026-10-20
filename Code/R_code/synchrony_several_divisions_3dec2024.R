@@ -12,6 +12,7 @@ library(stringi)
 library(purrr)
 library(ghibli)
 library(tidyr)
+library(ggbeeswarm)
 
 theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
@@ -100,48 +101,13 @@ table(t600_doubled$strain_timepoint, t600_doubled$division_number)
 
 # Supplementary Figure ####
 
-div_num_t600=ggplot(t600_doubled, 
-       aes(x=division_number, y=hours, fill=division_number)) +
-  geom_violin(adjust=2)+
-  facet_wrap(~strain_timepoint)+
-  xlab('Division Number')+ylab('Doubling Time (Hours)')+
-  guides(fill='none')+
-  theme_classic()+
-  stat_summary(fun='mean', geom='crossbar')+
-  # petite_t200_colors+
-  scale_fill_manual(values=c("#BBA78CFF", "#333544FF", "#B50A2AFF", "#44A57CFF"))+
-  NULL
-div_num_t600
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig1_similar_mean_several_div_3oct2025.png',
-#        plot=div_num_t600, dpi='retina', width=6, height=4, bg='white')
-
+#### version 26 mar 2026 ####
 
 doubled_filtered <- doubled %>%
   group_by(strain_timepoint, division_number) %>%
   filter(n() >= 20) %>%
   ungroup()
-
-
-div_num_all=ggplot(doubled_filtered[doubled_filtered$timepoint!="t0",], 
-       aes(x=division_number, y=hours, fill=division_number)) +
-  geom_violin(adjust=2)+
-  # geom_boxplot()+
-  facet_grid(strain~timepoint)+
-  xlab('Division Number')+ylab('Doubling Time (Hours)')+
-  guides(fill='none')+
-  theme_classic(base_size=10)+
-  stat_summary(fun='mean', geom='crossbar', linewidth=0.25)+
-  scale_fill_manual(values=c("#EAD890FF", "#E48C2AFF", "#CD4F38FF", "#44A57CFF"))+
-  NULL
-div_num_all
-
-
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig1_similar_mean_several_div_24feb2026.png',
-#        plot=div_num_all, dpi='retina', width=6.5, height=5.5, bg='white')
-
-
-#### version 26 mar 2026 ####
 
 doubled_few_data_points <- doubled %>%
   group_by(strain_timepoint, division_number) %>%
@@ -165,7 +131,8 @@ div_num_ancestors=ggplot(doubled_filtered[doubled_filtered$timepoint=="t0",],
 div_num_ancestors
 
 
-div_num_all_v2=ggplot(doubled_filtered[doubled_filtered$timepoint!="t0",], 
+div_num_all_v2=ggplot(doubled_filtered[doubled_filtered$timepoint!="t0" &
+                                         !(doubled_filtered$complete_id %in% c("PA3_t200_4_2022nov23", "PA1_t1000_3_2022sep27", "PA4_t200_2_2022nov23")),], 
                    aes(x=division_number, y=hours, fill=division_number)) +
   geom_violin(adjust=2)+
   geom_beeswarm(data=doubled_few_data_points[doubled_few_data_points$timepoint!="t0",], 
@@ -186,7 +153,7 @@ division_numbers_all=plot_grid(row_1, div_num_all_v2,
                                labels=c('A', 'B'), ncol=1, label_size=11, rel_heights=c(1,4))
 
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_2_similar_mean_several_div_28aug2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_2_similar_mean_several_div_8oct2026.png',
        plot=division_numbers_all, dpi='retina', width=6.5, height=7, bg='white')
 
 

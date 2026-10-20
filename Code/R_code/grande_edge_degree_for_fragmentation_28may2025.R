@@ -27,7 +27,7 @@ theme_set(theme_classic(base_size = 16))
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
-setwd("/Users/pipe/Desktop/edge_degree_selection_28may2025")
+# setwd("/Users/pipe/Desktop/edge_degree_selection_28may2025")
 
 # Loading the network simulation data ####
 
@@ -40,10 +40,10 @@ setwd("/Users/pipe/Desktop/edge_degree_selection_28may2025")
 #   frag_df=rbind(frag_df, temp_df)
 # }
 # 
-# write.csv(frag_df, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig3_edge_degree_selection/edge_selection_grande_frag_28may2026.csv",
+# write.csv(frag_df, "~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_4_edge_degree_selection/edge_selection_grande_frag_28may2026.csv",
 #           row.names = FALSE)
 
-frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_3_edge_degree_selection/edge_selection_grande_frag_28may2026.csv",
+frag_df=read.csv("~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/supp_fig_4_edge_degree_selection/edge_selection_grande_frag_28may2026.csv",
                  header=TRUE)
 
 summary(frag_df)
@@ -373,5 +373,5 @@ supp_fig=plot_grid(cluster_radius, cells_per_cluster, edge_degree,
                                    labels=c('A', 'B', 'C'), ncol=1, label_size=11)
 supp_fig
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_3_edge_degree_selection.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_4_edge_degree_selection.png',
        plot=supp_fig, dpi='retina', width=3.5, height=6.3, bg='white')

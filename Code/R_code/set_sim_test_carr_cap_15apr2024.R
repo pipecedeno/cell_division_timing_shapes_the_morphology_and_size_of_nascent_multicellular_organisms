@@ -1061,7 +1061,7 @@ pairwise.t.test(mean_comp_sett_carr_cap_top$mean_sel_r, mean_comp_sett_carr_cap_
 
 
 
-# Supplementary Figure 7 ####
+# Supplementary Figure 8 ####
 
 
 supp_mean_growth=ggplot(mean_filt_sel_r[mean_filt_sel_r$phase=='Growth' & mean_filt_sel_r$carr_cap!='10k',], 
@@ -1189,16 +1189,16 @@ pairwise.wilcox.test(mean_comp_sett_carr_cap_top$mean_sel_r, mean_comp_sett_carr
 #        plot=supp_carr_cap, dpi='retina', width=9, height=7)
 
 supp_carr_cap=plot_grid(supp_mean_settling, supp_mean_settling_top, 
-                        labels=c('A', 'B'), ncol=2, align='hv', label_size = 11)
+                        labels=c('A', 'B'), ncol=2, label_size = 11, rel_widths = c(1.1,1))
 supp_carr_cap
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_7_carrying_capacity_test_28aug2026.png',
-#        plot=supp_carr_cap, dpi='retina', width=6.5, height=2.5)
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_8_carrying_capacity_test_28aug2026.png',
+       plot=supp_carr_cap, dpi='retina', width=6.5, height=2.5)
 
 
 
 
-# Supplementary Figure 8 ####
+# Supplementary Figure 9 ####
 
 growth_s_rate=ggplot(growth_prop[growth_prop$carr_cap=='10mill',],
                      aes(x=transfer, y=cell_sel_r, group=sim_number,))+
@@ -1252,8 +1252,8 @@ supp_s_rate=plot_grid(growth_s_rate,settling_s_rate, p_num_gen,
                       labels=c('A', 'B', 'C'), ncol=1, label_size = 11)
 supp_s_rate
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_8_selection_rate_per_transfer_28aug2026.png',
-#        plot=supp_s_rate, dpi='retina', width=5.5, height=7)
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_9_selection_rate_per_transfer_28aug2026.png',
+       plot=supp_s_rate, dpi='retina', width=5.5, height=7)
 
 
 

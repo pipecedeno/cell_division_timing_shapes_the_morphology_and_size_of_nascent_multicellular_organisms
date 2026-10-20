@@ -250,9 +250,10 @@ shared_legend <- ggpubr::get_legend(temp_plot)
 plots_grid <- plot_grid(p1_strain, p2_strain, p3_strain, ncol = 3)
 
 # Combine the plots with the shared legend
-final_plot <- plot_grid(plots_grid, shared_legend, ncol = 1, rel_heights = c(1, 0.1))
+final_plot <- plot_grid(plots_grid, shared_legend, ncol = 1, rel_heights = c(1, 0.1)) +
+  theme(plot.background = element_rect(fill = "white", color = NA))
 final_plot
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_5_normalized_net_diam_method_28aug2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_6_normalized_net_diam_method_28aug2026.png',
        plot=final_plot, dpi='retina', width=9, height=3)
 

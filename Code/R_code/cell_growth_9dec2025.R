@@ -121,8 +121,8 @@ p_cell_props_v2=plot_grid(p_dt_asp_r, p_dt_diam,
                        ncol=2, labels=LETTERS[1:6], label_size=10)
 p_cell_props_v2
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_1_cell_growth_properties_28aug2026.png',
-#        plot=p_cell_props_v2, dpi='retina', width=6.5, height=3, bg='white')
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_1_cell_growth_properties_28aug2026.png',
+       plot=p_cell_props_v2, dpi='retina', width=6.5, height=3, bg='white')
 
 ancestor_spots[ancestor_spots$division_number==2 &
                  ancestor_spots$ELLIPSE_ASPECTRATIO!=1,] %>%

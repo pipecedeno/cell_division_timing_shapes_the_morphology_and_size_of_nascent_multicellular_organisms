@@ -39,16 +39,16 @@ strain="grande";
 % strain="petite";
 
 %directory paths
-directory_path="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/test_"+strain+"_1000m_500n/edges_sim_files/";
+directory_path="~/Desktop/version_supreme_corrected_results/supp_fig4_biophysics_sim/test_"+strain+"_1000m_100n/edges_sim_files/";
 
 % Open output file
-output_filename="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/"+strain+"_frac_size_30sim_500n_1.2aspr_10attempts_70overlap_v2_sampled_angles.csv";
+output_filename="~/Desktop/version_supreme_corrected_results/supp_fig4_biophysics_sim/"+strain+"_frac_size_30sim_100n_90overlap.csv";
 
 
 % Cell budding angle information
 use_cell_angles = 1;
 
-cell_angle_path = '/Users/pipe/emergence_of_coordinated_cell_division_during_the_evolution_of_multicellularity/Data/cell_budding_angles_grande_ancestor_30july2025.csv';
+cell_angle_path = 'cell_budding_angles_grande_ancestor_30july2025.csv';
 cell_angle_data = readtable(cell_angle_path, 'Delimiter', ',', 'ReadVariableNames', true);
 cell_angles_degrees = cell_angle_data.angle_to_bud_scar;
 cell_angles_radians = deg2rad(cell_angles_degrees);  % Convert to radians
@@ -60,7 +60,7 @@ calculate_overlap_position_end=1;
 
 
 % Overlap file name
-overlap_position_name="~/Desktop/results_edge_degree_15/supp_fig3_physics_sim/"+strain+"_overlap_pos_30sim_500n_1.2aspr_10attempts_70overlap_sampled_angles.csv";
+overlap_position_name="~/Desktop/version_supreme_corrected_results/supp_fig4_biophysics_sim/"+strain+"_overlap_pos_30sim_100n_90overlap.csv";
 
 %# Calculate individual cells overlap? This is for the main loop
 calc_ind_overlap=0; % 1 = Y, 0 = N
@@ -71,14 +71,14 @@ save_ind_overlaps=0; % 1 = Y, 0 = N
 % overlaps_filename = '/home/lprez3/work_dir/observed_synchrony/physics_model/overlap_sim_18nov2023/petite_50sim_50n_1.2ar_overlaps.csv';
 
 
-add_cell_after_all_attempts=0; % 1 it always add the cell, 0 only adds it if there was space in the first 10 attempts
+add_cell_after_all_attempts=1; % 1 it always add the cell, 0 only adds it if there was space in the first 10 attempts
 
 
 N               = 30; % number of clusters to generate
 numGens         = 5; % number of generations of cell division in a group
-diam            = 4.58; % smallest diameter of the cell
+diam            = 4.26; % smallest diameter of the cell
 err_diam        = 0; % variation in cell size, taken from coefficient of variation data
-AR              = 1.2;%:.1:2.8; % aspect ratio value %# DEFAULT was 1.2
+AR              = 1.19;%:.1:2.8; % aspect ratio value %# DEFAULT was 1.2
 err_AR          = 0; % standard deviation in aspect ratio from Shane's measurements
 pole_theta      = deg2rad(10); % buds nearest the pole will be chosen from between 0 and 10 degrees in polar angle
 THETA           = deg2rad(45); % polar angle average from SEM data
@@ -86,7 +86,7 @@ thetaVariance   = deg2rad(0); % variation in polar angle from SEM data
 distance_thresh = 1.1672; % minimum distance (um) separating bud scars
 new_bud_prob    = .8; % probability that the first cell will bud near the pole
 check_overlap   = 1; % do we check the overlap?
-overlap_thresh  = 70; % threshold of total overlaps %#2.5e2
+overlap_thresh  = 88; % threshold of total overlaps %#2.5e2
 
 % Force input parameters:
 include_forces  = 0; % do we include forces for rearrangements? 1 = Y, 0 = N
@@ -599,6 +599,7 @@ function [cell_list] = ELYES_SIM(diam, err_diam, aspRat, err_AR, pole_theta, the
                     force_selection=0;
                     while cont_attempts<10 & newBud == 0 %if one of this conditions is met then it needs to stop
                         [newBud, newBudRel, newAxis] = getDaughterPos_measured_angles(cell_list(n), distance_thresh, cell_angles_radians, force_selection); % finds the new bud xyz position and relative position to the old cell
+                        cont_attempts=cont_attempts+1;
                     end
 
                     % If there wasn't space for the cell then it is just sampled randomly if add_cell_after_all_attempts is 1

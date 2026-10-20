@@ -720,8 +720,8 @@ figure_7_annotated <- ggdraw(
 figure_7_annotated
 
 
-ggsave(filename="~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_6_selection_rates_10mill_12mar2026.png",
-       plot=figure_7_annotated, dpi='retina', width=6.5, height=5)
+# ggsave(filename="~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_6_selection_rates_10mill_12mar2026.png",
+#        plot=figure_7_annotated, dpi='retina', width=6.5, height=5)
 
 
 

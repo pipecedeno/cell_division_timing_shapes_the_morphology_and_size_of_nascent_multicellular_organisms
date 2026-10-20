@@ -37,7 +37,7 @@ The bash script executes the following python script:
 
 ### Figure 6: Settling selection simulations
 
-All the following codes are needed for figure 6, and supplementary figures 7 and 9.  
+All the following codes are needed for figure 6, and supplementary figures 8 and 9.  
 
 ```
 # Testing different carrying capacities
@@ -120,7 +120,11 @@ The following code was executed to obtain the result of all variabled tested com
 snowflake_synchrony_volume_prediction_combined_effect.m
 ```
 
-### Supplementary Figure 3: Finding edge degree threshold for simulations
+### Supplementary Figure 3: Autocorrelation Function (ACF) synchrony index
+cell_division_synchronicity_simulation_TCD_empirical_sim.m  
+
+
+### Supplementary Figure 4: Finding edge degree threshold for simulations
 
 ```
 diff_edge_degrees_grande_28may2025.sh
@@ -128,7 +132,7 @@ diff_edge_degrees_grande_28may2025.sh
 Note: this code executes the python script ```sim_frag_clust_edge_degree_after_all_cells_22feb2024.py``` same as supplementary figure 6.
 
 
-### Supplementary figure 4: Validation of the network model with biophysical simulations
+### Supplementary figure 5: Validation of the network model with biophysical simulations
 
 First some networks need to be created for the matlab code to be executed:
 ```
@@ -141,7 +145,7 @@ Then the matlab code ``` size_diff_sync_vs_async_2024sep26_v3.m ``` is executed 
 
 To generate the statistics of the overlap data the following python code was used:
 ```
-process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_100n.csv -o stats_overlap_pos.csv
+process_overlap_pos_physics_sim_1nov2024.py -i . -f _overlap_pos_30sim_100n_88overlap.csv -o stats_overlap_pos_88overlap.csv
 ```
 
 Finally, the code matlab code ``` size_diff_overlap_acumulation_2024dec2.m ``` is executed to calculate how the overlap changes as a cell gets added.
@@ -149,7 +153,7 @@ Finally, the code matlab code ``` size_diff_overlap_acumulation_2024dec2.m ``` i
 
 
 
-### Supplementary Figure 5: Normalization method for network diameter
+### Supplementary Figure 6: Normalization method for network diameter
 
 The code used to generate the results is the following:  
 ```
@@ -158,7 +162,7 @@ test_network_diam_normalization.ipynb
 The value of the linear regression obtained here is what was used in the for the normalization, even though an R code was used to generate the plots.  
 
 
-### Supplementary figure 6: Network growth with fragmentation tracking only one cluster after fragmentation
+### Supplementary figure 7: Network growth with fragmentation tracking only one cluster after fragmentation
 
 ```
 sim_frag_clust_edge_degree_after_all_cells_22feb2024.py -d petite_doubling_time_dist_2023may30.csv -n 500 -g 100 -e 15 -o petite_15e_100g_random -c random
@@ -169,9 +173,9 @@ sim_frag_clust_edge_degree_after_all_cells_22feb2024.py -d grande_doubling_time_
 ```
 
 
-### Supplementary Figure 10 & 11
+### Supplementary Figure 11, 12, 13, and 14
 
-For simulations without fragmentation:  
+For simulations without fragmentation (S12 and S13):  
 
 ```
 lognormal_parameter_csv="~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/params_distributions_50percent_15var_14sep2026.csv"
@@ -187,15 +191,51 @@ done
 Bash script runs the following python script:  
 sim_clust_no_fragmentation_lognormal_death_prob_5aug2025.py  
 
-For simulations with fragmentation:  
+
+For simulations with fragmentation (S11, S13, and S14):  
 
 ```
 lognormal_parameter_csv="/Users/pipe/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Data/fig_8_fast_first_division/params_distributions_50percent_15var_14sep2026.csv"
 
-exec_death_prob_frag_parallel_delays.sh -n 30 -g 50 -e 15 -c random -i ${lognormal_parameter_csv} -p 0.0 -P 0.3 -s 0.05 -t 4
+exec_death_prob_frag_parallel_delays.sh -n 30 -g 20 -e 15 -c random -i ${lognormal_parameter_csv} -p 0.0 -P 0.3 -s 0.05 -t 4
 ```
 
-This bash script runs the python script: ```sim_frag_clust_death_prob_16sep2026.py```  
+For validation of network simulation results with biophysical simulations:
+```
+exec_death_prob_frag_parallel_delays_save_edges.sh -n 30 -g 20 -e 15 -c random -i ../params_distributions_50percent_15var_14sep2026_reduced_values.csv -p 0.0 -P 0.3 -s 0.15 -t 5
+```
+This bash script executes the python code ```sim_frag_clust_death_prob_save_edges_order_6oct2026.py``` inside it.  
+
+The following bash code was used to rename the files for easier loading into the matlab script, it saves all the network csv files into the same directory:
+```
+# Executed within the propagule, parent, random-only folder
+outdir="all_network_order_files"
+mkdir -p "$outdir"
+
+find . -type d -name edge_order_dir | while IFS= read -r dir; do
+    for f in "$dir"/*.csv; do
+        [ -e "$f" ] || continue   # skip if no csv files match
+
+        base=$(basename "$f" .csv)
+        sim=${base%_*}
+        gen=${base##*_}
+
+        middle_dir=$(basename "$(dirname "$dir")")
+        prob_dir=$(basename "$(dirname "$(dirname "$dir")")")
+
+        suffix=${middle_dir#*_var_}
+
+        newname="${prob_dir}_${suffix}_sim_${sim}_gen_${gen}.csv"
+        cp "$f" "$outdir/$newname"
+    done
+done
+```
+
+Finally, the csv network files are processed in the following matlab code:  
+```
+death_prob_spatial_constraints_test_6oct2026.m  
+```
+
 
 ### Codes to create visualizations
 

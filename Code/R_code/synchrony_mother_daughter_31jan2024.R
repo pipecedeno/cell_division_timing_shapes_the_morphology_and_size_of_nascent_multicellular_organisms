@@ -19,6 +19,7 @@ library(ggh4x)
 library(MASS)
 
 theme_set(theme_classic(base_size = 16))
+
 mycolors <- rev(ghibli_palettes$LaputaMedium)
 petite_t200_colors <- list(scale_color_manual(values = mycolors), scale_fill_ghibli_d("LaputaMedium", direction = -1))
 
@@ -708,7 +709,7 @@ contour_sd=ggplot(df_grid_analysis, aes(x = delay*100/default_mean, y = std, z =
              aes(x = x, y = y, z = NULL),
              shape = 8, size = 1, color = "#F0D77BFF", stroke = 1) +  # Petite
   labs(x = "Delay (% Second Division)", 
-       y = "Doubling Time\nStandard Deviation") + 
+       y = "Doubling Time\nStandard Deviation (min)") + 
   theme_classic(base_size=10) +
   theme(legend.key.size = unit(0.4, "cm"),
         legend.text = element_text(size = 7),
@@ -814,11 +815,11 @@ column1 <- plot_grid(img_plot_grande_v2, img_plot_petite_v2,
                      label_size = 10, 
                      rel_heights = c(1, 0.8))
 
-row_cde=plot_grid(p2_ancestors_v2, p4_doubling_times_ancestors_v3, p3_ancestors,
-                  labels=c('', 'D', 'E'),
+row_cde=plot_grid(p4_doubling_times_ancestors_v3, p2_ancestors_v2, p3_ancestors,
+                  labels=c('C', 'D', 'E'),
                   nrow=1,
                   label_size = 10,
-                  rel_widths = c(0.9, 0.4, 0.9))
+                  rel_widths = c(0.4, 0.9, 0.9))
 
 
 
@@ -831,7 +832,7 @@ row_fg=plot_grid(p4_doubling_times_violin_ancestors, contour_sd,
 
 row_cde_fg=plot_grid(row_cde, row_fg,
                ncol = 1,
-               labels=c('C',''),
+               labels=c('',''),
                label_size = 10,
                rel_heights = c(1.4, 1.4))
 
@@ -842,7 +843,7 @@ figure_2_paper_ancestors_dt_v5 <- plot_grid(column1, row_cde_fg,
 figure_2_paper_ancestors_dt_v5
 
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_22sep2026.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_2_synchronization_ancestors_dt_22sep2026_hdf.png',
        plot=figure_2_paper_ancestors_dt_v5, dpi='retina', width=6, height=7.2, bg='white')
 
 
@@ -850,62 +851,15 @@ ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascen
 
 # Figure 7 ####
 
-p3_paper=ggplot(cell_sync[cell_sync$strain!='grande',], 
-                aes(x=mother_minutes, y=daughter_minutes, col=timepoint))+
-  geom_point(alpha=0.5)+
-  geom_abline(linetype='dashed')+
-  facet_wrap(~timepoint, ncol=5)+
-  guides(col='none')+
-  xlab('Mother Doubling Time (minutes)')+
-  ylab('Daughter Doubling\nTime (minutes)')+
-  scale_x_continuous(breaks = seq(100, 300, by = 100))+
-  scale_color_manual(values=c("#ff767e","#add8e6","#00BF7D","#00B0F6","#E76BF3"))+
-  # theme_classic(base_size = 11)+
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    strip.background = element_blank()
-  )+
-  NULL
-p3_paper
-
-p4_doubling_times_violin=ggplot(doubled[as.numeric(doubled$division_number)<=2 & doubled$strain!='grande',], 
-                                aes(x=division_number, y=hours, fill=timepoint, col=timepoint))+
-  facet_wrap(~timepoint, ncol=5)+
-  # geom_boxplot()+
-  geom_jitter(alpha=0.2)+
-  # geom_violin(adjust=2, color='black')+
-  stat_summary(fun='mean', geom='crossbar', col='black')+
-  xlab('Division Number')+
-  ylab('Cell Doubling Time\n(hours)')+
-  guides(fill='none', col='none')+
-  petite_t200_colors+
-  scale_fill_manual(values=c("#ff767e","#add8e6","#00BF7D","#00B0F6","#E76BF3"))+
-  scale_color_manual(values=c("#ff767e","#add8e6","#00BF7D","#00B0F6","#E76BF3"))+
-  # theme_classic(base_size = 11)+
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    strip.background = element_blank()
-  )+
-  NULL
-p4_doubling_times_violin
-
-
-figure_evol_sync=plot_grid(p3_paper, p4_doubling_times_violin, 
-                           labels=c('A', 'B'), ncol=1, label_size=16)
-figure_evol_sync
-
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_7_evolution_synchrony_PA_line_5may2025.png',
-#        plot=figure_evol_sync, dpi='retina', width=10, height=6, bg='white')
-
-
 
 doubled$division_number_12=ifelse(as.numeric(doubled$division_number)>=2, "2+", "1")
 doubled$division_number_12=factor(doubled$division_number_12, levels=c("1", "2+"))
 
-# not using timelapse 2022nov23_gob385_2 as it has higher doubling times that differ from the 2 other time lapses
-# of PA4 t200
+# not using all time lapses as 
+# PA3_t200_4_2022nov23
+# PA1_t1000_3_2022sep27
+# PA4_t200_2_2022nov23
+
 p_all_timepoints=ggplot(doubled[doubled$strain!='grande' & doubled$id_file!='2022nov23_gob385_2',], 
                         aes(x=strain, y=hours, fill=division_number_12, col=division_number_12))+
   facet_wrap(~timepoint, ncol=5, scales="free_x") +
@@ -932,7 +886,7 @@ p_all_timepoints=ggplot(doubled[doubled$strain!='grande' & doubled$id_file!='202
 p_all_timepoints
 
 
-doubled_no_pa4_t200_outlier=doubled[doubled$id_file!='2022nov23_gob385_2',]
+doubled_no_pa4_t200_outlier=doubled[!(doubled$complete_id %in% c("PA3_t200_4_2022nov23", "PA1_t1000_3_2022sep27", "PA4_t200_2_2022nov23")),]
 for (temp_timepoint in unique(doubled_no_pa4_t200_outlier$timepoint)){
   for (temp_strain in unique(doubled_no_pa4_t200_outlier[doubled_no_pa4_t200_outlier$timepoint==temp_timepoint,]$strain)){
     temp_strain_timepoint=paste(temp_strain, temp_timepoint, sep="_")
@@ -962,7 +916,7 @@ for (temp_timepoint in unique(doubled_no_pa4_t200_outlier$timepoint)){
 # [1] "PA1_t600: median=0 p=0.689629388955025  FALSE"
 # [1] "PA4_t200: median=10 p=0.041127523553486  FALSE"
 # [1] "PA5_t200: median=5 p=0.0928361420904245  FALSE"
-# [1] "PA3_t200: median=0 p=0.519740510434724  FALSE"
+# [1] "PA3_t200: median=0 p=0.633462638551858  FALSE"
 # [1] "PA1_t200: median=0 p=0.843582984142905  FALSE"
 # [1] "PA2_t200: median=0 p=0.503230809022216  FALSE"
 # [1] "petite_t0: median=32.5 p=3.77108895395933e-07  TRUE"
@@ -972,9 +926,14 @@ for (temp_timepoint in unique(doubled_no_pa4_t200_outlier$timepoint)){
 # ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_7_evolution_synchrony_PA_line_all_23feb2026.png',
 #        plot=p_all_timepoints, dpi='retina', width=6.5, height=3.5, bg='white')
 
-# not using timelapse 2022nov23_gob385_2 as it has higher doubling times that differ from the 2 other time lapses
-# of PA4 t200
-p_all_timepoints_no_outliers=ggplot(doubled[doubled$strain!='grande' & doubled$id_file!='2022nov23_gob385_2',], 
+
+# Removing the following time lapses because have higher variation than the rest
+# PA3_t200_4_2022nov23  == '2022nov23_gob385_2'
+# PA1_t1000_3_2022sep27
+# PA4_t200_2_2022nov23
+
+p_all_timepoints_no_outliers=ggplot(doubled[doubled$strain!='grande' &
+                                              !(doubled$complete_id %in% c("PA3_t200_4_2022nov23", "PA1_t1000_3_2022sep27", "PA4_t200_2_2022nov23")),], 
                         aes(x=strain, y=hours, fill=division_number_12, col=division_number_12))+
   facet_wrap(~timepoint, ncol=5, scales="free_x") +
   force_panelsizes(cols = c(1, 5, 5, 5, 5)) +
@@ -1047,8 +1006,8 @@ ggplot(cell_sync[cell_sync$timepoint!='t0',],
 
 
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_7_evolution_synchrony_PA_line_all_no_outliers_28aug2026.png',
-#        plot=p_all_timepoints_no_outliers, dpi='retina', width=6.5, height=3, bg='white')
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_7_evolution_synchrony_PA_line_all_no_outliers_8oct2026.png',
+       plot=p_all_timepoints_no_outliers, dpi='retina', width=6.5, height=3, bg='white')
 
 # View(doubled %>%
 #   group_by(strain_timepoint) %>%
@@ -1056,7 +1015,8 @@ ggplot(cell_sync[cell_sync$timepoint!='t0',],
 
 # Supplementary Figure 9 ####
 
-p_mother_daughter=ggplot(cell_sync[cell_sync$timepoint!='t0' & cell_sync$id_file!='2022nov23_gob385_2',], 
+p_mother_daughter=ggplot(cell_sync[cell_sync$timepoint!='t0' & 
+                                     !(cell_sync$complete_id %in% c("PA3_t200_4_2022nov23", "PA1_t1000_3_2022sep27", "PA4_t200_2_2022nov23")),], 
                             aes(x=mother_minutes, y=daughter_minutes, col=timepoint))+
   geom_point(alpha=0.5, size=1)+
   geom_abline(linetype='dashed')+
@@ -1079,7 +1039,7 @@ p_mother_daughter=ggplot(cell_sync[cell_sync$timepoint!='t0' & cell_sync$id_file
 p_mother_daughter
 
 
-cell_sync_no_pa4_t200_outlier=cell_sync[cell_sync$id_file!='2022nov23_gob385_2',]
+cell_sync_no_pa4_t200_outlier=cell_sync[!(cell_sync$complete_id %in% c("PA3_t200_4_2022nov23", "PA1_t1000_3_2022sep27", "PA4_t200_2_2022nov23")),]
 for (temp_timepoint in unique(cell_sync_no_pa4_t200_outlier$timepoint)){
   for (temp_strain in unique(cell_sync_no_pa4_t200_outlier[cell_sync_no_pa4_t200_outlier$timepoint==temp_timepoint,]$strain)){
     temp_strain_timepoint=paste(temp_strain, temp_timepoint, sep="_")
@@ -1096,7 +1056,7 @@ for (temp_timepoint in unique(cell_sync_no_pa4_t200_outlier$timepoint)){
 
 # [1] "PA1_t200: median=5 p-value= 0.00929154518699802  FALSE"
 # [1] "PA2_t200: median=0 p-value= 0.0918346064781602  FALSE"
-# [1] "PA3_t200: median=0 p-value= 0.505792044277484  FALSE"
+# [1] "PA3_t200: median=0 n=50 p-value= 0.81128248936315  FALSE"
 # [1] "PA4_t200: median=5 p-value= 0.00398595954631529  FALSE"
 # [1] "PA5_t200: median=0 p-value= 0.0381508024479592  FALSE"
 
@@ -1113,7 +1073,7 @@ for (temp_timepoint in unique(cell_sync_no_pa4_t200_outlier$timepoint)){
 # [1] "PA5_t600: median=0 p-value= 0.00025804651334413  TRUE" ###
 
 
-# [1] "PA1_t1000: median=0 p-value= 0.000447569467883027  TRUE" ###
+# [1] "PA1_t1000: median=0 n=132 p-value= 0.000447569467883027  TRUE"
 # [1] "PA2_t1000: median=0 p-value= 0.570581277021137  FALSE"
 # [1] "PA3_t1000: median=0 p-value= 0.0276433269884977  FALSE"
 # [1] "PA4_t1000: median=0 p-value= 0.420573936928138  FALSE"
@@ -1148,7 +1108,7 @@ for(temp_strain_timepoint in sort(unique(cell_sync_no_pa4_t200_outlier$strain_ti
 # [1] "PA2_t400: p=1.17047478773858e-13"
 # [1] "PA2_t600: p=3.2179058817524e-28"
 # [1] "PA3_t1000: p=5.85563586229025e-17"
-# [1] "PA3_t200: p=3.18438709250436e-16"
+# [1] "PA3_t200: p=9.04800502952605e-16"
 # [1] "PA3_t400: p=1.94486086214801e-26"
 # [1] "PA3_t600: p=2.04678584914912e-25"
 # [1] "PA4_t1000: p=2.06259001024433e-21"
@@ -1245,6 +1205,6 @@ ggplot(cell_sync[cell_sync$timepoint=='t200' & cell_sync$strain=='PA5',],
   )+
   NULL
 
-# ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_9_mother_daughter_synchrony_PA_line_all_28aug2026.png',
-#               plot=p_mother_daughter, dpi='retina', width=6.5, height=5.5, bg='white')
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig_9_mother_daughter_synchrony_PA_line_all_8oct2026.png',
+              plot=p_mother_daughter, dpi='retina', width=6.5, height=5.5, bg='white')
 
