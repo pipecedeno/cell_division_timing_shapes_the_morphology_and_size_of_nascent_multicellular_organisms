@@ -21,6 +21,7 @@ library(grid)
 library(see)
 library(gridExtra)
 library(metR)
+library(effsize)
 
 # setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/results_edge_degree_15/test_death_prob/more_parameters_alive_status')
 # setwd('~/work_dir/observed_synchrony/paper_results_edge_degree_15_2025may29/corrections_supreme_version_sep2026/supp_fig10_11_death_prob')
@@ -524,6 +525,29 @@ ggplot(mean_mean_clust_size, aes(x=death_percentage, y=mean, col=percentage_diff
   NULL
 
 
+ggplot(mean_mean_clust_size, aes(x=death_percentage, y=mean, col=factor(percentage_diff), group=factor(percentage_diff))) +
+  geom_point() +
+  geom_line() +
+  # geom_errorbar(aes(ymin=lower_ci, ymax=upper_ci), width=0.1) +
+  xlab('Death Probability') +
+  ylab('Mean fracture size') +
+  # color_diff_mean+
+  NULL
+
+
+linear_reg_df=data.frame()
+for (temp_percentage_diff in unique(mean_mean_clust_size$percentage_diff)){
+  temp_df=mean_mean_clust_size[mean_mean_clust_size$percentage_diff==temp_percentage_diff,]
+  
+  temp_p_val=summary(lm(temp_df$mean ~ temp_df$death_percentage))$coefficients[8]
+  
+  temp_row=data.frame(delay=temp_percentage_diff,
+                      p_val=temp_p_val,
+                      significant=temp_p_val<(0.05/21))
+  linear_reg_df=rbind(linear_reg_df, temp_row)
+}
+linear_reg_df
+
 ggplot(mean_clust_size[mean_clust_size$percentage_diff %in% c(-50, -25, 0, 25, 50),] %>%
          mutate(percentage_diff=factor(as.character(percentage_diff), levels=c("50", "25", "0", "-25", "-50"))), 
        aes(x=generation, y=mean_size, fill=percentage_diff, col=percentage_diff)) +
@@ -540,11 +564,12 @@ ggplot(mean_clust_size[mean_clust_size$percentage_diff %in% c(-50, -25, 0, 25, 5
 
 
 ggplot(mean_mean_clust_size, aes(x = death_percentage, y = percentage_diff, z = mean)) +
-  geom_contour_filled(breaks = seq(0, 2400, 300)) +
+  geom_contour_filled(bins=7) + # breaks = seq(0, 2400, 300)
   # scale_fill_viridis_d(name = "Fracture\nSize") +  # Use discrete scale
   scale_fill_brewer(palette = "Purples", name = "Fracture\nSize")+
   labs(x = "Death Probability", y = "Delay (% Second Division)") +
   theme_classic()+
+  geom_hline(yintercept = -45)+
   NULL
 
 
@@ -898,7 +923,7 @@ ggplot(diff_fragmentation_corrected[diff_fragmentation_corrected$cluster_generat
 
 ## Median and confidence interval of the median
 mean_frag_long <- diff_fragmentation_corrected %>%
-  filter(cluster_generation == 20) %>%
+  # filter(cluster_generation == 20) %>%
   pivot_longer(
     cols      = c(network_num_nodes, fragmentation_size_biophysics),
     names_to  = "model",
@@ -1128,7 +1153,7 @@ temp_df %>%
   group_by(model, death_percentage) %>%
   summarise(mean_size=mean(mean_frag))
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig14_apoptosis_comparison_models_19oct2026_median.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig14_apoptosis_comparison_models_25oct2026_median.png',
        plot=size_bifurcation_random, dpi='retina', width=5, height=3, bg='white')
 
 
@@ -1167,8 +1192,8 @@ for(temp_percentage_diff in unique(diff_frag_models_long$percentage_diff)){
   for(temp_death_percentage in unique(diff_frag_models_long$death_percentage)){
     temp_df=diff_frag_models_long[diff_frag_models_long$death_percentage==temp_death_percentage & 
                                     diff_frag_models_long$percentage_diff==temp_percentage_diff &
-                                    diff_frag_models_long$propagule_selection=='Random' & 
-                                    diff_frag_models_long$cluster_generation==20,]
+                                    diff_frag_models_long$propagule_selection=='Random',]
+    # & diff_frag_models_long$cluster_generation==20
     
     temp_median_network=median(temp_df[temp_df$model=='Network',]$mean_frag)
     temp_median_biophysic=median(temp_df[temp_df$model=='Biophysic',]$mean_frag)
@@ -1176,20 +1201,27 @@ for(temp_percentage_diff in unique(diff_frag_models_long$percentage_diff)){
     temp_pvalue_wilcox=wilcox.test(data=temp_df, mean_frag ~ model)$p.value
     # temp_pvalue_t_test=t.test(data=temp_df, mean_frag ~ model)$p.value
     
+    temp_cliff_delta_result=cliff.delta(data=temp_df, mean_frag ~ model)
+
     temp_row=data.frame(death_percentage=temp_death_percentage,
                         median_network=temp_median_network,
                         median_biophysic=temp_median_biophysic,
                         percentage_diff=temp_percentage_diff,
-                        p_value_wilcox=temp_pvalue_wilcox)
+                        p_value_wilcox=temp_pvalue_wilcox,
+                        cliff_delta=temp_cliff_delta_result$estimate,
+                        cliff_delta_magnitude=temp_cliff_delta_result$magnitude)
                         # , p_value_t_test=temp_pvalue_t_test
     results_model_comparison_df=rbind(results_model_comparison_df, temp_row)
   }
 }
 
-results_model_comparison_df$not_significant=results_model_comparison_df$p_value_wilcox>(0.05/15)
+results_model_comparison_df$significant=results_model_comparison_df$p_value_wilcox<(0.05/15)
 results_model_comparison_df[results_model_comparison_df$death_percentage==0,]
 # death prob = 0, 0.15 and 0.3; delays 0, 25 and 50 are not significant
 
+results_model_comparison_df[results_model_comparison_df$significant==FALSE,]
+
+# write.csv(results_model_comparison_df, "supp_apoptosis_models_comp_stats.csv", row.names = FALSE)
 
 pairwise.wilcox.test(diff_frag_models_long[diff_frag_models_long$model=="Biophysic" & 
                                                   diff_frag_models_long$percentage_diff<=0 & 
@@ -1205,6 +1237,6 @@ mean_frag_long[mean_frag_long$percentage_diff<=0 &
                  mean_frag_long$death_percentage==0 &
                  mean_frag_long$propagule_selection=='Random',]
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig14_comparison_models_19oct2026_median.png',
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/supp_fig11_comparison_models_25oct2026_median.png',
        plot=size_comp_no_apoptosis, dpi='retina', width=4, height=3, bg='white')
 

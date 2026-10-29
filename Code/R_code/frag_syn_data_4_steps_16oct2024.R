@@ -422,8 +422,16 @@ supp_net_prop_v4=plot_grid(clust_delay, clust_var,
                           label_size=10, rel_heights = c(1,1,1,0.1), rel_widths = c(1, 0.82))
 supp_net_prop_v4
 
-ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_5_effects_delay_variation_22sep2026.png',
-       plot=supp_net_prop_v4, dpi='retina', width=5.6, height=5.6, bg='white')
+supp_net_prop_v4_test=plot_grid(common_legend_variation, common_legend_delay,
+                           clust_delay, clust_var, 
+                           diam_delay, diam_var, 
+                           prop_delay, prop_var, 
+                           labels=c('','','A', 'B', 'C', 'D', 'E', 'F'), ncol=2, 
+                           label_size=10, rel_heights = c(0.1,1,1,1.17), rel_widths = c(1, 0.82))
+supp_net_prop_v4_test
+
+ggsave(filename='~/cell_division_timing_shapes_the_morphology_and_size_of_nascent_multicellular_organisms/Paper_figures/fig_5_effects_delay_variation_26oct2026.png',
+       plot=supp_net_prop_v4_test, dpi='retina', width=5.6, height=5.6, bg='white')
 
 
 
